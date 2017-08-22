@@ -9,6 +9,7 @@
     "test": "standard && npm run deps"
   },
   "dependencies": {
+    "loopbench": "^1.2.0",
     "pidusage": "^1.1.6"
   },
   "devDependencies": {

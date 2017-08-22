@@ -8,8 +8,8 @@ Aggregate stats from the Node VM.
 ```js
 var vmStats = require('vm-stats')
 
-vmStats(function (data) {
-  console.log(data)
+vmStats(function (eventName, data) {
+  console.log(eventName, data)
 })
 ```
 

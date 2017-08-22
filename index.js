@@ -1,4 +1,5 @@
 var ric = require('./lib/requestIdleCallback')
+var loopbench = require('loopbench')
 var pidUsage = require('pidusage')
 
 module.exports = vmStats
@@ -16,5 +17,13 @@ function vmStats (emit) {
         ric(gatherStats)
       }, 300)
     })
+  })
+
+  var instance = loopbench()
+  instance.on('load', function () {
+    emit('load', instance.delay)
+  })
+  instance.on('unload', function () {
+    emit('unload', instance.delay)
   })
 }

@@ -43,6 +43,9 @@ function vmStats (emit) {
     emit('unload', instance.delay)
   })
 
+  // Would be cool if we did a snapshot with an incremental backoff. Account
+  // for that if a service is running for a longer time, the chances of failing
+  // become increasingly slim.
   setTimeout(function () {
     snapshot(handle)
 

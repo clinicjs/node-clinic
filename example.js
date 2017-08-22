@@ -1,14 +1,29 @@
+var defaults = require('dat-swarm-defaults')
+var swarm = require('discovery-swarm')
 var hyperdrive = require('hyperdrive')
 var pretty = require('prettier-bytes')
 var vmStats = require('./')
 
-var drive = hyperdrive('/tmp/stats')
 var id = 'cat-server-01'
+
+var archive = hyperdrive('/tmp/stats')
+var sw = swarm(defaults({
+  id: archive.id,
+  hash: false,
+  tcp: false,
+  stream: () => archive.replicate({ live: true })
+}))
+
+sw.listen(3282)
+archive.on('ready', function () {
+  sw.join(archive.discoveryKey)
+  console.log('\nkey is', archive.discoveryKey.toString('hex') + '\n')
+})
 
 vmStats(function (name, data) {
   var now = ms(process.hrtime())
 
-  drive.writeFile(`/${id}/${name}/${now}`, JSON.stringify(data))
+  archive.writeFile(`/${id}/${name}/${now}`, JSON.stringify(data))
 
   if (name === 'memory') {
     console.log('memory used', pretty(data))

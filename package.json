@@ -9,11 +9,15 @@
     "test": "standard && npm run deps"
   },
   "dependencies": {
+    "heapdump": "^0.3.9",
+    "hyperdrive": "^9.5.1",
     "loopbench": "^1.2.0",
+    "on-async-hook": "^1.0.0",
     "pidusage": "^1.1.6"
   },
   "devDependencies": {
     "dependency-check": "^2.9.1",
+    "hyperdb": "^1.0.0-rc2",
     "prettier-bytes": "^1.0.4",
     "standard": "^10.0.2",
     "tape": "^4.8.0"

@@ -1,9 +1,11 @@
 var ric = require('./lib/requestIdleCallback')
+
 var onAsyncHook = require('on-async-hook')
 var loopbench = require('loopbench')
 var mapLimit = require('map-limit')
 var pidUsage = require('pidusage')
 var heapdump = require('heapdump')
+var gcStats = require('gc-stats')
 var path = require('path')
 var os = require('os')
 var fs = require('fs')
@@ -46,6 +48,11 @@ function vmStats (emit) {
   })
   instance.on('unload', function () {
     emit('unload', instance.delay)
+  })
+
+  var gc = gcStats()
+  gc.on('stats', function (stats) {
+    emit('gc', stats)
   })
 }
 

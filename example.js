@@ -35,6 +35,8 @@ vmStats(function (name, data) {
     console.log('event loop delay low', data + 'ms')
   } else if (name === 'heapsnapshot') {
     console.log('snapshot taken', pretty(data.length))
+  } else if (name === 'gc') {
+    console.log('garbage collected', pretty(data.diff.usedHeapSize).replace(' ', ''), Math.round(data.pause / 1e4) / 1e2 + 'ms')
   } else {
     console.log(name, data)
   }

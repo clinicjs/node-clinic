@@ -1,7 +1,7 @@
 {
-  "name": "vm-stats",
+  "name": "node-clinic",
   "description": "Aggregate stats from the Node VM",
-  "repository": "nearform/vm-stats",
+  "repository": "nearform/node-clinic",
   "version": "1.0.0",
   "scripts": {
     "deps": "dependency-check . && dependency-check . --extra --no-dev",

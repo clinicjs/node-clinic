@@ -2,7 +2,7 @@
 // var swarm = require('discovery-swarm')
 // var hyperdrive = require('hyperdrive')
 // var pretty = require('prettier-bytes')
-// var vmStats = require('./')
+// var nodeClinic = require('./')
 
 // var id = 'cat-server-01'
 
@@ -20,7 +20,7 @@
 //   console.log('\nkey is', archive.discoveryKey.toString('hex') + '\n')
 // })
 
-// vmStats(function (name, data) {
+// nodeClinic(function (name, data) {
 //   var now = ms(process.hrtime())
 
 //   archive.writeFile(`/${id}/${name}/${now}`, JSON.stringify(data))

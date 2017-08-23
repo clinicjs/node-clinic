@@ -10,9 +10,9 @@ var path = require('path')
 var os = require('os')
 var fs = require('fs')
 
-module.exports = vmStats
+module.exports = nodeClinic
 
-function vmStats (emit) {
+function nodeClinic (emit) {
   var pid = process.pid
 
   sequence(function () {

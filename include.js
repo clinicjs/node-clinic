@@ -1,7 +1,7 @@
 var defaults = require('dat-swarm-defaults')
 var swarm = require('discovery-swarm')
 var hyperdrive = require('hyperdrive')
-var vmStats = require('./')
+var nodeClinic = require('./')
 
 var archive = hyperdrive('/tmp/stats')
 var sw = swarm(defaults({
@@ -17,7 +17,7 @@ archive.on('ready', function () {
   console.log('\nkey is', archive.discoveryKey.toString('hex') + '\n')
 })
 
-vmStats(function (name, data) {
+nodeClinic(function (name, data) {
   var now = ms(process.hrtime())
   archive.writeFile(`/${name}/${now}`, JSON.stringify(data))
 })

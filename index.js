@@ -1,19 +1,24 @@
 var ric = require('./lib/requestIdleCallback')
 var onAsyncHook = require('on-async-hook')
 var loopbench = require('loopbench')
+var mapLimit = require('map-limit')
 var pidUsage = require('pidusage')
 var heapdump = require('heapdump')
 var path = require('path')
 var os = require('os')
 var fs = require('fs')
 
-var SNAPSHOT_INTERVAL = 1000 * 60 * 20 // every 20 mins
-
 module.exports = vmStats
 
-// Gather VM stats when process is idle, and at max. 3x per second.
 function vmStats (emit) {
   var pid = process.pid
+
+  sequence(function () {
+    snapshot(function (err, buf) {
+      if (err) emit('error', err)
+      emit('heapsnapshot', buf)
+    })
+  })
 
   ric(function gatherStats (remaining) {
     pidUsage.stat(pid, function (_, stat) {
@@ -42,22 +47,6 @@ function vmStats (emit) {
   instance.on('unload', function () {
     emit('unload', instance.delay)
   })
-
-  // TODO: Would be cool if we did a snapshot with an incremental backoff.
-  // Account for that if a service is running for a longer time, the chances of
-  // failing become increasingly slim.
-  setTimeout(function () {
-    snapshot(handle)
-
-    setInterval(function () {
-      snapshot(handle)
-    }, SNAPSHOT_INTERVAL)
-
-    function handle (err, buf) {
-      if (err) emit('error', err)
-      emit('heapsnapshot', buf)
-    }
-  })
 }
 
 function snapshot (cb) {
@@ -72,4 +61,25 @@ function snapshot (cb) {
       })
     })
   })
+}
+
+function sequence (cb) {
+  var arr = [
+    1000 * 10 * 1,
+    1000 * 60 * 5,
+    1000 * 60 * 10,
+    1000 * 60 * 20
+  ]
+
+  mapLimit(arr, Infinity, iterator, function (err) {
+    if (err) return cb(err)
+    setInterval(cb, 60 * 30)
+  })
+
+  function iterator (val, done) {
+    setTimeout(function () {
+      cb()
+      done()
+    }, val)
+  }
 }

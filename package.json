@@ -14,6 +14,7 @@
     "heapdump": "^0.3.9",
     "hyperdrive": "^9.5.1",
     "loopbench": "^1.2.0",
+    "map-limit": "0.0.1",
     "on-async-hook": "^1.0.0",
     "pidusage": "^1.1.6"
   },

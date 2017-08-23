@@ -2,15 +2,13 @@
 [![npm version][2]][3] [![build status][4]][5]
 [![downloads][8]][9] [![js-standard-style][10]][11]
 
-Aggregate stats from the Node VM.
+Aggregate stats from the Node VM, and expose them over the network for later
+analysis.
 
 ## Usage
-```js
-var vmStats = require('vm-stats')
-
-vmStats(function (eventName, data) {
-  console.log(eventName, data)
-})
+```sh
+$ node-clinic index.js
+# => returns an archive key
 ```
 
 ## License

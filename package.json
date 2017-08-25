@@ -3,12 +3,16 @@
   "description": "Aggregate stats from the Node VM",
   "repository": "nearform/node-clinic",
   "version": "1.0.0",
+  "bin": {
+    "node-clinic": "./bin.js"
+  },
   "scripts": {
     "deps": "dependency-check . && dependency-check . --extra --no-dev",
     "start": "node .",
     "test": "standard && npm run deps"
   },
   "dependencies": {
+    "ansi-escape-sequences": "^4.0.0",
     "dat-swarm-defaults": "^1.0.0",
     "discovery-swarm": "^4.4.2",
     "gc-stats": "^1.0.2",
@@ -18,7 +22,8 @@
     "map-limit": "0.0.1",
     "minimist": "^1.2.0",
     "on-async-hook": "^1.0.0",
-    "pidusage": "^1.1.6"
+    "pidusage": "^1.1.6",
+    "pino": "^4.7.1"
   },
   "devDependencies": {
     "dependency-check": "^2.9.1",

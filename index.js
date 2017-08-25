@@ -10,21 +10,24 @@ var path = require('path')
 var os = require('os')
 var fs = require('fs')
 
+var maxMem = os.totalmem()
+
 module.exports = nodeClinic
 
 function nodeClinic (emit) {
   var pid = process.pid
 
   sequence(function () {
-    snapshot(function (err, buf) {
+    snapshot(function (err, obj) {
       if (err) emit('error', err)
-      emit('heapsnapshot', buf)
+      emit('heapsnapshot', obj)
     })
   })
 
   ric(function gatherStats (remaining) {
     pidUsage.stat(pid, function (_, stat) {
-      emit('memory', stat.memory)
+      var mem = stat.memory / maxMem
+      emit('memory', mem)
       emit('cpu', stat.cpu)
 
       setTimeout(function () {
@@ -64,7 +67,10 @@ function snapshot (cb) {
       if (err) return cb(err)
       fs.unlink(filename, function (err) {
         if (err) return cb(err)
-        cb(null, buf)
+        cb(null, {
+          data: buf,
+          path: filename
+        })
       })
     })
   })

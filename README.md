@@ -2,15 +2,30 @@
 [![npm version][2]][3] [![build status][4]][5]
 [![downloads][8]][9] [![js-standard-style][10]][11]
 
-Aggregate stats from the Node VM, and expose them over the network for later
-analysis.
+Aggregate stats from the Node VM, and expose them for later analysis.
 
 ## Usage
-```sh
-$ node-clinic index.js
+```txt
+  $ node-clinic <entry-file> [options]
+
+  Options:
+
+    -h, --help        print usage
+    -v, --version     print version
+
+  Examples:
+
+    Debug a node application
+    $ node-clinic
+
+  Running into trouble? Feel free to file an issue:
+  https://github.com/nearform/node-clinic/issues/new
+
+  Do you enjoy using this software? nearForm is hiring!
+  https://www.nearform.com/careers/
 ```
 
-## Output example
+## Example Output
 ```txt
 {"pid":86684,"hostname":"anons-MacBook.local","level":10,"time":1503668805287,"msg":"stats","type":"memory","data":0.004611492156982422,"v":1}
 {"pid":86684,"hostname":"anons-MacBook.local","level":10,"time":1503668805290,"msg":"stats","type":"cpu","data":95.5,"v":1}

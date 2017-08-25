@@ -7,17 +7,13 @@
     "node-clinic": "./bin.js"
   },
   "scripts": {
-    "deps": "dependency-check . && dependency-check . --extra --no-dev",
     "start": "node .",
-    "test": "standard && npm run deps"
+    "test": "standard"
   },
   "dependencies": {
     "ansi-escape-sequences": "^4.0.0",
-    "dat-swarm-defaults": "^1.0.0",
-    "discovery-swarm": "^4.4.2",
     "gc-stats": "^1.0.2",
     "heapdump": "^0.3.9",
-    "hyperdrive": "^9.5.1",
     "loopbench": "^1.2.0",
     "map-limit": "0.0.1",
     "minimist": "^1.2.0",
@@ -26,7 +22,6 @@
     "pino": "^4.7.1"
   },
   "devDependencies": {
-    "dependency-check": "^2.9.1",
     "hyperdb": "^1.0.0-rc2",
     "prettier-bytes": "^1.0.4",
     "standard": "^10.0.2",

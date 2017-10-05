@@ -1,7 +1,1 @@
 node_modules/
-coverage/
-tmp/
-dist/
-npm-debug.log*
-.DS_Store
-.nyc_output

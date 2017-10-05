@@ -4,28 +4,15 @@
   "repository": "nearform/node-clinic",
   "version": "1.0.0",
   "bin": {
-    "node-clinic": "./bin.js"
+    "node-clinic": "./bin/node-clinic.js"
   },
   "scripts": {
     "start": "node .",
     "test": "standard"
   },
   "dependencies": {
-    "ansi-escape-sequences": "^4.0.0",
-    "gc-stats": "^1.0.2",
-    "heapdump": "^0.3.9",
-    "loopbench": "^1.2.0",
-    "map-limit": "0.0.1",
-    "minimist": "^1.2.0",
-    "on-async-hook": "^1.0.0",
-    "pidusage": "^1.1.6",
-    "pino": "^4.7.1"
   },
   "devDependencies": {
-    "hyperdb": "^1.0.0-rc2",
-    "prettier-bytes": "^1.0.4",
-    "standard": "^10.0.2",
-    "tape": "^4.8.0"
   },
   "keywords": [
     "vm",

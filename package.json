@@ -7,16 +7,15 @@
     "node-clinic": "./bin/node-clinic.js"
   },
   "scripts": {
-    "start": "node .",
-    "test": "standard"
+    "test": "standard | snazzy && tap --no-cov doctor/test/*.test.js",
+    "ci": "standard | snazzy && tap --cov doctor/test/*.test.js"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
+    "snazzy": "^7.0.0",
+    "standard": "^10.0.3",
+    "tap": "^10.7.2"
   },
-  "keywords": [
-    "vm",
-    "stats"
-  ],
+  "keywords": [],
   "license": "MIT"
 }

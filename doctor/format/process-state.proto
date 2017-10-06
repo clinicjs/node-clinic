@@ -1,0 +1,13 @@
+message ProcessState {
+  required double delay = 1;
+  required double cpu = 2;
+  required Memory memory = 3;
+  required int32 handles = 4;
+
+  message Memory {
+    required double rss = 1;
+    required double heapTotal = 2;
+    required double heapUsed = 3;
+    required double external = 4;
+  }
+}

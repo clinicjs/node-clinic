@@ -11,7 +11,8 @@
     "ci": "standard | snazzy && tap --cov doctor/test/*.test.js"
   },
   "dependencies": {
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "protocol-buffers": "^3.2.1"
   },
   "devDependencies": {
     "snazzy": "^7.0.0",

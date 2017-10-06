@@ -4,13 +4,15 @@
   "repository": "nearform/node-clinic",
   "version": "1.0.0",
   "bin": {
-    "node-clinic": "./bin/node-clinic.js"
+    "clinic": "./bin/clinic.js"
   },
   "scripts": {
     "test": "standard | snazzy && tap --no-cov doctor/test/*.test.js",
     "ci": "standard | snazzy && tap --cov doctor/test/*.test.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "minimist": "^1.2.0"
+  },
   "devDependencies": {
     "snazzy": "^7.0.0",
     "standard": "^10.0.3",

@@ -1,5 +1,6 @@
+'use strict'
 
-var test = require('tap').test
+const test = require('tap').test
 const ProcessState = require('../collect/process-state.js')
 
 test('number of handles', function (t) {
@@ -40,7 +41,7 @@ test('cpu usage', function (t) {
   state.refresh()
   sleep(20)
   const sample = state.sample()
-  t.ok(sample.cpu >= 0.8 && sample.cpu <= 1, 'sleep has high usage')
+  t.ok(sample.cpu >= 0.7 && sample.cpu <= 1, 'sleep has high usage')
 
   state.refresh()
   setTimeout(function () {

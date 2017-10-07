@@ -10,6 +10,7 @@ const messages = protobuf(
 )
 
 const objectSize = messages.ProcessState.encodingLength({
+  timestamp: 0,
   delay: 0,
   cpu: 0,
   memory: {

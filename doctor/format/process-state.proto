@@ -1,8 +1,9 @@
 message ProcessState {
-  required double delay = 1;
-  required double cpu = 2;
-  required Memory memory = 3;
-  required int32 handles = 4;
+  required double timestamp = 1;
+  required double delay = 2;
+  required double cpu = 3;
+  required Memory memory = 4;
+  required int32 handles = 5;
 
   message Memory {
     required double rss = 1;

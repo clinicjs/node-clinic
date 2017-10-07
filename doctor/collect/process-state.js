@@ -37,6 +37,7 @@ class ProcessState {
     const elapsedTime = hrtime2ms(process.hrtime(this._lastSampleTime))
 
     return {
+      timestamp: Date.now(),
       delay: this._sampleDelay(elapsedTime),
       cpu: this._sampleCpuUsage(elapsedTime),
       memory: process.memoryUsage(),

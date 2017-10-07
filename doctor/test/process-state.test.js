@@ -3,6 +3,13 @@
 const test = require('tap').test
 const ProcessState = require('../collect/process-state.js')
 
+test('timestamp', function (t) {
+  const state = new ProcessState(1)
+  const sample = state.sample()
+  t.ok(sample.timestamp > Date.now() - 100 && sample.timestamp <= Date.now())
+  t.end()
+})
+
 test('number of handles', function (t) {
   const state = new ProcessState(1)
   const sample = state.sample()

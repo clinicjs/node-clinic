@@ -22,13 +22,13 @@ Aggregate stats from the Node VM, and expose them for later analysis.
 
   You can then transfer the data and visualize it locally:
 
-     clinic doctor --visualize
+     clinic doctor --visualize-only 518.clinic-doctor-sample
 
   Flags
-  -h | --help       Display Help
-  -v | --version    Display Version
-  --collect-only    Do not process data on terminiation
-  --visualize-only  Build or rebuild visualization from data
+  -h | --help                Display Help
+  -v | --version             Display Version
+  --collect-only             Do not process data on terminiation
+  --visualize-only datapath  Build or rebuild visualization from data
 ```
 
 ## License

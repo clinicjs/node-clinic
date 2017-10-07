@@ -19,14 +19,16 @@ const argv = minimist(args, {
   boolean: [
     'help',
     'version',
-    'collect-only',
+    'collect-only'
+  ],
+  string: [
     'visualize-only'
   ]
 })
 
 // get executable parameters, by removeing everything before the first
 // unrecognized option. Note, this only works because there are only
-// boolean parameters.
+// boolean parameters when collecting data.
 const extra = process.argv.slice(process.argv.indexOf(argv._[0], 2))
 
 // First check the tool, then check the --version and --help arguments.
@@ -49,19 +51,22 @@ function runTool (Tool) {
   const tool = new Tool()
 
   if (argv['collect-only']) {
-    tool.collect(extra, handleError)
+    tool.collect(extra, function (err, filename) {
+      if (err) throw err
+      console.log(`output file is ${filename}`)
+    })
   } else if (argv['visualize-only']) {
-    tool.visualize(handleError)
+    tool.visualize(argv['visualize-only'], function (err) {
+      if (err) throw err
+    })
   } else {
-    tool.collect(extra, function (err) {
-      if (err) handleError(err)
-      tool.visualize(handleError)
+    tool.collect(extra, function (err, filename) {
+      if (err) throw err
+      tool.visualize(filename, function (err) {
+        if (err) throw err
+      })
     })
   }
-}
-
-function handleError (err) {
-  if (err) throw err
 }
 
 function printVersion () {

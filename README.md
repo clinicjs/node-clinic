@@ -6,24 +6,29 @@ Aggregate stats from the Node VM, and expose them for later analysis.
 
 ## Usage
 ```txt
-  node-clinic [flags] file.js
-  node-clinic [flags] node [node-flags] file.js
+  Clinic
 
-  Options:
+  As a first step, run the clinic doctor:
 
-    -h, --help        print usage
-    -v, --version     print version
+     clinic doctor node server.js
 
-  Examples:
+  To debug asynchronous issues and event loop issues, use clinic bubbleprof:
 
-    Debug a node application
-    $ node-clinic node my-app.js
+     clinic bubbleprof node server.js
 
-  Running into trouble? Feel free to file an issue:
-  https://github.com/nearform/node-clinic/issues/new
+  On the server, it can be useful to only do data collection:
 
-  Do you enjoy using this software? nearForm is hiring!
-  https://www.nearform.com/careers/
+     clinic doctor --collect-only node server.js
+
+  You can then transfer the data and visualize it locally:
+
+     clinic doctor --visualize
+
+  Flags
+  -h | --help       Display Help
+  -v | --version    Display Version
+  --collect-only    Do not process data on terminiation
+  --visualize-only  Build or rebuild visualization from data
 ```
 
 ## License

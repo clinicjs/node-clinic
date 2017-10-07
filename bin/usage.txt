@@ -18,7 +18,7 @@
      [33mclinic doctor --visualize[39m
 
   [0m[36m[1mFlags[22m[39m[0m
-  -h | --help      Display Help
-  -v | --version   Display Version
-  --collect-only   Do not process data on terminiation
-  --visualize      Build or rebuild visualization from data
+  -h | --help       Display Help
+  -v | --version    Display Version
+  --collect-only    Do not process data on terminiation
+  --visualize-only  Build or rebuild visualization from data

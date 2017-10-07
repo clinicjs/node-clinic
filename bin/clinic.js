@@ -19,7 +19,7 @@ const argv = minimist(args, {
     'help',
     'version',
     'collect-only',
-    'visualize'
+    'visualize-only'
   ]
 })
 
@@ -32,9 +32,9 @@ const extra = process.argv.slice(process.argv.indexOf(argv._[0], 2))
 // This is to prevent `clinic doctor node script.js --help` from printing
 // the help text.
 if (tool === 'doctor') {
-  require('./doctor/bin.js')(argv, extra)
+  runTool(require('./doctor'))
 } else if (tool === 'bubbleprof') {
-  require('./bubbleprof/bin.js')(argv, extra)
+  runTool(require('./bubbleprof'))
 } else if (argv.version) {
   printVersion()
 } else if (argv.help) {
@@ -42,6 +42,25 @@ if (tool === 'doctor') {
 } else {
   printHelp()
   process.exit(1)
+}
+
+function runTool (Tool) {
+  const tool = new Tool(extra)
+
+  if (argv['collect-only']) {
+    tool.collect(handleError)
+  } else if (argv['visualize-only']) {
+    tool.visualize(handleError)
+  } else {
+    tool.collect(function (err) {
+      if (err) handleError(err)
+      tool.visualize(handleError)
+    })
+  }
+}
+
+function handleError (err) {
+  if (err) throw err
 }
 
 function printVersion () {

@@ -1,4 +1,5 @@
 #! /usr/bin/env node
+'use strict'
 
 const fs = require('fs')
 const path = require('path')
@@ -45,14 +46,14 @@ if (tool === 'doctor') {
 }
 
 function runTool (Tool) {
-  const tool = new Tool(extra)
+  const tool = new Tool()
 
   if (argv['collect-only']) {
-    tool.collect(handleError)
+    tool.collect(extra, handleError)
   } else if (argv['visualize-only']) {
     tool.visualize(handleError)
   } else {
-    tool.collect(function (err) {
+    tool.collect(extra, function (err) {
       if (err) handleError(err)
       tool.visualize(handleError)
     })

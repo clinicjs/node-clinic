@@ -35,9 +35,9 @@ const extra = process.argv.slice(process.argv.indexOf(argv._[0], 2))
 // This is to prevent `clinic doctor node script.js --help` from printing
 // the help text.
 if (tool === 'doctor') {
-  runTool(require('./doctor'))
+  runTool(require('../doctor'))
 } else if (tool === 'bubbleprof') {
-  runTool(require('./bubbleprof'))
+  runTool(require('../bubbleprof'))
 } else if (argv.version) {
   printVersion()
 } else if (argv.help) {
@@ -56,13 +56,17 @@ function runTool (Tool) {
       console.log(`output file is ${filename}`)
     })
   } else if (argv['visualize-only']) {
-    tool.visualize(argv['visualize-only'], function (err) {
-      if (err) throw err
-    })
+    tool.visualize(
+      argv['visualize-only'],
+      argv['visualize-only'] + '.html',
+      function (err) {
+        if (err) throw err
+      }
+    )
   } else {
     tool.collect(extra, function (err, filename) {
       if (err) throw err
-      tool.visualize(filename, function (err) {
+      tool.visualize(filename, filename + '.html', function (err) {
         if (err) throw err
       })
     })

@@ -11,8 +11,15 @@
     "ci": "standard | snazzy && tap --cov doctor/test/*.test.js"
   },
   "dependencies": {
+    "base64-stream": "^0.1.3",
+    "brfs": "^1.4.3",
+    "browserify": "^14.4.0",
+    "d3": "^4.11.0",
     "minimist": "^1.2.0",
-    "protocol-buffers": "^3.2.1"
+    "protocol-buffers": "^3.2.1",
+    "pump": "^1.0.2",
+    "startpoint": "^0.3.2",
+    "stream-template": "0.0.4"
   },
   "devDependencies": {
     "rimraf": "^2.6.2",

@@ -12,11 +12,17 @@ menu.on('toggle-theme', function () {
 
 menu.on('toggle-grid', function () {
   document.documentElement.classList.toggle('grid-layout')
+  graph.draw()
 })
 
 loaddata(function maybeDone (err, data) {
   if (err) throw err
 
-  graph.draw(data, { width: window.innerWidth, height: 180 })
+  graph.data(data)
+  graph.draw()
   recomendation.draw(data)
+
+  window.addEventListener('resize', function () {
+    graph.draw()
+  })
 })

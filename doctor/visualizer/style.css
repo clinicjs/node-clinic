@@ -44,6 +44,44 @@ body {
   background: var(--main-bg-color);
 }
 
+#graph {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 200px 200px 200px 200px;
+  grid-template-areas:
+    "cpu"
+    "memory"
+    "delay"
+    "handles";
+  grid-column-gap: 20px;
+  grid-row-gap: 50px;
+  margin-right: 20px;
+}
+
+html.grid-layout #graph {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 200px 200px;
+  grid-template-areas:
+    "cpu memory"
+    "delay handles";
+}
+
+#graph .graph.cpu {
+  grid-area: cpu;
+}
+
+#graph .graph.memory {
+  grid-area: memory;
+}
+
+#graph .graph.delay {
+  grid-area: delay;
+}
+
+#graph .graph.handles {
+  grid-area: handles;
+}
+
 /* Typography */
 
 html {
@@ -104,14 +142,9 @@ html.light-theme #toggle-theme {
 /* Graph layout */
 .graph .header {
   /* margin-left: is the `graph g[margin-left] - .domain[stroke-width]` */
-  margin: 50px 20px 0 48px;
+  margin: 0 20px 0 48px;
   color: var(--graph-text-color);
   font-size: 12pt;
-}
-
-.graph:first-of-type .header {
-  /* the first header has no top-margin */
-  margin-top: 0px;
 }
 
 .graph .header .name::after {

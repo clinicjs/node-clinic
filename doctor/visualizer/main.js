@@ -15,10 +15,14 @@ menu.on('toggle-grid', function () {
   graph.draw()
 })
 
+graph.on('hover-show', () => graph.hoverShow())
+graph.on('hover-hide', () => graph.hoverHide())
+graph.on('hover-update', (unitX) => graph.hoverUpdate(unitX))
+
 loaddata(function maybeDone (err, data) {
   if (err) throw err
 
-  graph.data(data)
+  graph.setData(data)
   graph.draw()
   recomendation.draw(data)
 

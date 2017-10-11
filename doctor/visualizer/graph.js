@@ -4,6 +4,7 @@ const EventEmitter = require('events')
 
 // size = {width, height}
 const margin = {top: 20, right: 20, bottom: 30, left: 50}
+const headerHeight = 18
 
 // https://bl.ocks.org/d3noob/402dd382a51a4f6eea487f9a35566de0
 class SubGraph extends EventEmitter {
@@ -17,7 +18,7 @@ class SubGraph extends EventEmitter {
       .classed('graph', true)
       .classed(setup.className, true)
 
-    // Add headline
+    // add headline
     this.header = this.container.append('div')
       .classed('header', true)
     this.header.append('span')
@@ -27,11 +28,30 @@ class SubGraph extends EventEmitter {
       .classed('unit', true)
       .text(this.setup.unit)
 
+    // add hover box
+    this.hover = new HoverBox(this.container, this.setup)
+
     // setup graph area
     this.svg = this.container.append('svg')
+      .classed('chart', true)
     this.graph = this.svg.append('g')
-        .attr('transform',
-              'translate(' + margin.left + ',' + margin.top + ')')
+      .attr('transform',
+            'translate(' + margin.left + ',' + margin.top + ')')
+
+    // setup hover events
+    this.hoverArea = this.container.append('div')
+      .classed('hover-area', true)
+      .style('left', margin.left + 'px')
+      .style('top', margin.top + 'px')
+      .on('mousemove', () => {
+        const positionX = d3.mouse(this.graph.node())[0]
+        if (positionX >= 0) {
+          const unitX = this.xScale.invert(positionX)
+          this.emit('hover-update', unitX)
+        }
+      })
+      .on('mouseleave', () => this.emit('hover-hide'))
+      .on('mouseenter', () => this.emit('hover-show'))
 
     // add background node
     this.background = this.graph.append('rect')
@@ -73,7 +93,7 @@ class SubGraph extends EventEmitter {
     }
   }
 
-  data (data) {
+  setData (data) {
     // Update domain of scales
     this.xScale.domain(d3.extent(data, function (d) { return d.x }))
 
@@ -98,7 +118,12 @@ class SubGraph extends EventEmitter {
   draw () {
     const { width, height } = this.getGraphSize()
 
-    // add background size
+    // set hover area size
+    this.hoverArea
+      .style('width', width + 'px')
+      .style('height', height + 'px')
+
+    // set background size
     this.background
       .attr('width', width)
       .attr('height', height)
@@ -118,6 +143,140 @@ class SubGraph extends EventEmitter {
     for (let i = 0; i < this.setup.numLines; i++) {
       this.lineElements[i].attr('d', this.lineDrawers[i])
     }
+
+    // since the xScale was changed, update the hover box
+    if (this.hover.showen) {
+      this.hoverUpdate(this.hover.point)
+    }
+  }
+
+  hoverShow () {
+    this.hover.show()
+  }
+
+  hoverHide () {
+    this.hover.hide()
+  }
+
+  hoverUpdate (point) {
+    if (!this.hover.showen) return;
+
+    // get position of curve there is at the top
+    const xInGraphPositon = this.xScale(point.x)
+    const yInGraphPositon = this.yScale(Math.max(...point.y))
+
+    // calculate graph position relative to `this.container`.
+    // The `this.container` has `position:relative`, which is why that is
+    // the origin.
+    const xPosition = xInGraphPositon + margin.left
+    const yPosition = yInGraphPositon + margin.top + headerHeight
+
+    this.hover.setPoint(point)
+    this.hover.setPosition(xPosition, yPosition)
+    this.hover.setDate(point.x)
+    this.hover.setData(point.y.map((v) => this.yScale.tickFormat()(v)))
+  }
+}
+
+class HoverBox {
+  constructor (container, setup) {
+    this.container = container
+    this.setup = setup
+    this.showen = false
+    this.point = null
+
+    const size = {
+      titleHeight: 36,
+      lineWidth: 1,
+      marginTop: 3,
+      marginBottom: 3,
+      lengedHeight: 28,
+      pointHeight: 10
+    }
+    const lengedTopOffset = size.titleHeight + size.lineWidth +
+                           size.marginTop
+    const hoverBoxHeight = lengedTopOffset + size.marginBottom +
+                           this.setup.numLines * size.lengedHeight
+    this.height = hoverBoxHeight + size.pointHeight
+    this.width = 136
+
+    // create main svg element
+    this.svg = this.container.append('svg')
+      .classed('hover', true)
+      .attr('width', this.width)
+      .attr('height', this.height)
+
+    // create background
+    this.svg.append('rect')
+      .classed('background', true)
+      .attr('rx', 5)
+      .attr('width', this.width)
+      .attr('height', hoverBoxHeight)
+    this.svg.append('path')
+      .classed('pointer', true)
+      .attr('d', `M${this.width / 2 - size.pointHeight} ${hoverBoxHeight} ` +
+                 `L${this.width / 2} ${this.height} ` +
+                 `L${this.width / 2 + size.pointHeight} ${hoverBoxHeight} Z`)
+    this.svg.append('rect')
+      .classed('line', true)
+      .attr('width', this.width)
+      .attr('height', size.lineWidth)
+      .attr('y', size.titleHeight)
+
+    // create title text
+    this.title = this.svg.append('text')
+      .classed('title', true)
+      .attr('y', 5)
+      .attr('x', this.width / 2)
+      .attr('dy', '1em')
+
+    // create content text
+    this.values = []
+    for (let i = 0; i < this.setup.numLines; i++) {
+      this.svg.append('text')
+        .classed('legend', true)
+        .attr('y', lengedTopOffset + i * size.lengedHeight)
+        .attr('dy', '1em')
+        .attr('x', 12)
+        .text(this.setup.shortLenged[i])
+
+      const valueText = this.svg.append('text')
+        .classed('value', true)
+        .attr('y', lengedTopOffset + i * size.lengedHeight)
+        .attr('dy', '1em')
+        .attr('x', 72)
+      this.values.push(valueText)
+    }
+  }
+
+  setPoint (point) {
+    this.point = point;
+  }
+
+  setPosition (x, y) {
+    this.svg
+      .style('top', Math.round(y - this.height) + 'px')
+      .style('left', Math.round(x - this.width / 2) + 'px')
+  }
+
+  setDate (date) {
+    this.title.text(d3.timeFormat("%H:%M:%S.%L")(date))
+  }
+
+  setData (data) {
+    for (let i = 0; i < this.setup.numLines; i++) {
+      this.values[i].text(data[i] + ' ' + this.setup.unit)
+    }
+  }
+
+  show () {
+    this.showen = true
+    this.svg.classed('visible', true)
+  }
+
+  hide () {
+    this.showen = false
+    this.svg.classed('visible', false)
   }
 }
 
@@ -125,12 +284,14 @@ class Graph extends EventEmitter {
   constructor () {
     super()
 
+    this.data = null
     this.container = d3.select('#graph')
 
     this.cpu = new SubGraph(this.container, {
       className: 'cpu',
       name: 'CPU Usage',
       unit: '%',
+      shortLenged: ['Usage'],
       ymin: 0,
       ymax: 100,
       numLines: 1
@@ -141,6 +302,7 @@ class Graph extends EventEmitter {
       name: 'Memory Usage',
       unit: 'GB',
       legend: ['RSS', 'Total Heap Allocated', 'Heap Used'],
+      shortLenged: ['RSS', 'THA', 'HU'],
       ymin: 0,
       numLines: 3
     })
@@ -149,6 +311,7 @@ class Graph extends EventEmitter {
       className: 'delay',
       name: 'Event Loop Delay',
       unit: 'ms',
+      shortLenged: ['Delay'],
       ymin: 0,
       numLines: 1
     })
@@ -157,16 +320,60 @@ class Graph extends EventEmitter {
       className: 'handles',
       name: 'Alive Handles',
       unit: '',
+      shortLenged: ['Handles'],
       ymin: 0,
       numLines: 1
     })
+
+    // relay events
+    for (const subgraph of [this.cpu, this.memory, this.delay, this.handles]) {
+      subgraph.on('hover-update', (unitX) => this.emit('hover-update', unitX))
+      subgraph.on('hover-show', () => this.emit('hover-show'))
+      subgraph.on('hover-hide', () => this.emit('hover-hide'))
+    }
   }
 
-  data (data) {
-    this.cpu.data(data.cpu)
-    this.memory.data(data.memory)
-    this.delay.data(data.delay)
-    this.handles.data(data.handles)
+  hoverUpdate (unitX) {
+    if (this.data === null) {
+      throw new Error('data not loaded')
+    }
+
+    const points = this.data.getPoints(unitX)
+    this.cpu.hoverUpdate(points.cpu)
+    this.memory.hoverUpdate(points.memory)
+    this.delay.hoverUpdate(points.delay)
+    this.handles.hoverUpdate(points.handles)
+  }
+
+  hoverShow () {
+    if (this.data === null) {
+      throw new Error('data not loaded')
+    }
+
+    this.cpu.hoverShow()
+    this.memory.hoverShow()
+    this.delay.hoverShow()
+    this.handles.hoverShow()
+  }
+
+  hoverHide () {
+    if (this.data === null) {
+      throw new Error('data not loaded')
+    }
+
+    this.cpu.hoverHide()
+    this.memory.hoverHide()
+    this.delay.hoverHide()
+    this.handles.hoverHide()
+  }
+
+  setData (data) {
+    this.data = data
+
+    this.cpu.setData(data.cpu)
+    this.memory.setData(data.memory)
+    this.delay.setData(data.delay)
+    this.handles.setData(data.handles)
   }
 
   draw () {

@@ -167,11 +167,72 @@ html.light-theme #toggle-theme {
   height: 18px;
   color: var(--graph-text-color);
   font-size: 12pt;
+  overflow: hidden;
 }
 
-.graph .header .name::after {
+.graph .header .title {
+  float: left;
+  height: 18px;
+  margin-right: 20px;
+}
+
+.graph .header .title .name::after {
   content: ' ';
 }
+
+.graph .header .legend {
+  float: left;
+  height: 18px;
+  overflow: hidden;
+}
+
+.graph .header .legend .legend-item {
+  float: left;
+  height: 18px;
+  margin-left: 20px;
+  overflow: hidden;
+}
+
+.graph .header .legend .legend-item svg {
+  float: left;
+  margin-right: 6px;
+}
+
+.graph .header .legend .legend-item svg line {
+  stroke-width: 2px;
+  stroke: var(--graph-good-line-color);
+}
+
+.graph .header .legend .legend-item span {
+  float: left;
+  font-size: 10pt;
+  line-height: 18px;
+}
+
+.graph .header .legend .legend-item .short-legend {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .graph .header .legend .legend-item .long-legend {
+    display: none;
+  }
+
+  .graph .header .legend .legend-item .short-legend {
+    display: unset;
+  }
+}
+
+@media (max-width: 1280px) {
+  html.grid-layout .graph .header .legend .legend-item .long-legend {
+    display: none;
+  }
+
+  html.grid-layout .graph .header .legend .legend-item .short-legend {
+    display: unset;
+  }
+}
+
 
 .graph .hover-area {
   position: absolute;

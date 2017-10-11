@@ -21,12 +21,42 @@ class SubGraph extends EventEmitter {
     // add headline
     this.header = this.container.append('div')
       .classed('header', true)
-    this.header.append('span')
+    this.title = this.header.append('div')
+      .classed('title', true)
+    this.title.append('span')
       .classed('name', true)
       .text(this.setup.name)
-    this.header.append('span')
+    this.title.append('span')
       .classed('unit', true)
       .text(this.setup.unit)
+
+    // add legned
+    if (setup.showLegend) {
+      const legend = this.header.append('div')
+        .classed('legend', true)
+
+      for (let i = 0; i < this.setup.numLines; i++) {
+        const legendItem = legend.append('div')
+          .classed('legend-item', true)
+
+        legendItem.append('svg')
+          .attr('width', 30)
+          .attr('height', 18)
+          .append('line')
+            .attr('stroke-dasharray', this.setup.lineStyle[i])
+            .attr('x1', 0)
+            .attr('x2', 30)
+            .attr('y1', 9)
+            .attr('y2', 9)
+
+        legendItem.append('span')
+          .classed('long-legend', true)
+          .text(this.setup.longLegend[i])
+        legendItem.append('span')
+          .classed('short-legend', true)
+          .text(this.setup.shortLegend[i])
+      }
+    }
 
     // add hover box
     this.hover = new HoverBox(this.container, this.setup)
@@ -81,6 +111,7 @@ class SubGraph extends EventEmitter {
 
       const lineElement = this.graph.append('path')
           .attr('class', 'line')
+          .attr('stroke-dasharray', this.setup.lineStyle[i])
       this.lineElements.push(lineElement)
     }
   }
@@ -238,7 +269,7 @@ class HoverBox {
         .attr('y', lengedTopOffset + i * size.lengedHeight)
         .attr('dy', '1em')
         .attr('x', 12)
-        .text(this.setup.shortLenged[i])
+        .text(this.setup.shortLegend[i])
 
       const valueText = this.svg.append('text')
         .classed('value', true)
@@ -291,38 +322,46 @@ class Graph extends EventEmitter {
       className: 'cpu',
       name: 'CPU Usage',
       unit: '%',
-      shortLenged: ['Usage'],
+      shortLegend: ['Usage'],
+      showLegend: false,
+      lineStyle: [''],
+      numLines: 1,
       ymin: 0,
-      ymax: 100,
-      numLines: 1
+      ymax: 100
     })
 
     this.memory = new SubGraph(this.container, {
       className: 'memory',
       name: 'Memory Usage',
       unit: 'GB',
-      legend: ['RSS', 'Total Heap Allocated', 'Heap Used'],
-      shortLenged: ['RSS', 'THA', 'HU'],
-      ymin: 0,
-      numLines: 3
+      longLegend: ['RSS', 'Total Heap Allocated', 'Heap Used'],
+      shortLegend: ['RSS', 'THA', 'HU'],
+      showLegend: true,
+      lineStyle: ['1, 2', '5, 3', ''],
+      numLines: 3,
+      ymin: 0
     })
 
     this.delay = new SubGraph(this.container, {
       className: 'delay',
       name: 'Event Loop Delay',
       unit: 'ms',
-      shortLenged: ['Delay'],
-      ymin: 0,
-      numLines: 1
+      shortLegend: ['Delay'],
+      showLegend: false,
+      lineStyle: [''],
+      numLines: 1,
+      ymin: 0
     })
 
     this.handles = new SubGraph(this.container, {
       className: 'handles',
       name: 'Alive Handles',
       unit: '',
-      shortLenged: ['Handles'],
-      ymin: 0,
-      numLines: 1
+      shortLegend: ['Handles'],
+      showLegend: false,
+      lineStyle: [''],
+      numLines: 1,
+      ymin: 0
     })
 
     // relay events

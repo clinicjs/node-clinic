@@ -35,9 +35,9 @@ const extra = process.argv.slice(process.argv.indexOf(argv._[0], 2))
 // This is to prevent `clinic doctor node script.js --help` from printing
 // the help text.
 if (tool === 'doctor') {
-  runTool(require('../doctor'))
+  runTool(require('clinic-doctor'))
 } else if (tool === 'bubbleprof') {
-  runTool(require('../bubbleprof'))
+  runTool(require('clinic-bubbleprof'))
 } else if (argv.version) {
   printVersion()
 } else if (argv.help) {

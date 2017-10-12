@@ -72,7 +72,7 @@ class SubGraph extends EventEmitter {
     this.hoverArea = this.container.append('div')
       .classed('hover-area', true)
       .style('left', margin.left + 'px')
-      .style('top', margin.top + 'px')
+      .style('top', (margin.top + headerHeight) + 'px')
       .on('mousemove', () => {
         const positionX = d3.mouse(this.graph.node())[0]
         if (positionX >= 0) {

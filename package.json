@@ -14,7 +14,8 @@
     "clinic-bubbleprof": "^1.0.0",
     "clinic-doctor": "^1.0.0",
     "commist": "^1.0.0",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "open": "0.0.5"
   },
   "devDependencies": {
     "snazzy": "^7.0.0",

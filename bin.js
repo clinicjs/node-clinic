@@ -3,6 +3,7 @@
 
 const fs = require('fs')
 const path = require('path')
+const open = require('open')
 const commist = require('commist')
 const minimist = require('minimist')
 
@@ -75,6 +76,8 @@ function runTool (argv, Tool) {
       argv['visualize-only'] + '.html',
       function (err) {
         if (err) throw err
+
+        console.log(`generated HTML file is ${argv['visualize-only']}.html`)
       }
     )
   } else {
@@ -82,6 +85,11 @@ function runTool (argv, Tool) {
       if (err) throw err
       tool.visualize(filename, filename + '.html', function (err) {
         if (err) throw err
+
+        console.log(`generated HTML file is ${filename}.html`)
+
+        // open HTML file in default browser
+        open('file://' + path.resolve(filename + '.html'));
       })
     })
   }

@@ -15,7 +15,8 @@ class ProcessState {
   }
 
   _sampleDelay (elapsedTime) {
-    return elapsedTime - this.sampleInterval
+    // delay can't be negative, so truncate to 0
+    return Math.max(0, elapsedTime - this.sampleInterval)
   }
 
   _sampleCpuUsage (elapsedTime) {

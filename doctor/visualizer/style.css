@@ -3,6 +3,9 @@
 html {
   --main-bg-color: rgb(27, 29, 39);
 
+  --banner-text-color: rgb(255, 255, 255);
+  --banner-bg-color: rgb(41, 44, 57);
+
   --menu-button-color: rgb(200, 201, 203);
 
   --graph-text-color: rgb(255, 255, 255);
@@ -29,6 +32,8 @@ html {
 
 html.light-theme {
   --main-bg-color: rgb(239, 239, 239);
+
+  --banner-bg-color: rgb(65, 69, 85);
 
   --menu-button-color: rgb(123, 128, 146);
 
@@ -92,7 +97,7 @@ html {
   font-family: sans-serif;
 }
 
-html #menu, html #graph {
+html #banner, html #menu, html #graph, #graph .hover text {
   /* light text on dark background doesn't look so good in the browser compared
      to graphical design tools. This is because graphical design tools uses
      antialiasing, where browsers uses subpixel rendering. To make it look
@@ -109,12 +114,29 @@ html.light-theme #menu, html.light-theme #graph {
   -moz-osx-font-smoothing: unset;
 }
 
+/* Banner layout */
+#banner {
+  height: 65px;
+  background: var(--banner-bg-color);
+  position: relative;
+}
+
+#banner::after {
+  content: 'Doctor';
+  font-size: 14pt;
+  font-weight: lighter;
+  color: var(--banner-text-color);
+  display: block;
+  margin-left: 35px;
+  line-height: 65px;
+}
+
 /* Menu layout */
 
 #menu {
   height: 24px;
   overflow: hidden;
-  margin: 22px 45px 30px 10px;
+  margin: 22px 45px 10px 10px;
 }
 
 #menu .toggle {
@@ -260,8 +282,6 @@ html.light-theme #toggle-theme {
   alignment-baseline: central;
   fill: var(--hover-text-color);
   font-size: 10pt;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 .graph .hover .title {

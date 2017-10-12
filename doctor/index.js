@@ -76,6 +76,7 @@ class ClinicDoctor {
 
       <style>${styleFile}</style>
 
+      <div id="banner"></div>
       <div id="menu"></div>
       <div id="graph"></div>
       <div id="recomendation"></div>

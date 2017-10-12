@@ -13,6 +13,7 @@
   "dependencies": {
     "clinic-bubbleprof": "^1.0.0",
     "clinic-doctor": "^1.0.0",
+    "commist": "^1.0.0",
     "minimist": "^1.2.0"
   },
   "devDependencies": {

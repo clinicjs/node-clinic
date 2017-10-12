@@ -4,7 +4,7 @@
   "repository": "nearform/node-clinic",
   "version": "1.0.0",
   "bin": {
-    "clinic": "./bin/clinic.js"
+    "clinic": "./bin.js"
   },
   "scripts": {
     "test": "standard | snazzy",

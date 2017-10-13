@@ -15,7 +15,7 @@
 
   [0mYou can then transfer the data and visualize it locally:[0m
 
-     [33mclinic doctor --visualize 518.clinic-doctor-sample[39m
+     [33mclinic doctor --visualize-only PID.clinic-doctor-sample[39m
 
   [0m[36m[1mFlags[22m[39m[0m
   -h | --help                Display Help

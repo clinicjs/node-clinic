@@ -22,7 +22,7 @@ Aggregate stats from the Node VM, and expose them for later analysis.
 
   You can then transfer the data and visualize it locally:
 
-     clinic doctor --visualize-only 518.clinic-doctor-sample
+     clinic doctor --visualize-only PID.clinic-doctor-sample
 
   Flags
   -h | --help                Display Help

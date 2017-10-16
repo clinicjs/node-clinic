@@ -1,0 +1,25 @@
+
+  <title>Clinic Doctor</title> - v{{version}}
+
+  <code>clinic doctor</code> is the first step in profiling your application.
+  It will show you what kind of problem you are having and recommend the path
+  forward.
+
+  To run <code>clinic doctor</code>
+
+    <code>clinic doctor -- node server.js</code>
+
+  If profiling on a server, it can be useful to only do data collection:
+
+    <code>clinic doctor --collect-only -- node server.js</code>
+
+  You can then transfer the data and visualize it locally:
+
+    <code>clinic doctor --visualize-only PID.clinic-doctor-sample</code>
+
+  <h1>Flags</h1>
+  -h | --help                Display Help
+  -v | --version             Display Version
+  --collect-only             Do not process data on terminiation
+  --visualize-only datapath  Build or rebuild visualization from data
+  --sample-interval interval Sample interval in milliseconds

@@ -9,33 +9,72 @@ const minimist = require('minimist')
 
 const result = commist()
   .register('doctor', function (args) {
+    const version = require('clinic-doctor/package.json').version;
     const argv = minimist(args, {
+      alias: {
+        help: 'h',
+        version: 'v'
+      },
       boolean: [
+        'help',
+        'version',
         'collect-only'
       ],
       string: [
-        'visualize-only'
-      ]
+        'visualize-only',
+        'sample-interval'
+      ],
+      default: {
+        'sample-interval': '10'
+      },
+      '--': true
     })
 
-    runTool(argv, require('clinic-doctor'))
+    if (argv.version) {
+      printVersion(version)
+    } else if (argv.help) {
+      printHelp('clinic-doctor', version)
+    } else if (argv['--'].length > 1) {
+      runTool(argv, require('clinic-doctor'))
+    } else {
+      printHelp('clinic-doctor', version)
+      process.exit(1)
+    }
   })
   .register('bubbleprof', function (args) {
+    const version = require('clinic-bubbleprof/package.json').version;
     const argv = minimist(args, {
+      alias: {
+        help: 'h',
+        version: 'v'
+      },
       boolean: [
+        'help',
+        'version',
         'collect-only'
       ],
       string: [
         'visualize-only'
-      ]
+      ],
+      '--': true
     })
 
-    runTool(argv, require('clinic-doctor'))
+    if (argv.version) {
+      printVersion(version)
+    } else if (argv.help) {
+      printHelp('clinic-bubbleprof', version)
+    } else if (argv['--'].length > 1) {
+      runTool(argv, require('clinic-bubbleprof'))
+    } else {
+      printHelp('clinic-bubbleprof', version)
+      process.exit(1)
+    }
   })
   .parse(process.argv.slice(2))
 
 // not `clinic doctor` and not `clinic bubbleprof`
 if (result !== null) {
+  const version = require('./package.json').version;
   const argv = minimist(process.argv.slice(1), {
     alias: {
       help: 'h',
@@ -48,25 +87,22 @@ if (result !== null) {
   })
 
   if (argv.version) {
-    printVersion()
+    printVersion(version)
   } else if (argv.help) {
-    printHelp()
+    printHelp('clinic', version)
   } else {
-    printHelp()
+    printHelp('clinic', version)
     process.exit(1)
   }
 }
 
 function runTool (argv, Tool) {
-  // Get executable parameters, by removeing everything before the first
-  // unrecognized option. Note, this only works because there are only
-  // boolean parameters when collecting data.
-  const executeArgs = process.argv.slice(process.argv.indexOf(argv._[0], 2))
-
-  const tool = new Tool()
+  const tool = new Tool({
+    sampleInterval: parseInt(argv['sample-interval'], 10)
+  })
 
   if (argv['collect-only']) {
-    tool.collect(executeArgs, function (err, filename) {
+    tool.collect(argv['--'], function (err, filename) {
       if (err) throw err
       console.log(`output file is ${filename}`)
     })
@@ -81,7 +117,7 @@ function runTool (argv, Tool) {
       }
     )
   } else {
-    tool.collect(executeArgs, function (err, filename) {
+    tool.collect(argv['--'], function (err, filename) {
       if (err) throw err
       tool.visualize(filename, filename + '.html', function (err) {
         if (err) throw err
@@ -95,13 +131,21 @@ function runTool (argv, Tool) {
   }
 }
 
-function printVersion () {
-  console.log('v' + require('./package.json').version)
+function printVersion (version) {
+  console.log('v' + version)
 }
 
-function printHelp () {
-  const usage = fs.readFileSync(path.resolve(__dirname, './usage.txt'))
+function printHelp (name, version) {
+  const filepath = path.resolve(__dirname, 'docs', name + '.txt')
+
+  const usage = fs.readFileSync(filepath)
     .toString()
-    .replace('{{version}}', require('./package.json').version)
+    .replace(/<title>/g, '\x1B[37m\x1B[1m\x1B[4m')
+    .replace(/<\/title>/g, '\x1B[24m\x1B[22m\x1B[39m')
+    .replace(/<h1>/g, '\x1B[36m\x1B[1m')
+    .replace(/<\/h1>/g, '\x1B[22m\x1B[39m')
+    .replace(/<code>/g, '\x1B[33m')
+    .replace(/<\/code>/g, '\x1B[39m')
+    .replace('{{version}}', version)
   console.log(usage)
 }

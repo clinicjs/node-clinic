@@ -10,25 +10,20 @@ Aggregate stats from the Node VM, and expose them for later analysis.
 
   As a first step, run the clinic doctor:
 
-     clinic doctor node server.js
+    clinic doctor -- node server.js
 
   To debug asynchronous issues and event loop issues, use clinic bubbleprof:
 
-     clinic bubbleprof node server.js
+    clinic bubbleprof -- node server.js
 
-  On the server, it can be useful to only do data collection:
+  For more information use the --help option:
 
-     clinic doctor --collect-only node server.js
-
-  You can then transfer the data and visualize it locally:
-
-     clinic doctor --visualize-only PID.clinic-doctor-sample
+    clinic doctor --help
+    clinic bubbleprof --help
 
   Flags
   -h | --help                Display Help
   -v | --version             Display Version
-  --collect-only             Do not process data on terminiation
-  --visualize-only datapath  Build or rebuild visualization from data
 ```
 
 ## License

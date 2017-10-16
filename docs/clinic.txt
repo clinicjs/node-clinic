@@ -1,0 +1,19 @@
+
+  <title>Clinic</title> - v{{version}}
+
+  As a first step, run the <code>clinic doctor</code>:
+
+    <code>clinic doctor -- node server.js</code>
+
+  To debug asynchronous issues and event loop issues, use <code>clinic bubbleprof</code>:
+
+    <code>clinic bubbleprof -- node server.js</code>
+
+  For more information use the <code>--help</code> option:
+
+    <code>clinic doctor --help</code>
+    <code>clinic bubbleprof --help</code>
+
+  <h1>Flags</h1>
+  -h | --help                Display Help
+  -v | --version             Display Version

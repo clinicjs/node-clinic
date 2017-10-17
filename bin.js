@@ -34,7 +34,7 @@ const result = commist()
       printVersion(version)
     } else if (argv.help) {
       printHelp('clinic-doctor', version)
-    } else if (argv['--'].length > 1) {
+    } else if (argv['visualize-only'] || argv['--'].length > 1) {
       runTool(argv, require('clinic-doctor'))
     } else {
       printHelp('clinic-doctor', version)
@@ -63,7 +63,7 @@ const result = commist()
       printVersion(version)
     } else if (argv.help) {
       printHelp('clinic-bubbleprof', version)
-    } else if (argv['--'].length > 1) {
+    } else if (argv['visualize-only'] || argv['--'].length > 1) {
       runTool(argv, require('clinic-bubbleprof'))
     } else {
       printHelp('clinic-bubbleprof', version)

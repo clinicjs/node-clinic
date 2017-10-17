@@ -1,5 +1,5 @@
 {
-  "name": "node-clinic",
+  "name": "clinic",
   "description": "Aggregate stats from the Node VM",
   "repository": "nearform/node-clinic",
   "version": "1.0.0",

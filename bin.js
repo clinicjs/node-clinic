@@ -119,6 +119,8 @@ function runTool (argv, Tool) {
   } else {
     tool.collect(argv['--'], function (err, filename) {
       if (err) throw err
+      console.log('analysing data')
+
       tool.visualize(filename, filename + '.html', function (err) {
         if (err) throw err
 

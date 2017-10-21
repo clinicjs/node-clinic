@@ -9,7 +9,7 @@ const minimist = require('minimist')
 
 const result = commist()
   .register('doctor', function (args) {
-    const version = require('clinic-doctor/package.json').version;
+    const version = require('@nearform/clinic-doctor/package.json').version;
     const argv = minimist(args, {
       alias: {
         help: 'h',
@@ -35,14 +35,14 @@ const result = commist()
     } else if (argv.help) {
       printHelp('clinic-doctor', version)
     } else if (argv['visualize-only'] || argv['--'].length > 1) {
-      runTool(argv, require('clinic-doctor'))
+      runTool(argv, require('@nearform/clinic-doctor'))
     } else {
       printHelp('clinic-doctor', version)
       process.exit(1)
     }
   })
   .register('bubbleprof', function (args) {
-    const version = require('clinic-bubbleprof/package.json').version;
+    const version = require('@nearform/clinic-bubbleprof/package.json').version;
     const argv = minimist(args, {
       alias: {
         help: 'h',
@@ -64,7 +64,7 @@ const result = commist()
     } else if (argv.help) {
       printHelp('clinic-bubbleprof', version)
     } else if (argv['visualize-only'] || argv['--'].length > 1) {
-      runTool(argv, require('clinic-bubbleprof'))
+      runTool(argv, require('@nearform/clinic-bubbleprof'))
     } else {
       printHelp('clinic-bubbleprof', version)
       process.exit(1)

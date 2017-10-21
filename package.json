@@ -1,8 +1,8 @@
 {
-  "name": "clinic",
+  "name": "@nearform/clinic",
   "description": "Aggregate stats from the Node VM",
   "repository": "nearform/node-clinic",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "bin": {
     "clinic": "./bin.js"
   },
@@ -11,8 +11,8 @@
     "ci": "standard | snazzy"
   },
   "dependencies": {
-    "clinic-bubbleprof": "^1.0.0",
-    "clinic-doctor": "^1.0.0",
+    "@nearform/clinic-bubbleprof": "*",
+    "@nearform/clinic-doctor": "*",
     "commist": "^1.0.0",
     "minimist": "^1.2.0",
     "open": "0.0.5"

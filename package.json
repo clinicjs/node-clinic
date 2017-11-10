@@ -2,7 +2,7 @@
   "name": "@nearform/clinic",
   "description": "Aggregate stats from the Node VM",
   "repository": "nearform/node-clinic",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "bin": {
     "clinic": "./bin.js"
   },

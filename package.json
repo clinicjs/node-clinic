@@ -11,8 +11,8 @@
     "ci": "standard | snazzy"
   },
   "dependencies": {
-    "@nearform/clinic-bubbleprof": "*",
-    "@nearform/clinic-doctor": "*",
+    "@nearform/clinic-bubbleprof": "latest",
+    "@nearform/clinic-doctor": "latest",
     "commist": "^1.0.0",
     "minimist": "^1.2.0",
     "open": "0.0.5"

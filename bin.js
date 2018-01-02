@@ -9,7 +9,7 @@ const minimist = require('minimist')
 
 const result = commist()
   .register('doctor', function (args) {
-    const version = require('@nearform/clinic-doctor/package.json').version;
+    const version = require('@nearform/clinic-doctor/package.json').version
     const argv = minimist(args, {
       alias: {
         help: 'h',
@@ -42,7 +42,7 @@ const result = commist()
     }
   })
   .register('bubbleprof', function (args) {
-    const version = require('@nearform/clinic-bubbleprof/package.json').version;
+    const version = require('@nearform/clinic-bubbleprof/package.json').version
     const argv = minimist(args, {
       alias: {
         help: 'h',
@@ -74,7 +74,7 @@ const result = commist()
 
 // not `clinic doctor` and not `clinic bubbleprof`
 if (result !== null) {
-  const version = require('./package.json').version;
+  const version = require('./package.json').version
   const argv = minimist(process.argv.slice(1), {
     alias: {
       help: 'h',
@@ -127,7 +127,7 @@ function runTool (argv, Tool) {
         console.log(`generated HTML file is ${filename}.html`)
 
         // open HTML file in default browser
-        open('file://' + path.resolve(filename + '.html'));
+        open('file://' + path.resolve(filename + '.html'))
       })
     })
   }

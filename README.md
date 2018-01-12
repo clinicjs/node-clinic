@@ -16,10 +16,15 @@ Aggregate stats from the Node VM, and expose them for later analysis.
 
     clinic bubbleprof -- node server.js
 
+  To help us improve the tool, upload your data to the clinic cloud:
+
+    clinic upload 1000.clinic-doctor
+
   For more information use the --help option:
 
     clinic doctor --help
     clinic bubbleprof --help
+    clinic upload --help
 
   Flags
   -h | --help                Display Help

@@ -8,6 +8,31 @@ const commist = require('commist')
 const minimist = require('minimist')
 
 const result = commist()
+  .register('upload', function (args) {
+    const tarAndUpload = require('./lib/tar-and-upload')
+    const argv = minimist(args, {
+      alias: {
+        help: 'h'
+      },
+      boolean: [
+        'help'
+      ]
+    })
+
+    if (!argv._.length || argv.help) {
+      printHelp('clinic-upload')
+      return
+    }
+
+    // join with . to ensure no trailing / for dirs
+    const prefix = path.join(argv._[0].replace(/\.html$/, ''), '.')
+
+    console.log(`Uploading data for ${prefix}`)
+    tarAndUpload(prefix, argv, function (err, reply) {
+      if (err) throw err
+      console.log(`The data is stored under the following id: ${reply.id}`)
+    })
+  })
   .register('doctor', function (args) {
     const version = require('@nearform/clinic-doctor/package.json').version
     const argv = minimist(args, {

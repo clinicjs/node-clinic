@@ -7,19 +7,25 @@
     "clinic": "./bin.js"
   },
   "scripts": {
-    "test": "standard | snazzy",
-    "ci": "standard | snazzy"
+    "test": "standard | snazzy && tap --no-cov test/*.test.js",
+    "ci-lint": "standard | snazzy",
+    "ci-test": "tap test/*.test.js"
   },
   "dependencies": {
     "@nearform/clinic-bubbleprof": "latest",
     "@nearform/clinic-doctor": "latest",
     "commist": "^1.0.0",
     "minimist": "^1.2.0",
-    "open": "0.0.5"
+    "open": "0.0.5",
+    "simple-get": "^2.7.0",
+    "stream-collector": "^1.0.1",
+    "tar-fs": "^1.16.0"
   },
   "devDependencies": {
     "snazzy": "^7.0.0",
-    "standard": "^10.0.3"
+    "standard": "^10.0.3",
+    "tap": "^11.0.1",
+    "tar-stream": "^1.5.5"
   },
   "keywords": [],
   "license": "MIT"

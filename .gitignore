@@ -3,6 +3,7 @@
 *.clinic-bubbleprof.html
 *.clinic-doctor
 *.clinic-doctor.html
+*.tmp
 
 # Logs
 logs

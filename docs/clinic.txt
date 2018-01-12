@@ -9,10 +9,15 @@
 
     <code>clinic bubbleprof -- node server.js</code>
 
+  To help us improve the tool, upload your data to the clinic cloud:
+
+    <code>clinic upload 1000.clinic-doctor</code>
+
   For more information use the <code>--help</code> option:
 
     <code>clinic doctor --help</code>
     <code>clinic bubbleprof --help</code>
+    <code>clinic upload --help</code>
 
   <h1>Flags</h1>
   -h | --help                Display Help

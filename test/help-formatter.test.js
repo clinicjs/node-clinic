@@ -17,5 +17,9 @@ test('help formatter', function (t) {
     helpFormatter('<code>CODE</code>', '1.0.0'),
     '\x1B[33mCODE\x1B[39m'
   )
+  t.strictEqual(
+    helpFormatter('<link>CODE</link>', '1.0.0'),
+    '\x1B[4mCODE\x1B[24m'
+  )
   t.end()
 })

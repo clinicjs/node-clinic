@@ -2,33 +2,64 @@
 [![npm version][2]][3] [![build status][4]][5]
 [![downloads][8]][9] [![js-standard-style][10]][11]
 
-Aggregate stats from the Node VM, and expose them for later analysis.
+## Install
 
-## Usage
-```txt
-  Clinic
+```
+npm install -g clinic
+```
 
-  As a first step, run the clinic doctor:
+## Getting started
+As a first step, run the <code>clinic doctor</code>:
 
-    clinic doctor -- node server.js
+  <code>clinic doctor -- node server.js</code>
 
-  To debug asynchronous issues and event loop issues, use clinic bubbleprof:
+Then benchmark your server with <code>wrk</code> or <code>autocannon</code>:
 
-    clinic bubbleprof -- node server.js
+```
+wrk http://localahost:3000
+autocannon http://localahost:3000
+```
 
-  To help us improve the tool, upload your data to the clinic cloud:
+Finally shut down your server (Ctrl+C). Once the server process has shutdown
+<code>clinic doctor</code> will analyse the collected data and detect what type of issue
+you are having. Based on the issue type, it will provide a recommendation for
+you.
 
-    clinic upload 1000.clinic-doctor
+For example, to debug I/O issues, use <code>clinic bubbleprof</code>:
 
-  For more information use the --help option:
+```
+clinic bubbleprof -- node server.js
+```
 
-    clinic doctor --help
-    clinic bubbleprof --help
-    clinic upload --help
+Then benchmark your server again, just like you did with <code>clinic doctor</code>.
 
-  Flags
-  -h | --help                Display Help
-  -v | --version             Display Version
+## Report an issue
+If you encounter any issue, feel free to send us an issue report at:
+
+```
+https://github.com/nearform/node-clinic/issues
+```
+
+When creating an issue, it will be a huge help for us if you upload your
+data to the clinic cloud. To do this, use <code>clinic upload</code>:
+
+```
+clinic upload 1000.clinic-doctor
+```
+
+## More information
+For more information use the <code>--help</code> option:
+
+```
+clinic doctor --help
+clinic bubbleprof --help
+clinic upload --help
+```
+
+## Flags
+```
+-h | --help                Display Help
+-v | --version             Display Version
 ```
 
 ## License

@@ -1,6 +1,6 @@
 {
   "name": "@nearform/clinic",
-  "description": "Aggregate stats from the Node VM",
+  "description": "Clinic diagnoses your performance issues",
   "repository": "nearform/node-clinic",
   "version": "0.2.0",
   "bin": {

@@ -4,34 +4,54 @@
 const fs = require('fs')
 const path = require('path')
 const open = require('open')
+const async = require('async')
 const commist = require('commist')
 const minimist = require('minimist')
+const tarAndUpload = require('./lib/tar-and-upload.js')
+const helpFormatter = require('./lib/help-formatter.js')
 
 const result = commist()
   .register('upload', function (args) {
-    const tarAndUpload = require('./lib/tar-and-upload')
     const argv = minimist(args, {
       alias: {
         help: 'h'
       },
+      string: [
+        'upload-url'
+      ],
       boolean: [
         'help'
-      ]
+      ],
+      default: {
+        'upload-url': 'https://clinic-submit.nearform.net'
+      }
     })
 
-    if (!argv._.length || argv.help) {
+    if (argv.help) {
       printHelp('clinic-upload')
-      return
+    } else if (argv._.length > 0) {
+      async.eachSeries(argv._, function (filename, done) {
+        // filename may either be .clinic-doctor.html or the data directory
+        // .clinic-doctor
+        const filePrefix = path.join(filename).replace(/\.html$/, '')
+
+        console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
+        tarAndUpload(
+          path.resolve(filePrefix),
+          argv['upload-url'],
+          function (err, reply) {
+            if (err) return done(err)
+            console.log(`The data is stored under the following id: ${reply.id}`)
+            done(null)
+          }
+        )
+      }, function (err) {
+        if (err) throw err
+      })
+    } else {
+      printHelp('clinic-upload')
+      process.exit(1)
     }
-
-    // join with . to ensure no trailing / for dirs
-    const prefix = path.join(argv._[0].replace(/\.html$/, ''), '.')
-
-    console.log(`Uploading data for ${prefix}`)
-    tarAndUpload(prefix, argv, function (err, reply) {
-      if (err) throw err
-      console.log(`The data is stored under the following id: ${reply.id}`)
-    })
   })
   .register('doctor', function (args) {
     const version = require('@nearform/clinic-doctor/package.json').version
@@ -43,14 +63,16 @@ const result = commist()
       boolean: [
         'help',
         'version',
-        'collect-only'
+        'collect-only',
+        'open'
       ],
       string: [
         'visualize-only',
         'sample-interval'
       ],
       default: {
-        'sample-interval': '10'
+        'sample-interval': '10',
+        'open': true
       },
       '--': true
     })
@@ -76,11 +98,15 @@ const result = commist()
       boolean: [
         'help',
         'version',
-        'collect-only'
+        'collect-only',
+        'open'
       ],
       string: [
         'visualize-only'
       ],
+      default: {
+        'open': true
+      },
       '--': true
     })
 
@@ -152,7 +178,8 @@ function runTool (argv, Tool) {
         console.log(`generated HTML file is ${filename}.html`)
 
         // open HTML file in default browser
-        open('file://' + path.resolve(filename + '.html'))
+        /* istanbul ignore if: we don't want to open a browser in `npm test` */
+        if (argv.open) open('file://' + path.resolve(filename + '.html'))
       })
     })
   }
@@ -164,15 +191,6 @@ function printVersion (version) {
 
 function printHelp (name, version) {
   const filepath = path.resolve(__dirname, 'docs', name + '.txt')
-
-  const usage = fs.readFileSync(filepath)
-    .toString()
-    .replace(/<title>/g, '\x1B[37m\x1B[1m\x1B[4m')
-    .replace(/<\/title>/g, '\x1B[24m\x1B[22m\x1B[39m')
-    .replace(/<h1>/g, '\x1B[36m\x1B[1m')
-    .replace(/<\/h1>/g, '\x1B[22m\x1B[39m')
-    .replace(/<code>/g, '\x1B[33m')
-    .replace(/<\/code>/g, '\x1B[39m')
-    .replace('{{version}}', version)
+  const usage = helpFormatter(fs.readFileSync(filepath), version)
   console.log(usage)
 }

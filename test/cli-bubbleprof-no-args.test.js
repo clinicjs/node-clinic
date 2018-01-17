@@ -1,0 +1,12 @@
+'use strict'
+
+const test = require('tap').test
+const cli = require('./cli.js')
+
+test('clinic bubbleprof', function (t) {
+  cli({}, ['clinic', 'bubbleprof'], function (err, stdout) {
+    t.strictDeepEqual(err, new Error('process exited with exit code 1'))
+    t.ok(/Clinic BubbleProf[^\w ]/.test(stdout.split('\n')[1]))
+    t.end()
+  })
+})

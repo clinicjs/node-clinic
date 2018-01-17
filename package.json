@@ -9,11 +9,13 @@
   "scripts": {
     "test": "standard | snazzy && tap --no-cov test/*.test.js",
     "ci-lint": "standard | snazzy",
-    "ci-test": "tap test/*.test.js"
+    "ci-test": "tap test/*.test.js",
+    "ci-cov": "tap --100 test/*.test.js"
   },
   "dependencies": {
     "@nearform/clinic-bubbleprof": "latest",
     "@nearform/clinic-doctor": "latest",
+    "async": "^2.6.0",
     "commist": "^1.0.0",
     "minimist": "^1.2.0",
     "open": "0.0.5",
@@ -22,6 +24,7 @@
     "tar-fs": "^1.16.0"
   },
   "devDependencies": {
+    "rimraf": "^2.6.2",
     "snazzy": "^7.0.0",
     "standard": "^10.0.3",
     "tap": "^11.0.1",

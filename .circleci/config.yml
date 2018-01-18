@@ -30,7 +30,12 @@ jobs:
           name: npm outdated
           command: npm outdated || true
 
-      - run: npm update
+
+      - run:
+         name: npm update
+         command: |
+           npm update
+           npm update --save-dev # https://github.com/npm/npm/issues/16901
 
       - save_cache:
           paths:

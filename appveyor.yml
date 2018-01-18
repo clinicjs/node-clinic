@@ -15,6 +15,7 @@ install:
   - ps: Install-Product node $env:nodejs_version
   - ps: echo "//registry.npmjs.org/:_authToken=`$`{NPM_TOKEN`}" | Out-File (Join-Path $ENV:APPVEYOR_BUILD_FOLDER ".npmrc") -Encoding UTF8
   - npm update
+  - npm update --save-dev # https://github.com/npm/npm/issues/16901
 
 build: off
 

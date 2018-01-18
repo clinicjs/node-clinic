@@ -6,32 +6,32 @@ const http = require('http')
 const cli = require('./cli.js')
 const FakeUploadServer = require('./fake-upload-server.js')
 
-const doctorDirectory = path.resolve(
+const doctorADirectory = path.resolve(
   __dirname,
   'fixtures',
   'only-folder',
-  '10000.clinic-doctor'
+  '10000a.clinic-doctor'
 )
 
-const bubbleprofDirectory = path.resolve(
+const doctorBDirectory = path.resolve(
   __dirname,
   'fixtures',
   'only-folder',
-  '10000.clinic-bubbleprof'
+  '10000b.clinic-doctor'
 )
 
-test('clinic upload 10000.clinic-doctor', function (t) {
+test('clinic upload 10000a.clinic-doctor', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {
     cli({}, [
       'clinic', 'upload',
       '--upload-url', server.uploadUrl,
-      doctorDirectory
+      doctorADirectory
     ], function (err, stdout) {
       t.ifError(err)
 
       t.strictDeepEqual(stdout.trim().split('\n'), [
-        `Uploading data for ${doctorDirectory} and ${doctorDirectory}.html`,
+        `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`,
         `The data is stored under the following id: some-id`
       ])
 
@@ -39,9 +39,9 @@ test('clinic upload 10000.clinic-doctor', function (t) {
         method: 'POST',
         url: '/data',
         files: {
-          '10000.clinic-doctor/a.txt': 'a',
-          '10000.clinic-doctor/b.txt': 'b',
-          '10000.clinic-doctor/c.txt': 'c'
+          '10000a.clinic-doctor/a.txt': 'a',
+          '10000a.clinic-doctor/b.txt': 'b',
+          '10000a.clinic-doctor/c.txt': 'c'
         }
       }])
 
@@ -50,20 +50,20 @@ test('clinic upload 10000.clinic-doctor', function (t) {
   })
 })
 
-test('clinic upload 10000.clinic-doctor 10000.clinic-bubbleprof', function (t) {
+test('clinic upload 10000a.clinic-doctor 10000b.clinic-doctor', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {
     cli({}, [
       'clinic', 'upload',
       '--upload-url', server.uploadUrl,
-      doctorDirectory, bubbleprofDirectory
+      doctorADirectory, doctorBDirectory
     ], function (err, stdout) {
       t.ifError(err)
 
       t.strictDeepEqual(stdout.trim().split('\n'), [
-        `Uploading data for ${doctorDirectory} and ${doctorDirectory}.html`,
+        `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`,
         `The data is stored under the following id: some-id`,
-        `Uploading data for ${bubbleprofDirectory} and ${bubbleprofDirectory}.html`,
+        `Uploading data for ${doctorBDirectory} and ${doctorBDirectory}.html`,
         `The data is stored under the following id: some-id`
       ])
 
@@ -71,17 +71,17 @@ test('clinic upload 10000.clinic-doctor 10000.clinic-bubbleprof', function (t) {
         method: 'POST',
         url: '/data',
         files: {
-          '10000.clinic-doctor/a.txt': 'a',
-          '10000.clinic-doctor/b.txt': 'b',
-          '10000.clinic-doctor/c.txt': 'c'
+          '10000a.clinic-doctor/a.txt': 'a',
+          '10000a.clinic-doctor/b.txt': 'b',
+          '10000a.clinic-doctor/c.txt': 'c'
         }
       }, {
         method: 'POST',
         url: '/data',
         files: {
-          '10000.clinic-bubbleprof/a.txt': 'a',
-          '10000.clinic-bubbleprof/b.txt': 'b',
-          '10000.clinic-bubbleprof/c.txt': 'c'
+          '10000b.clinic-doctor/a.txt': 'a',
+          '10000b.clinic-doctor/b.txt': 'b',
+          '10000b.clinic-doctor/c.txt': 'c'
         }
       }])
 
@@ -99,11 +99,11 @@ test('clinic upload - bad status code', function (t) {
     cli({ relayStderr: false }, [
       'clinic', 'upload',
       '--upload-url', `http://127.0.0.1:${server.address().port}`,
-      doctorDirectory
+      doctorADirectory
     ], function (err, stdout, stderr) {
       t.strictDeepEqual(err, new Error('process exited with exit code 1'))
       t.strictDeepEqual(stdout.trim().split('\n'), [
-        `Uploading data for ${doctorDirectory} and ${doctorDirectory}.html`
+        `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`
       ])
       t.ok(stderr.includes('Bad status code: 500'))
       server.close(() => t.end())

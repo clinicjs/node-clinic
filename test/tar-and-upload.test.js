@@ -18,7 +18,7 @@ function testFixtureUpload (type, html) {
   const dataDrectory = path.join(
     'fixtures',
     html ? 'html-and-folder' : 'only-folder',
-    `10000.clinic-${type}`
+    `10000a.clinic-${type}`
   )
 
   test(`upload ${dataDrectory}`, function (t) {
@@ -34,12 +34,12 @@ function testFixtureUpload (type, html) {
             method: 'POST',
             url: '/data',
             files: {
-              [`10000.clinic-${type}/a.txt`]: 'a',
-              [`10000.clinic-${type}/b.txt`]: 'b',
-              [`10000.clinic-${type}/c.txt`]: 'c'
+              [`10000a.clinic-${type}/a.txt`]: 'a',
+              [`10000a.clinic-${type}/b.txt`]: 'b',
+              [`10000a.clinic-${type}/c.txt`]: 'c'
             }
           }
-          if (html) expectedRequest.files[`10000.clinic-${type}.html`] = 'html'
+          if (html) expectedRequest.files[`10000a.clinic-${type}.html`] = 'html'
 
           t.strictDeepEqual(server.requests, [expectedRequest])
           t.strictDeepEqual(data, { id: 'some-id' })
@@ -55,7 +55,7 @@ test('upload - bad response', function (t) {
     __dirname,
     'fixtures',
     'only-folder',
-    `10000.clinic-doctor`
+    `10000a.clinic-doctor`
   )
 
   const server = http.createServer(function (req, res) {
@@ -76,7 +76,7 @@ test('upload - bad body encoding', function (t) {
     __dirname,
     'fixtures',
     'only-folder',
-    `10000.clinic-doctor`
+    `10000a.clinic-doctor`
   )
 
   const server = http.createServer(function (req, res) {
@@ -97,7 +97,7 @@ test('upload - bad status code', function (t) {
     __dirname,
     'fixtures',
     'only-folder',
-    `10000.clinic-doctor`
+    `10000a.clinic-doctor`
   )
 
   const server = http.createServer(function (req, res) {
@@ -119,7 +119,7 @@ test('upload fixtures/empty-directory.tmp/10000.clinic-doctor', function (t) {
     __dirname,
     'fixtures',
     'empty-directory.tmp',
-    '10000.clinic-doctor'
+    '10000a.clinic-doctor'
   )
 
   let server
@@ -158,7 +158,7 @@ test('upload fixtures/too-big-should-fail', function (t) {
     __dirname,
     'fixtures',
     'too-big-should-fail',
-    '10000.clinic-doctor'
+    '10000a.clinic-doctor'
   )
 
   let server

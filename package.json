@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@nearform/clinic-bubbleprof": "latest",
-    "@nearform/clinic-doctor": "latest",
+    "@nearform/clinic-doctor": "^0.5.0",
     "async": "^2.6.0",
     "commist": "^1.0.0",
     "minimist": "^1.2.0",

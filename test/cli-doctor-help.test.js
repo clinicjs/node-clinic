@@ -1,0 +1,20 @@
+'use strict'
+
+const test = require('tap').test
+const cli = require('./cli.js')
+
+test('clinic doctor --help', function (t) {
+  cli({}, ['clinic', 'doctor', '--help'], function (err, stdout) {
+    t.ifError(err)
+    t.ok(/Clinic Doctor[^\w ]/.test(stdout.split('\n')[1]))
+    t.end()
+  })
+})
+
+test('clinic doctor -h', function (t) {
+  cli({}, ['clinic', 'doctor', '-h'], function (err, stdout) {
+    t.ifError(err)
+    t.ok(/Clinic Doctor[^\w ]/.test(stdout.split('\n')[1]))
+    t.end()
+  })
+})

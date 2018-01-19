@@ -1,0 +1,37 @@
+
+  <title>Clinic</title> - v{{version}}
+
+  <h1>Getting started</h1>
+  As a first step, run the <code>clinic doctor</code>:
+
+    <code>clinic doctor -- node server.js</code>
+
+  Then benchmark your server with <code>wrk</code> or <code>autocannon</code>:
+
+    <code>wrk http://localahost:3000</code>
+    <code>autocannon http://localahost:3000</code>
+
+  Finally shut down your server (Ctrl+C). Once the server process has shutdown
+  <code>clinic doctor</code> will analyse the collected data and detect what type of issue
+  you are having. Based on the issue type, it will provide a recommendation for
+  you.
+
+  <h1>Report an issue</h1>
+  If you encounter any issue, feel free to send us an issue report at:
+
+    <link>https://github.com/nearform/node-clinic/issues</link>
+
+  When creating an issue, it will be a huge help for us if you upload your
+  data to the clinic cloud. To do this, use <code>clinic upload</code>:
+
+    <code>clinic upload 1000.clinic-doctor</code>
+
+  <h1>More information</h1>
+  For more information use the <code>--help</code> option:
+
+    <code>clinic doctor --help</code>
+    <code>clinic upload --help</code>
+
+  <h1>Flags</h1>
+  -h | --help                Display Help
+  -v | --version             Display Version

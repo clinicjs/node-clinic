@@ -27,15 +27,11 @@ jobs:
           - v1-dependencies-
 
       - run:
-          name: npm outdated
-          command: npm outdated || true
-
-
-      - run:
          name: npm update
          command: |
-           npm update
+           npm config set package-lock false
            npm update --save-dev # https://github.com/npm/npm/issues/16901
+           npm update
 
       - save_cache:
           paths:

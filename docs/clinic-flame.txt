@@ -1,0 +1,36 @@
+
+  <title>Clinic Flame</title> - v{{version}}
+
+  <code>clinic flame</code> helps you find synchronous bottlenecks 
+  by creating a flamegraph visualization that assists in identifying
+  function calls that may be blocking the event loop.
+
+  <code>clinic flame</code> only supports Linux, OS X and Solaris.
+  It will run a command via sudo because it uses some low-level operating system
+  tools that requires such permission level. Unfortunately, those that are not
+  easily available on Windows: feel free to get in touch if you want to help
+  with Windows support.
+  
+  For more information see the 0x readme, https://github.com/davidmarkclements/0x
+
+  To run <code>clinic flame</code>
+
+    <code>clinic flame -- node server.js</code>
+
+  If profiling on a server, it can be useful to only do data collection:
+
+    <code>clinic flame --collect-only -- node server.js</code>
+
+  You can then transfer the data and visualize it locally:
+
+    <code>clinic flame --visualize-only PID.flamegraph</code>
+
+  <h1>Flags</h1>
+  -h | --help                Display Help
+  -v | --version             Display Version
+  --collect-only             Do not process data on terminiation
+  --visualize-only datapath  Build or rebuild visualization from data
+  --all-options              <code>clinic flame</code> wraps a tool
+                             named <code>0x</code> (http://npm.im/0x). Use this flag 
+                             to output the <code>0x</code> help, which contains the 
+                             full list of options available.

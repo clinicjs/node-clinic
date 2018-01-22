@@ -8,11 +8,13 @@
   },
   "scripts": {
     "test": "standard | snazzy && tap --no-cov test/*.test.js",
+    "test-local": "standard | snazzy && tap --no-cov test/*.test.js test-local/*.test.js",
     "ci-lint": "standard | snazzy",
     "ci-test": "tap test/*.test.js",
     "ci-cov": "tap --100 test/*.test.js"
   },
   "dependencies": {
+    "0x": "^3.0.0",
     "@nearform/clinic-bubbleprof": "latest",
     "@nearform/clinic-doctor": "^0.5.0",
     "async": "^2.6.0",

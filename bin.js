@@ -121,6 +121,42 @@ const result = commist()
       process.exit(1)
     }
   })
+  .register('flame', function (args) {
+    const version = require('0x/package.json').version
+    const argv = minimist(args, {
+      alias: {
+        help: 'h',
+        version: 'v'
+      },
+      boolean: [
+        'help',
+        'version',
+        'all-options',
+        'open'
+      ],
+      default: {
+        open: true
+      },
+      '--': true
+    })
+
+    if (argv.version) {
+      printVersion(version)
+    } else if (argv['all-options']) {
+      require('0x/cmd')(['-h'])
+    } else if (argv.help) {
+      printHelp('clinic-flame', version)
+    } /* istanbul ignore next */ else if (argv['visualize-only']) {
+      require('0x/cmd')(args)
+    } /* istanbul ignore next */ else if (argv['collect-only'] && argv['--'].length > 1) {
+      require('0x/cmd')(args)
+    } /* istanbul ignore next */ else if (argv['--'].length > 1) {
+      require('0x/cmd')(argv.open ? ['-o', ...args] : args)
+    } else {
+      printHelp('clinic-flame', version)
+      process.exit(1)
+    }
+  })
   .parse(process.argv.slice(2))
 
 // not `clinic doctor` and not `clinic bubbleprof`

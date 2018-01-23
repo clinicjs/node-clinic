@@ -19,24 +19,11 @@ jobs:
 
       - checkout
 
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
       - run:
-         name: npm update
+         name: npm install
          command: |
            npm config set package-lock false
-           npm update --save-dev # https://github.com/npm/npm/issues/16901
-           npm update
-
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+           npm install
 
       - persist_to_workspace:
           root: ~/

@@ -11,8 +11,8 @@ const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 
 const result = commist()
-  .register('upload', function (args) {
-    const argv = minimist(args, {
+  .register('upload', function (argv) {
+    const args = minimist(argv, {
       alias: {
         help: 'h'
       },
@@ -27,10 +27,10 @@ const result = commist()
       }
     })
 
-    if (argv.help) {
+    if (args.help) {
       printHelp('clinic-upload')
-    } else if (argv._.length > 0) {
-      async.eachSeries(argv._, function (filename, done) {
+    } else if (args._.length > 0) {
+      async.eachSeries(args._, function (filename, done) {
         // filename may either be .clinic-doctor.html or the data directory
         // .clinic-doctor
         const filePrefix = path.join(filename).replace(/\.html$/, '')
@@ -38,7 +38,7 @@ const result = commist()
         console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
         tarAndUpload(
           path.resolve(filePrefix),
-          argv['upload-url'],
+          args['upload-url'],
           function (err, reply) {
             if (err) return done(err)
             console.log(`The data is stored under the following id: ${reply.id}`)
@@ -53,9 +53,9 @@ const result = commist()
       process.exit(1)
     }
   })
-  .register('doctor', function (args) {
+  .register('doctor', function (argv) {
     const version = require('@nearform/clinic-doctor/package.json').version
-    const argv = minimist(args, {
+    const args = minimist(argv, {
       alias: {
         help: 'h',
         version: 'v'
@@ -77,20 +77,20 @@ const result = commist()
       '--': true
     })
 
-    if (argv.version) {
+    if (args.version) {
       printVersion(version)
-    } else if (argv.help) {
+    } else if (args.help) {
       printHelp('clinic-doctor', version)
-    } else if (argv['visualize-only'] || argv['--'].length > 1) {
-      runTool(argv, require('@nearform/clinic-doctor'))
+    } else if (args['visualize-only'] || args['--'].length > 1) {
+      runTool(args, require('@nearform/clinic-doctor'))
     } else {
       printHelp('clinic-doctor', version)
       process.exit(1)
     }
   })
-  .register('flame', function (args) {
+  .register('flame', function (argv) {
     const version = require('0x/package.json').version
-    const argv = minimist(args, {
+    const args = minimist(argv, {
       alias: {
         help: 'h',
         version: 'v'
@@ -107,18 +107,18 @@ const result = commist()
       '--': true
     })
 
-    if (argv.version) {
+    if (args.version) {
       printVersion(version)
-    } else if (argv['all-options']) {
+    } else if (args['all-options']) {
       require('0x/cmd')(['-h'])
-    } else if (argv.help) {
+    } else if (args.help) {
       printHelp('clinic-flame', version)
-    } /* istanbul ignore next */ else if (argv['visualize-only']) {
-      require('0x/cmd')(args)
-    } /* istanbul ignore next */ else if (argv['collect-only'] && argv['--'].length > 1) {
-      require('0x/cmd')(args)
-    } /* istanbul ignore next */ else if (argv['--'].length > 1) {
-      require('0x/cmd')(argv.open ? ['-o', ...args] : args)
+    } /* istanbul ignore next */ else if (args['visualize-only']) {
+      require('0x/cmd')(argv)
+    } /* istanbul ignore next */ else if (args['collect-only'] && args['--'].length > 1) {
+      require('0x/cmd')(argv)
+    } /* istanbul ignore next */ else if (args['--'].length > 1) {
+      require('0x/cmd')(args.open ? ['-o', ...argv] : argv)
     } else {
       printHelp('clinic-flame', version)
       process.exit(1)
@@ -129,7 +129,7 @@ const result = commist()
 // not `clinic doctor` and not `clinic upload`
 if (result !== null) {
   const version = require('./package.json').version
-  const argv = minimist(process.argv.slice(1), {
+  const args = minimist(process.argv.slice(1), {
     alias: {
       help: 'h',
       version: 'v'
@@ -140,9 +140,9 @@ if (result !== null) {
     ]
   })
 
-  if (argv.version) {
+  if (args.version) {
     printVersion(version)
-  } else if (argv.help) {
+  } else if (args.help) {
     printHelp('clinic', version)
   } else {
     printHelp('clinic', version)
@@ -150,28 +150,28 @@ if (result !== null) {
   }
 }
 
-function runTool (argv, Tool) {
+function runTool (args, Tool) {
   const tool = new Tool({
-    sampleInterval: parseInt(argv['sample-interval'], 10)
+    sampleInterval: parseInt(args['sample-interval'], 10)
   })
 
-  if (argv['collect-only']) {
-    tool.collect(argv['--'], function (err, filename) {
+  if (args['collect-only']) {
+    tool.collect(args['--'], function (err, filename) {
       if (err) throw err
       console.log(`output file is ${filename}`)
     })
-  } else if (argv['visualize-only']) {
+  } else if (args['visualize-only']) {
     tool.visualize(
-      argv['visualize-only'],
-      argv['visualize-only'] + '.html',
+      args['visualize-only'],
+      args['visualize-only'] + '.html',
       function (err) {
         if (err) throw err
 
-        console.log(`generated HTML file is ${argv['visualize-only']}.html`)
+        console.log(`generated HTML file is ${args['visualize-only']}.html`)
       }
     )
   } else {
-    tool.collect(argv['--'], function (err, filename) {
+    tool.collect(args['--'], function (err, filename) {
       if (err) throw err
       console.log('analysing data')
 
@@ -182,7 +182,7 @@ function runTool (argv, Tool) {
 
         // open HTML file in default browser
         /* istanbul ignore if: we don't want to open a browser in `npm test` */
-        if (argv.open) open('file://' + path.resolve(filename + '.html'))
+        if (args.open) open('file://' + path.resolve(filename + '.html'))
       })
     })
   }

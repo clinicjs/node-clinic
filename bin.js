@@ -3,7 +3,7 @@
 
 const fs = require('fs')
 const path = require('path')
-const open = require('open')
+const opn = require('opn')
 const async = require('async')
 const commist = require('commist')
 const minimist = require('minimist')
@@ -215,7 +215,7 @@ function runTool (args, Tool) {
 
         // open HTML file in default browser
         /* istanbul ignore if: we don't want to open a browser in `npm test` */
-        if (args.open) open('file://' + path.resolve(filename + '.html'))
+        if (args.open) opn('file://' + path.resolve(filename + '.html'), {wait: false})
       })
     })
   }

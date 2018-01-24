@@ -11,11 +11,10 @@ test('clinic flame --collect-only - no issues', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 300)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    const dirname = stderr.match(/\/(\d+.flamegraph)/)[1]
+    const dirname = stderr.match(/\/(\d+.clinic-flame)/)[1]
     fs.access(path.resolve(tempdir, dirname), function (err) {
       t.ifError(err)
-
-      fs.access(path.resolve(tempdir, dirname, 'flamegraph.html'), function (err) {
+      fs.access(path.resolve(tempdir, dirname + '.html'), function (err) {
         t.strictEqual(err.code, 'ENOENT')
         t.end()
       })

@@ -126,7 +126,11 @@ const result = commist()
     const args = minimist(argv, {
       alias: {
         help: 'h',
-        version: 'v'
+        version: 'v',
+        'output-dir': 'outputDir',
+        D: 'outputDir',
+        'output-html': 'outputHtml',
+        F: 'outputHtml'
       },
       boolean: [
         'help',
@@ -139,6 +143,19 @@ const result = commist()
       },
       '--': true
     })
+
+    /* istanbul ignore else */
+    if (!args.name) {
+      argv = ['--name', 'clinic-flame', ...argv]
+    }
+    /* istanbul ignore else */
+    if (!args.outputHtml) {
+      argv = ['--output-html', '{pid}.{name}.html', ...argv]
+    }
+    /* istanbul ignore else */
+    if (!args.outputDir) {
+      argv = ['--output-dir', '{pid}.{name}', ...argv]
+    }
 
     if (args.version) {
       printVersion(version)

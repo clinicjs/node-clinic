@@ -13,7 +13,9 @@ test('clinic flame -- node - no issues', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 300)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    const dirname = stderr.match(/\/(\d+.flamegraph)/)[1]
+
+    const htmlFilename = stderr.match(/\/(\d+.clinic-flame\.html)/)[1]
+    const dirname = path.dirname(htmlFilename)
 
     // check that files exists
     async.parallel({
@@ -21,7 +23,7 @@ test('clinic flame -- node - no issues', function (t) {
         fs.access(path.resolve(tempdir, dirname), done)
       },
       htmlFile (done) {
-        fs.access(path.resolve(tempdir, dirname, 'flamegraph.html'), done)
+        fs.access(path.resolve(tempdir, htmlFilename), done)
       }
     }, function (err) {
       t.ifError(err)

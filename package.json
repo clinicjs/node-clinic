@@ -2,7 +2,7 @@
   "name": "@nearform/clinic",
   "description": "Clinic diagnoses your performance issues",
   "repository": "nearform/node-clinic",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "bin": {
     "clinic": "./bin.js"
   },

@@ -27,7 +27,10 @@ function cli (settings, args, callback) {
     }
   }
 
-  fs.mkdtemp(path.resolve(os.tmpdir(), 'foo-'), function (err, tempdir) {
+  if (settings.cwd) ondir(null, settings.cwd)
+  else fs.mkdtemp(path.resolve(os.tmpdir(), 'foo-'), ondir)
+
+  function ondir (err, tempdir) {
     if (err) return callback(err)
 
     const program = spawn(process.execPath, [BIN_PATH, ...args.slice(1)], {
@@ -69,7 +72,7 @@ function cli (settings, args, callback) {
                result ? result.stderr : null,
                tempdir)
     })
-  })
+  }
 }
 
 module.exports = cli

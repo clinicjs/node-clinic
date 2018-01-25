@@ -3,6 +3,9 @@
   "description": "Clinic diagnoses your performance issues",
   "repository": "nearform/node-clinic",
   "version": "0.5.1",
+  "engines": {
+    "node": ">=9.4.0"
+  },
   "bin": {
     "clinic": "./bin.js"
   },

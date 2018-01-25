@@ -32,12 +32,17 @@
 
     <code>clinic upload 1000.clinic-doctor</code>
 
+  <h1>Utilities</h1>
+  When using clinic a bunch you have fill up your directory with data folders and files.
+  You can clean these easily using <code>clinic clean</code>.
+
   <h1>More information</h1>
   For more information use the <code>--help</code> option:
 
     <code>clinic doctor --help</code>
     <code>clinic bubbleprof --help</code>
     <code>clinic upload --help</code>
+    <code>clinic clean --help</code>
 
   <h1>Flags</h1>
   -h | --help                Display Help

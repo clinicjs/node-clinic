@@ -9,6 +9,7 @@ const commist = require('commist')
 const minimist = require('minimist')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
+const clean = require('./lib/clean')
 
 const result = commist()
   .register('upload', function (argv) {
@@ -51,6 +52,22 @@ const result = commist()
     } else {
       printHelp('clinic-upload')
       process.exit(1)
+    }
+  })
+  .register('clean', function (argv) {
+    const args = minimist(argv, {
+      alias: {
+        help: 'h'
+      }
+    })
+
+    if (args.help) {
+      printHelp('clinic-clean')
+    } else {
+      // support --path to support failure testing
+      clean(args.path || '.', function (err) {
+        if (err) throw err
+      })
     }
   })
   .register('doctor', function (argv) {

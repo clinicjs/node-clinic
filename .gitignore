@@ -4,6 +4,7 @@
 *.clinic-doctor
 *.clinic-doctor.html
 *.tmp
+!test/fixtures/**/*.clinic-*
 
 # Logs
 logs

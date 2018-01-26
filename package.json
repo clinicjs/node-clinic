@@ -4,7 +4,7 @@
   "repository": "nearform/node-clinic",
   "version": "0.6.0",
   "engines": {
-    "node": ">=9.4.0 8.9.4"
+    "node": "^9.4.0 || ^8.9.4"
   },
   "bin": {
     "clinic": "./bin.js"

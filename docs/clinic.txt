@@ -8,8 +8,8 @@
 
   Then benchmark your server with <code>wrk</code> or <code>autocannon</code>:
 
-    <code>wrk http://localahost:3000</code>
-    <code>autocannon http://localahost:3000</code>
+    <code>wrk http://localhost:3000</code>
+    <code>autocannon http://localhost:3000</code>
 
   Finally shut down your server (Ctrl+C). Once the server process has shutdown
   <code>clinic doctor</code> will analyse the collected data and detect what type of issue

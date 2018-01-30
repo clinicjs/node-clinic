@@ -10,17 +10,24 @@ const doctorADirectory = path.resolve(
   __dirname,
   'fixtures',
   'only-folder',
-  '10000a.clinic-doctor'
+  '10000.clinic-doctor'
 )
 
 const doctorBDirectory = path.resolve(
   __dirname,
   'fixtures',
   'only-folder',
-  '10000b.clinic-doctor'
+  '10001.clinic-doctor'
 )
 
-test('clinic upload 10000a.clinic-doctor', function (t) {
+const doctorBadDirectory = path.resolve(
+  __dirname,
+  'fixtures',
+  'html-and-folder',
+  'bad-folder'
+)
+
+test('clinic upload 10000.clinic-doctor', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {
     cli({}, [
@@ -39,9 +46,9 @@ test('clinic upload 10000a.clinic-doctor', function (t) {
         method: 'POST',
         url: '/data',
         files: {
-          '10000a.clinic-doctor/a.txt': 'a',
-          '10000a.clinic-doctor/b.txt': 'b',
-          '10000a.clinic-doctor/c.txt': 'c'
+          '10000.clinic-doctor/a.txt': 'a',
+          '10000.clinic-doctor/b.txt': 'b',
+          '10000.clinic-doctor/c.txt': 'c'
         }
       }])
 
@@ -50,7 +57,7 @@ test('clinic upload 10000a.clinic-doctor', function (t) {
   })
 })
 
-test('clinic upload 10000a.clinic-doctor 10000b.clinic-doctor', function (t) {
+test('clinic upload 10000.clinic-doctor 10001.clinic-doctor', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {
     cli({}, [
@@ -71,17 +78,17 @@ test('clinic upload 10000a.clinic-doctor 10000b.clinic-doctor', function (t) {
         method: 'POST',
         url: '/data',
         files: {
-          '10000a.clinic-doctor/a.txt': 'a',
-          '10000a.clinic-doctor/b.txt': 'b',
-          '10000a.clinic-doctor/c.txt': 'c'
+          '10000.clinic-doctor/a.txt': 'a',
+          '10000.clinic-doctor/b.txt': 'b',
+          '10000.clinic-doctor/c.txt': 'c'
         }
       }, {
         method: 'POST',
         url: '/data',
         files: {
-          '10000b.clinic-doctor/a.txt': 'a',
-          '10000b.clinic-doctor/b.txt': 'b',
-          '10000b.clinic-doctor/c.txt': 'c'
+          '10001.clinic-doctor/a.txt': 'a',
+          '10001.clinic-doctor/b.txt': 'b',
+          '10001.clinic-doctor/c.txt': 'c'
         }
       }])
 
@@ -106,6 +113,21 @@ test('clinic upload - bad status code', function (t) {
         `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`
       ])
       t.ok(stderr.includes('Bad status code: 500'))
+      server.close(() => t.end())
+    })
+  })
+})
+
+test('clinic upload bad-folder', function (t) {
+  const server = new FakeUploadServer()
+  server.listen(function () {
+    cli({relayStderr: false}, [
+      'clinic', 'upload',
+      '--upload-url', server.uploadUrl,
+      doctorBadDirectory
+    ], function (err, stdout, stderr) {
+      t.strictDeepEqual(err, new Error('process exited with exit code 1'))
+      t.ok(stderr.includes('No data to upload'))
       server.close(() => t.end())
     })
   })

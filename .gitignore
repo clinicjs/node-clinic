@@ -61,3 +61,15 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# VSCode and Intellij
+.vscode
+.idea
+*.iml
+
+# MacOS
+.DS_Store
+
+# Lock files
+yarn.lock
+package-lock.json

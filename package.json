@@ -19,9 +19,11 @@
   "dependencies": {
     "0x": "^3.1.0",
     "@nearform/clinic-bubbleprof": "latest",
-    "@nearform/clinic-doctor": "^1.0.0",
+    "@nearform/clinic-doctor": "^2.0.0",
     "async": "^2.6.0",
     "commist": "^1.0.0",
+    "env-string": "^1.0.0",
+    "execspawn": "^1.0.1",
     "minimist": "^1.2.0",
     "opn": "^5.2.0",
     "pumpify": "^1.4.0",
@@ -31,6 +33,7 @@
     "tar-fs": "^1.16.0"
   },
   "devDependencies": {
+    "autocannon": "^2.0.0",
     "snazzy": "^7.0.0",
     "standard": "^10.0.3",
     "tap": "^11.0.1",

@@ -7,6 +7,8 @@ const opn = require('opn')
 const async = require('async')
 const commist = require('commist')
 const minimist = require('minimist')
+const execspawn = require('execspawn')
+const envString = require('env-string')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
@@ -85,7 +87,8 @@ const result = commist()
       ],
       string: [
         'visualize-only',
-        'sample-interval'
+        'sample-interval',
+        'on-port'
       ],
       default: {
         'sample-interval': '10',
@@ -218,9 +221,21 @@ if (result !== null) {
 }
 
 function runTool (args, Tool) {
+  const onPort = args['on-port']
+
   const tool = new Tool({
-    sampleInterval: parseInt(args['sample-interval'], 10)
+    sampleInterval: parseInt(args['sample-interval'], 10),
+    detectPort: !!onPort
   })
+
+  if (tool.on) {
+    tool.on('port', function (port, proc) {
+      process.env.PORT = port
+      // inline the PORT env to make it easier for cross platform usage
+      execspawn(envString(onPort, {PORT: port}), {stdio: 'inherit'})
+        .on('exit', () => proc.kill('SIGINT'))
+    })
+  }
 
   if (args['collect-only']) {
     tool.collect(args['--'], function (err, filename) {

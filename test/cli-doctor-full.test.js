@@ -67,3 +67,20 @@ test('clinic doctor -- node - visualization error', function (t) {
     t.end()
   })
 })
+
+test('clinic doctor --on-port', function (t) {
+  cli({ relayStderr: false }, [
+    'clinic', 'doctor', '--no-open',
+    '--on-port', 'autocannon localhost:$PORT -d 1',
+    '--', 'node', '-e', `
+      const http = require('http')
+
+      http.createServer((req, res) => res.end('ok')).listen(0)
+    `
+  ], function (err, stdout, stderr) {
+    t.ifError(err)
+    t.ok(stderr.indexOf('Running 1s test @ http://localhost:') > -1)
+    t.strictEqual(stdout.split('\n')[0], 'analysing data')
+    t.end()
+  })
+})

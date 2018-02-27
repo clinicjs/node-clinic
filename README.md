@@ -24,6 +24,14 @@ wrk http://localhost:3000
 autocannon http://localhost:3000
 ```
 
+If you want to run autocannon or wrk as soon as your server starts listening you can
+use the `--on-port` option
+
+``` sh
+# $PORT is the port the server is listening on
+clinic doctor --on-port 'autocannon http://localhost:$PORT' -- node server.js
+```
+
 Finally shut down your server (Ctrl+C). Once the server process has shutdown
 <code>clinic doctor</code> will analyse the collected data and detect what type of issue
 you are having. Based on the issue type, it will provide a recommendation for

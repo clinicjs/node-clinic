@@ -12,11 +12,6 @@ jobs:
   build:
     <<: *defaults
     steps:
-      # Setup access to our private npm organization
-      - run:
-          name: Setup private npm
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-
       - checkout
 
       - run:

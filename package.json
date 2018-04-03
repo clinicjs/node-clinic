@@ -17,7 +17,7 @@
     "ci-cov": "tap --100 test/*.test.js"
   },
   "dependencies": {
-    "0x": "^3.1.0",
+    "0x": "^4.0.3",
     "@nearform/clinic-bubbleprof": "latest",
     "@nearform/clinic-doctor": "^2.0.0",
     "async": "^2.6.0",

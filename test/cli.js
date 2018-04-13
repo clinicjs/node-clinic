@@ -68,9 +68,9 @@ function cli (settings, args, callback) {
       }
     }, function (err, result) {
       callback(err,
-               result ? result.stdout : null,
-               result ? result.stderr : null,
-               tempdir)
+        result ? result.stdout : null,
+        result ? result.stderr : null,
+        tempdir)
     })
   }
 }

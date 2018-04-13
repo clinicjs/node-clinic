@@ -37,6 +37,11 @@ Finally shut down your server (Ctrl+C). Once the server process has shutdown
 you are having. Based on the issue type, it will provide a recommendation for
 you.
 
+## Supported Node.js versions
+
+Clinic relies heavily on Node.js core instrumentation available in later versions.
+Currently the supported Node.js versions are `^9.4.0` and `^8.9.4`.
+
 ## Report an issue
 
 If you encounter any issue, feel free to send us an issue report at:

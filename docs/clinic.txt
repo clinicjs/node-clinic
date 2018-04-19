@@ -31,11 +31,12 @@
   You can clean these easily using <code>clinic clean</code>.
 
   <h1>More information</h1>
-  For more information use the <code>--help</code> option:
+  For information on the clinic sub-commands, use the <code>--help</code> option:
 
     <code>clinic doctor --help</code>
     <code>clinic upload --help</code>
     <code>clinic clean --help</code>
+    <code>clinic flame --help</code>
 
   <h1>Flags</h1>
   -h | --help                Display Help

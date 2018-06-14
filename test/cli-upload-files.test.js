@@ -39,7 +39,9 @@ test('clinic upload 10000.clinic-doctor', function (t) {
 
       t.strictDeepEqual(stdout.trim().split('\n'), [
         `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`,
-        `The data is stored under the following id: some-id`
+        `The data has been uploaded`,
+        `Use this link to share it:`,
+        `http://127.0.0.1:${server.server.address().port}/public/some-id/${path.basename(doctorADirectory)}.html`
       ])
 
       t.strictDeepEqual(server.requests, [{
@@ -69,9 +71,13 @@ test('clinic upload 10000.clinic-doctor 10001.clinic-doctor', function (t) {
 
       t.strictDeepEqual(stdout.trim().split('\n'), [
         `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`,
-        `The data is stored under the following id: some-id`,
+        `The data has been uploaded`,
+        `Use this link to share it:`,
+        `http://127.0.0.1:${server.server.address().port}/public/some-id/${path.basename(doctorADirectory)}.html`,
         `Uploading data for ${doctorBDirectory} and ${doctorBDirectory}.html`,
-        `The data is stored under the following id: some-id`
+        `The data has been uploaded`,
+        `Use this link to share it:`,
+        `http://127.0.0.1:${server.server.address().port}/public/some-id/${path.basename(doctorBDirectory)}.html`
       ])
 
       t.strictDeepEqual(server.requests, [{

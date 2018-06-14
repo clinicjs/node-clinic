@@ -20,9 +20,6 @@ install:
 
 build: off
 
-cache:
-  - node_modules -> package.json
-
 configuration: build-lint-test
 
 test_script:

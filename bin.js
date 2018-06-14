@@ -37,6 +37,7 @@ const result = commist()
         // filename may either be .clinic-doctor.html or the data directory
         // .clinic-doctor
         const filePrefix = path.join(filename).replace(/\.html$/, '')
+        const htmlFile = path.basename(filename) + '.html'
 
         console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
         tarAndUpload(
@@ -44,7 +45,9 @@ const result = commist()
           args['upload-url'],
           function (err, reply) {
             if (err) return done(err)
-            console.log(`The data is stored under the following id: ${reply.id}`)
+            console.log('The data has been uploaded')
+            console.log('Use this link to share it:')
+            console.log(`${args['upload-url']}/public/${reply.id}/${htmlFile}`)
             done(null)
           }
         )

@@ -77,6 +77,9 @@ clinic bubbleprof --help
 clinic upload --help
 ```
 
+The doctor functionality is provided by the [clinic-doctor](https://github.com/nearform/node-clinic-doctor) module and
+the bubbleprof functionality is provided by [clinic-bubbleprof](https://github.com/nearform/node-clinic-bubbleprof).
+
 ## Flags
 
 ```

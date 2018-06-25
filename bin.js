@@ -231,11 +231,10 @@ function runTool (args, Tool) {
     detectPort: !!onPort
   })
 
-  tool.on('port', function (port, proc) {
+  tool.on('port', function (port, proc, cb) {
     process.env.PORT = port
     // inline the PORT env to make it easier for cross platform usage
-    execspawn(envString(onPort, {PORT: port}), {stdio: 'inherit'})
-      .on('exit', () => proc.kill('SIGINT'))
+    execspawn(envString(onPort, {PORT: port}), {stdio: 'inherit'}).on('exit', cb)
   })
 
   if (args['collect-only']) {

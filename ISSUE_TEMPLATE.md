@@ -17,6 +17,7 @@
 <!--- Please `clinic upload` your generated sample and paste the link here -->
 
 ## Environment
-* Version used: <!--- e.g. Clinic v0.8.1 Doctor v2.4.1 -->
+* Clinic version: <!--- e.g. Clinic v0.8.1 Doctor v2.4.1 -->
+* Node version: <!--- e.g. v10.2.1 (npm v5.6.0) -->
 * Browser name and version: <!--- e.g. Chrome 67.0.3396.87 (Official Build) (64-bit) -->
 * Operating system and version: <!--- e.g. OSX El Capitan 10.11.5 -->

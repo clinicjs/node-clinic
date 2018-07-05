@@ -9,6 +9,7 @@ const commist = require('commist')
 const minimist = require('minimist')
 const execspawn = require('execspawn')
 const envString = require('env-string')
+const xargv = require('cross-argv')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
@@ -161,7 +162,7 @@ const result = commist()
       process.exit(1)
     }
   })
-  .parse(process.argv.slice(2))
+  .parse(xargv(process.argv.slice(2)))
 
 // not `clinic doctor` and not `clinic upload`
 if (result !== null) {

@@ -21,6 +21,7 @@
     "@nearform/clinic-doctor": "^2.0.0",
     "async": "^2.6.0",
     "commist": "^1.0.0",
+    "cross-argv": "^1.0.0",
     "env-string": "^1.0.0",
     "execspawn": "^1.0.1",
     "minimist": "^1.2.0",

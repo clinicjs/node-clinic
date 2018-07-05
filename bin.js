@@ -12,6 +12,7 @@ const envString = require('env-string')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
+const login = require('./lib/login')
 
 const result = commist()
   .register('upload', function (argv) {
@@ -159,6 +160,28 @@ const result = commist()
     } else {
       printHelp('clinic-flame', version)
       process.exit(1)
+    }
+  })
+  .register('login', function (argv) {
+    const args = minimist(argv, {
+      alias: {
+        help: 'h',
+        username: 'u'
+      },
+      string: [
+        'username'
+      ],
+      boolean: [
+        'help'
+      ]
+    })
+
+    if (args.help) {
+      printHelp('clinic-login')
+    } else {
+      login(args.username, function (err) {
+        if (err) throw err
+      })
     }
   })
   .parse(process.argv.slice(2))

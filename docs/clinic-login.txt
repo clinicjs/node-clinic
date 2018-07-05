@@ -1,0 +1,8 @@
+
+  <title>Clinic Login</title>
+
+  To perform actions that require authentication, run <code>clinic login</code> to authenticate.
+
+  <h1>Flags</h1>
+  -h | --help                Display Help
+  -u | --username            Set Username

@@ -10,6 +10,7 @@ const minimist = require('minimist')
 const execspawn = require('execspawn')
 const envString = require('env-string')
 const xargv = require('cross-argv')
+const crypto = require('crypto')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
@@ -103,9 +104,42 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-doctor', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      runTool(args, require('@nearform/clinic-doctor'))
+      runTool(args, require('@nearform/clinic-doctor'), version)
     } else {
       printHelp('clinic-doctor', version)
+      process.exit(1)
+    }
+  })
+  .register('bubbleprof', function (argv) {
+    const version = require('@nearform/clinic-bubbleprof/package.json').version
+    const args = minimist(argv, {
+      alias: {
+        help: 'h',
+        version: 'v'
+      },
+      boolean: [
+        'help',
+        'version',
+        'collect-only',
+        'open'
+      ],
+      string: [
+        'visualize-only'
+      ],
+      default: {
+        'open': true
+      },
+      '--': true
+    })
+
+    if (args.version) {
+      printVersion(version)
+    } else if (args.help) {
+      printHelp('clinic-bubbleprof', version)
+    } else if (args['visualize-only'] || args['--'].length > 1) {
+      runTool(args, require('@nearform/clinic-bubbleprof'), version)
+    } else {
+      printHelp('clinic-bubbleprof', version)
       process.exit(1)
     }
   })
@@ -188,7 +222,7 @@ if (result !== null) {
   }
 }
 
-function runTool (args, Tool) {
+function runTool (args, Tool, version) {
   const onPort = args['on-port']
 
   const tool = new Tool({
@@ -208,21 +242,18 @@ function runTool (args, Tool) {
       console.log(`output file is ${filename}`)
     })
   } else if (args['visualize-only']) {
-    tool.visualize(
-      args['visualize-only'],
-      args['visualize-only'] + '.html',
-      function (err) {
-        if (err) throw err
+    viz(args['visualize-only'], function (err) {
+      if (err) throw err
 
-        console.log(`generated HTML file is ${args['visualize-only']}.html`)
-      }
+      console.log(`generated HTML file is ${args['visualize-only']}.html`)
+    }
     )
   } else {
     tool.collect(args['--'], function (err, filename) {
       if (err) throw err
       console.log('analysing data')
 
-      tool.visualize(filename, filename + '.html', function (err) {
+      viz(filename, function (err) {
         if (err) throw err
 
         console.log(`generated HTML file is ${filename}.html`)
@@ -233,6 +264,34 @@ function runTool (args, Tool) {
       })
     })
   }
+
+  function viz (filename, cb) {
+    const html = filename + '.html'
+    const name = filename.match(/clinic-([^-]+)/)[1]
+    tool.visualize(filename, html, function (err) {
+      if (err) return cb(err)
+      hash(html, function (err, h) {
+        /* istanbul ignore next */ if (err) return cb(err)
+
+        const info = {
+          tool: name,
+          toolVersion: version,
+          hash: h.toString('hex')
+        }
+
+        fs.appendFile(html, `<!-- ${JSON.stringify(info)} -->\n`, cb)
+      })
+    })
+  }
+}
+
+function hash (filename, cb) {
+  const sha = crypto.createHash('sha512')
+  sha.update('clinic\n')
+  fs.createReadStream(filename)
+    .on('data', data => sha.update(data))
+    .on('end', () => cb(null, sha.digest()))
+    .on('error', cb)
 }
 
 function printVersion (version) {

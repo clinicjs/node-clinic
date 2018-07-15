@@ -4,12 +4,6 @@
   <code>clinic flame</code> helps you find synchronous bottlenecks 
   by creating a flamegraph visualization that assists in identifying
   function calls that may be blocking the event loop.
-
-  <code>clinic flame</code> only supports Linux, OS X and Solaris.
-  It will run a command via sudo because it uses some low-level operating system
-  tools that requires such permission level. Unfortunately, those that are not
-  easily available on Windows: feel free to get in touch if you want to help
-  with Windows support.
   
   For more information see the 0x readme, https://github.com/davidmarkclements/0x
 

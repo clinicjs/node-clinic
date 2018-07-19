@@ -30,7 +30,3 @@
   -v | --version             Display Version
   --collect-only             Do not process data on terminiation
   --visualize-only datapath  Build or rebuild visualization from data
-  --all-options              <code>clinic flame</code> wraps a tool
-                             named <code>0x</code> (http://npm.im/0x). Use this flag 
-                             to output the <code>0x</code> help, which contains the 
-                             full list of options available.

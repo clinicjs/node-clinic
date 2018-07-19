@@ -147,53 +147,33 @@ const result = commist()
     }
   })
   .register('flame', function (argv) {
-    const version = require('0x/package.json').version
+    const version = require('@nearform/clinic-flame/version')
     const args = minimist(argv, {
       alias: {
         help: 'h',
-        version: 'v',
-        'output-dir': 'outputDir',
-        D: 'outputDir',
-        'output-html': 'outputHtml',
-        F: 'outputHtml'
+        version: 'v'
       },
       boolean: [
         'help',
         'version',
-        'all-options',
+        'collect-only',
         'open'
       ],
+      string: [
+        'visualize-only'
+      ],
       default: {
-        open: true
+        'open': true
       },
       '--': true
     })
 
-    /* istanbul ignore else */
-    if (!args.name) {
-      argv = ['--name', 'clinic-flame', ...argv]
-    }
-    /* istanbul ignore else */
-    if (!args.outputHtml) {
-      argv = ['--output-html', '{pid}.{name}.html', ...argv]
-    }
-    /* istanbul ignore else */
-    if (!args.outputDir) {
-      argv = ['--output-dir', '{pid}.{name}', ...argv]
-    }
-
     if (args.version) {
       printVersion(version)
-    } else if (args['all-options']) {
-      require('0x/cmd')(['-h'])
     } else if (args.help) {
       printHelp('clinic-flame', version)
-    } /* istanbul ignore next */ else if (args['visualize-only']) {
-      require('0x/cmd')(argv)
-    } /* istanbul ignore next */ else if (args['collect-only'] && args['--'].length > 1) {
-      require('0x/cmd')(argv)
-    } /* istanbul ignore next */ else if (args['--'].length > 1) {
-      require('0x/cmd')(args.open ? ['-o', ...argv] : argv)
+    } /* istanbul ignore next */ else if (args['visualize-only'] || args['--'].length > 1) {
+      /* istanbul ignore next */ runTool(args, require('@nearform/clinic-flame'))
     } else {
       printHelp('clinic-flame', version)
       process.exit(1)
@@ -201,7 +181,7 @@ const result = commist()
   })
   .parse(xargv(process.argv.slice(2)))
 
-// not `clinic doctor` and not `clinic bubbleprof`
+// not `clinic doctor`, `clinic flame`, and not `clinic bubbleprof`
 if (result !== null) {
   const version = require('./package.json').version
   const args = minimist(process.argv.slice(1), {

@@ -15,7 +15,7 @@ test('clinic bubbleprof -- node - no issues', function (t) {
     t.ifError(err)
     const dirname = stdout.match(/(\d+.clinic-bubbleprof)/)[1]
 
-    t.strictEqual(stdout.split('\n')[0], 'analysing data')
+    t.strictEqual(stdout.split('\n')[0], 'Analysing data')
     t.ok(stdout.split('\n')[1], `generated HTML file is ${dirname}.html`)
 
     // check that files exists
@@ -62,7 +62,7 @@ test('clinic bubbleprof -- node - visualization error', function (t) {
     `
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, 'analysing data\n')
+    t.strictEqual(stdout, 'Analysing data\n')
     t.ok(stderr.includes('ENOENT: no such file or directory'))
     t.end()
   })

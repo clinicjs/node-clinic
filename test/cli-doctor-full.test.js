@@ -15,7 +15,7 @@ test('clinic doctor -- node - no issues', function (t) {
     t.ifError(err)
     const dirname = stdout.match(/(\d+.clinic-doctor)/)[1]
 
-    t.strictEqual(stdout.split('\n')[0], 'analysing data')
+    t.strictEqual(stdout.split('\n')[0], 'Analysing data')
     t.ok(stdout.split('\n')[1], `generated HTML file is ${dirname}.html`)
 
     // check that files exists
@@ -62,7 +62,7 @@ test('clinic doctor -- node - visualization error', function (t) {
     `
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, 'analysing data\n')
+    t.strictEqual(stdout, 'Analysing data\n')
     t.ok(stderr.includes('ENOENT: no such file or directory'))
     t.end()
   })
@@ -80,7 +80,7 @@ test('clinic doctor --on-port', function (t) {
   ], function (err, stdout, stderr) {
     t.ifError(err)
     t.ok(stderr.indexOf('Running 1s test @ http://localhost:') > -1)
-    t.strictEqual(stdout.split('\n')[0], 'analysing data')
+    t.strictEqual(stdout.split('\n')[0], 'Analysing data')
     t.end()
   })
 })

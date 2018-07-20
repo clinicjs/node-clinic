@@ -21,7 +21,7 @@ test('clinic doctor --visualize-only - no issues', function (t) {
       'clinic', 'doctor', '--visualize-only', dirpath
     ], function (err, stdout) {
       t.ifError(err)
-      t.strictEqual(stdout, `generated HTML file is ${dirpath}.html\n`)
+      t.strictEqual(stdout, `Generated HTML file is ${dirpath}.html\nYou can use this command to upload it:\nclinic upload ${dirpath}\n`)
 
       // check that HTML file exists
       fs.access(dirpath + '.html', function (err) {

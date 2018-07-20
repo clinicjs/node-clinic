@@ -1,8 +1,7 @@
 
   <title>Clinic BubbleProf</title> - v{{version}}
 
-  <code>clinic bubbleprof</code> helps you find asynchronous bottlenecks or
-  and debug event loop blocking.
+  <code>clinic bubbleprof</code> helps you find asynchronous bottlenecks and debug event loop blocking.
 
   To run <code>clinic bubbleprof</code>
 

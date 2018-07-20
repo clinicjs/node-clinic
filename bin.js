@@ -28,7 +28,7 @@ const result = commist()
         'help'
       ],
       default: {
-        'upload-url': 'https://clinic-submit.nearform.net'
+        'upload-url': 'https://upload.clinicjs.org'
       }
     })
 

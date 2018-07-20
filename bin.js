@@ -225,18 +225,21 @@ function runTool (args, Tool, version) {
     viz(args['visualize-only'], function (err) {
       if (err) throw err
 
-      console.log(`generated HTML file is ${args['visualize-only']}.html`)
-    }
-    )
+      console.log(`Generated HTML file is ${args['visualize-only']}.html`)
+      console.log('You can use this command to upload it:')
+      console.log(`clinic upload ${args['visualize-only']}`)
+    })
   } else {
     tool.collect(args['--'], function (err, filename) {
       if (err) throw err
-      console.log('analysing data')
+      console.log('Analysing data')
 
       viz(filename, function (err) {
         if (err) throw err
 
-        console.log(`generated HTML file is ${filename}.html`)
+        console.log(`Generated HTML file is ${filename}.html`)
+        console.log('You can use this command to upload it:')
+        console.log(`clinic upload ${filename}`)
 
         // open HTML file in default browser
         /* istanbul ignore if: we don't want to open a browser in `npm test` */

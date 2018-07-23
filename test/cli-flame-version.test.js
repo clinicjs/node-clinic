@@ -8,7 +8,7 @@ test('clinic flame --version', function (t) {
     t.ifError(err)
     t.strictEqual(
       stdout,
-      `v${require('@nearform/clinic-flame/version')}\n`
+      `v${require('@nearform/flame/version')}\n`
     )
     t.end()
   })
@@ -19,7 +19,7 @@ test('clinic flame -v', function (t) {
     t.ifError(err)
     t.strictEqual(
       stdout,
-      `v${require('@nearform/clinic-flame/version')}\n`
+      `v${require('@nearform/flame/version')}\n`
     )
     t.end()
   })

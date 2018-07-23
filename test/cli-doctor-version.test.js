@@ -8,7 +8,7 @@ test('clinic doctor --version', function (t) {
     t.ifError(err)
     t.strictEqual(
       stdout,
-      `v${require('@nearform/clinic-doctor/package.json').version}\n`
+      `v${require('@nearform/doctor/package.json').version}\n`
     )
     t.end()
   })
@@ -19,7 +19,7 @@ test('clinic doctor -v', function (t) {
     t.ifError(err)
     t.strictEqual(
       stdout,
-      `v${require('@nearform/clinic-doctor/package.json').version}\n`
+      `v${require('@nearform/doctor/package.json').version}\n`
     )
     t.end()
   })

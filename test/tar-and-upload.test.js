@@ -11,6 +11,8 @@ const FakeUploadServer = require('./fake-upload-server.js')
 
 testFixtureUpload('doctor', false)
 testFixtureUpload('doctor', true)
+testFixtureUpload('bubbleprof', false)
+testFixtureUpload('bubbleprof', true)
 
 function testFixtureUpload (type, html) {
   const dataDrectory = path.join(

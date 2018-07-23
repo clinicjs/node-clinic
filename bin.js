@@ -78,7 +78,7 @@ const result = commist()
     }
   })
   .register('doctor', function (argv) {
-    const version = require('@nearform/clinic-doctor/package.json').version
+    const version = require('@nearform/doctor/package.json').version
     const args = minimist(argv, {
       alias: {
         help: 'h',
@@ -107,14 +107,14 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-doctor', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      runTool(args, require('@nearform/clinic-doctor'), version)
+      runTool(args, require('@nearform/doctor'), version)
     } else {
       printHelp('clinic-doctor', version)
       process.exit(1)
     }
   })
   .register('bubbleprof', function (argv) {
-    const version = require('@nearform/clinic-bubbleprof/package.json').version
+    const version = require('@nearform/bubbleprof/package.json').version
     const args = minimist(argv, {
       alias: {
         help: 'h',
@@ -140,14 +140,14 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-bubbleprof', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      runTool(args, require('@nearform/clinic-bubbleprof'), version)
+      runTool(args, require('@nearform/bubbleprof'), version)
     } else {
       printHelp('clinic-bubbleprof', version)
       process.exit(1)
     }
   })
   .register('flame', function (argv) {
-    const version = require('@nearform/clinic-flame/version')
+    const version = require('@nearform/flame/version')
     const args = minimist(argv, {
       alias: {
         help: 'h',
@@ -173,7 +173,7 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-flame', version)
     } /* istanbul ignore next */ else if (args['visualize-only'] || args['--'].length > 1) {
-      /* istanbul ignore next */ runTool(args, require('@nearform/clinic-flame'))
+      /* istanbul ignore next */ runTool(args, require('@nearform/flame'))
     } else {
       printHelp('clinic-flame', version)
       process.exit(1)

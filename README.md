@@ -39,6 +39,14 @@ Finally shut down your server (Ctrl+C). Once the server process has shutdown
 you are having. Based on the issue type, it will provide a recommendation for
 you.
 
+For example, to debug I/O issues, use <code>clinic bubbleprof</code>:
+
+```
+clinic bubbleprof -- node server.js
+```
+
+Then benchmark your server again, just like you did with <code>clinic doctor</code>.
+
 ## Supported Node.js versions
 
 Clinic relies heavily on Node.js core instrumentation available in later versions.
@@ -65,6 +73,7 @@ For more information use the <code>--help</code> option:
 
 ```
 clinic doctor --help
+clinic bubbleprof --help
 clinic upload --help
 ```
 

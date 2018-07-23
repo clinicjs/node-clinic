@@ -16,6 +16,12 @@
   you are having. Based on the issue type, it will provide a recommendation for
   you.
 
+  For example, to debug I/O issues, use <code>clinic bubbleprof</code>:
+
+    <code>clinic bubbleprof -- node server.js</code>
+
+  Then benchmark your server again, just like you did with <code>clinic doctor</code>.
+
   <h1>Report an issue</h1>
   If you encounter any issue, feel free to send us an issue report at:
 
@@ -34,6 +40,7 @@
   For information on the clinic sub-commands, use the <code>--help</code> option:
 
     <code>clinic doctor --help</code>
+    <code>clinic bubbleprof --help</code>
     <code>clinic upload --help</code>
     <code>clinic clean --help</code>
     <code>clinic flame --help</code>

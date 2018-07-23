@@ -8,6 +8,10 @@
 
     <code>clinic upload 13242.clinic-doctor</code>
 
+  Or to upload bubbleprof data
+
+    <code>clinic upload 13242.clinic-bubbleprof</code>
+
   Replace 13242 with your pid.
 
   <h1>Flags</h1>

@@ -77,7 +77,7 @@ clinic upload --help
 
 ## License
 
-[Apache 2.0](<https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)>)
+[GPL 3.0](LICENSE)
 
 [0]: https://img.shields.io/badge/stability-experimental-orange.svg?style=flat-square
 [1]: https://nodejs.org/api/documentation.html#documentation_stability_index

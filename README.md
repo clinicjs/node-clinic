@@ -29,7 +29,7 @@ autocannon http://localhost:3000
 If you want to run autocannon or wrk as soon as your server starts listening you can
 use the `--on-port` option
 
-``` sh
+```sh
 # $PORT is the port the server is listening on
 clinic doctor --on-port 'autocannon http://localhost:$PORT' -- node server.js
 ```
@@ -50,7 +50,14 @@ Then benchmark your server again, just like you did with <code>clinic doctor</co
 ## Supported Node.js versions
 
 Clinic relies heavily on Node.js core instrumentation available in later versions.
-Currently the supported Node.js versions are `^9.4.0` and `^8.9.4`.
+Currently the supported Node.js versions are `^10.0.0` and `^8.9.4`.
+
+## Examples and Demos
+
+- [A set of simple Doctor examples](https://github.com/nearform/node-clinic-doctor-examples)
+- [A set of simple Bubbleprof examples](https://github.com/nearform/node-clinic-bubbleprof-examples)
+- [A MongoDB-based Bubbleprof demo/example](https://github.com/nearform/node-clinic-bubbleprof-demo)
+- [A Flame demo/example](https://github.com/nearform/node-clinic-flame-demo)
 
 ## Report an issue
 
@@ -67,6 +74,8 @@ data to the clinic cloud. To do this, use <code>clinic upload</code>:
 clinic upload 1000.clinic-doctor
 ```
 
+and include the URL that it returns.
+
 ## More information
 
 For more information use the <code>--help</code> option:
@@ -74,11 +83,13 @@ For more information use the <code>--help</code> option:
 ```
 clinic doctor --help
 clinic bubbleprof --help
+clinic flame --help
 clinic upload --help
 ```
 
-The doctor functionality is provided by the [clinic-doctor](https://github.com/nearform/node-clinic-doctor) module and
-the bubbleprof functionality is provided by [clinic-bubbleprof](https://github.com/nearform/node-clinic-bubbleprof).
+- The Doctor functionality is provided by the [clinic-doctor](https://github.com/nearform/node-clinic-doctor) module.
+- The Bubbleprof functionality is provided by [clinic-bubbleprof](https://github.com/nearform/node-clinic-bubbleprof).
+- The Flame functionality is provided by [clinic-flame](https://github.com/nearform/node-clinic-flame).
 
 ## Flags
 
@@ -86,6 +97,14 @@ the bubbleprof functionality is provided by [clinic-bubbleprof](https://github.c
 -h | --help                Display Help
 -v | --version             Display Version
 ```
+
+## Programmable Interfaces
+
+Each of the tools has a programmable interface which you can read about in their repos.
+
+- [Node Clinic Doctor](https://github.com/nearform/node-clinic-doctor)
+- [Node Clinic Bubbleprof](https://github.com/nearform/node-clinic-bubbleprof)
+- [Node Clinic Flame](https://github.com/nearform/node-clinic-flame)
 
 ## License
 

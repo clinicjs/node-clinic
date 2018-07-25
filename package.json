@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@nearform/bubbleprof": "^1.1.0",
-    "@nearform/doctor": "^2.6.1",
+    "@nearform/doctor": "^3.0.0",
     "@nearform/flame": "^2.0.0",
     "async": "^2.6.0",
     "commist": "^1.0.0",

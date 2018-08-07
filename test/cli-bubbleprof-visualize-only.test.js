@@ -33,12 +33,13 @@ test('clinic bubbleprof --collect-only - no issues', function (t) {
 })
 
 test('clinic bubbleprof --collect-only - missing data', function (t) {
+  const arg = 'missing.clinic-bubbleprof'
   cli({ relayStderr: false }, [
-    'clinic', 'bubbleprof', '--visualize-only', 'missing.clinic-bubbleprof'
+    'clinic', 'bubbleprof', '--visualize-only', arg
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
     t.strictEqual(stdout, '')
-    t.ok(stderr.includes('ENOENT: no such file or directory'))
+    t.ok(stderr.includes(`Unknown argument "${arg}". Pattern: {pid}.clinic-{command}`))
     t.end()
   })
 })

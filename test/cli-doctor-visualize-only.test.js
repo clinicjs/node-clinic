@@ -33,12 +33,13 @@ test('clinic doctor --visualize-only - no issues', function (t) {
 })
 
 test('clinic doctor --visualize-only - missing data', function (t) {
+  const arg = 'missing.clinic-doctor'
   cli({ relayStderr: false }, [
-    'clinic', 'doctor', '--visualize-only', 'missing.clinic-doctor'
+    'clinic', 'doctor', '--visualize-only', arg
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
     t.strictEqual(stdout, '')
-    t.ok(stderr.includes('ENOENT: no such file or directory'))
+    t.ok(stderr.includes(`Unknown argument "${arg}". Pattern: {pid}.clinic-{command}`))
     t.end()
   })
 })

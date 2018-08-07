@@ -252,6 +252,9 @@ function runTool (args, Tool, version) {
   }
 
   function viz (filename, cb) {
+    if (!/\d+\.clinic-.+$/.test(filename)) {
+      return cb(new Error(`Unknown argument "${filename}". Pattern: {pid}.clinic-{command}`))
+    }
     const html = filename + '.html'
     const name = filename.match(/clinic-([^-]+)/)[1]
     tool.visualize(filename, html, function (err) {

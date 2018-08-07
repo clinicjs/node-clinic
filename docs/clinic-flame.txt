@@ -4,7 +4,7 @@
   <code>clinic flame</code> helps you find synchronous bottlenecks 
   by creating a flamegraph visualization that assists in identifying
   function calls that may be blocking the event loop.
-  
+
   For more information see the 0x readme, https://github.com/davidmarkclements/0x
 
   To run <code>clinic flame</code>
@@ -17,7 +17,7 @@
 
   You can then transfer the data and visualize it locally:
 
-    <code>clinic flame --visualize-only PID.flamegraph</code>
+    <code>clinic flame --visualize-only PID.clinic.flame</code>
 
   <h1>Flags</h1>
   -h | --help                Display Help

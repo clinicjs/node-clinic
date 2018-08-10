@@ -213,6 +213,11 @@ function runTool (args, Tool, version) {
     detectPort: !!onPort
   })
 
+  /* istanbul ignore next */
+  tool.on('warning', function (warning) {
+    console.log('Warning: ' + warning)
+  })
+
   tool.on('port', function (port, proc, cb) {
     process.env.PORT = port
     // inline the PORT env to make it easier for cross platform usage

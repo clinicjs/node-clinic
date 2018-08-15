@@ -61,3 +61,6 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# Visual studio code
+.vscode

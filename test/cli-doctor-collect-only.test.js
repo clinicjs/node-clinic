@@ -11,7 +11,7 @@ test('clinic doctor --collect-only - no issues', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    t.ok(/output file is (\d+).clinic-doctor/.test(stdout))
+    t.ok(/Output file is (\d+).clinic-doctor/.test(stdout))
 
     const dirname = stdout.match(/(\d+.clinic-doctor)/)[1]
     fs.access(path.resolve(tempdir, dirname), function (err) {
@@ -31,7 +31,7 @@ test('clinic doctor --collect-only - bad status code', function (t) {
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, '')
+    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\n')
     t.ok(stderr.includes('process exited with exit code 1'))
     t.end()
   })

@@ -96,6 +96,7 @@ clinic upload --help
 ```
 -h | --help                Display Help
 -v | --version             Display Version
+--debug                    Do not minify the generated files
 ```
 
 ## Programmable Interfaces

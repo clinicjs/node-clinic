@@ -36,7 +36,7 @@ test('clinic flame --collect-only - missing data', function (t) {
     'clinic', 'flame', '--visualize-only', 'missing.flamegraph'
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, '')
+    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\n')
     t.ok(stderr.includes('Invalid data path provided'))
     t.end()
   })

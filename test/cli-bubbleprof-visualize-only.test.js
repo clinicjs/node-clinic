@@ -12,7 +12,7 @@ test('clinic bubbleprof --collect-only - no issues', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    t.ok(/output file is (\d+).clinic-bubbleprof/.test(stdout))
+    t.ok(/Output file is (\d+).clinic-bubbleprof/.test(stdout))
     const dirname = stdout.match(/(\d+.clinic-bubbleprof)/)[1]
     const dirpath = path.resolve(tempdir, dirname)
 
@@ -21,7 +21,12 @@ test('clinic bubbleprof --collect-only - no issues', function (t) {
       'clinic', 'bubbleprof', '--visualize-only', dirpath
     ], function (err, stdout) {
       t.ifError(err)
-      t.strictEqual(stdout, `Generated HTML file is ${dirpath}.html\nYou can use this command to upload it:\nclinic upload ${dirpath}\n`)
+      t.strictEqual(
+        stdout,
+        'To generate the report press: Ctrl + C\n' +
+        `Generated HTML file is ${dirpath}.html\n` +
+          'You can use this command to upload it:\n' +
+          `clinic upload ${dirpath}\n`)
 
       // check that HTML file exists
       fs.access(dirpath + '.html', function (err) {
@@ -38,7 +43,7 @@ test('clinic bubbleprof --collect-only - missing data', function (t) {
     'clinic', 'bubbleprof', '--visualize-only', arg
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, '')
+    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\n')
     t.ok(stderr.includes(`Unknown argument "${arg}". Pattern: {pid}.clinic-{command}`))
     t.end()
   })

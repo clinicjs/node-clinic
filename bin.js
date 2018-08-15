@@ -208,9 +208,14 @@ if (result !== null) {
 function runTool (args, Tool, version) {
   const onPort = args['on-port']
 
+  if (!onPort) {
+    console.log('To generate the report press: Ctrl + C')
+  }
+
   const tool = new Tool({
     sampleInterval: parseInt(args['sample-interval'], 10),
-    detectPort: !!onPort
+    detectPort: !!onPort,
+    debug: 'debug' in args
   })
 
   /* istanbul ignore next */
@@ -227,7 +232,7 @@ function runTool (args, Tool, version) {
   if (args['collect-only']) {
     tool.collect(args['--'], function (err, filename) {
       if (err) throw err
-      console.log(`output file is ${filename}`)
+      console.log(`Output file is ${filename}`)
     })
   } else if (args['visualize-only']) {
     viz(args['visualize-only'], function (err) {

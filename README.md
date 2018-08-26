@@ -47,6 +47,15 @@ clinic bubbleprof -- node server.js
 
 Then benchmark your server again, just like you did with <code>clinic doctor</code>.
 
+Note that when looking at the CPU graph you might notice that it doesn't
+necessarily go from 0-100 but might go from 0-200 or higher. This is because the
+percentage reflects the total amount of CPU cores your computer has. Node.js
+itself uses more than one thread behind the scene even though JavaScript is
+single threaded. V8 (The JavaScript engine) runs the garbage collector and some
+optimizations on background threads. With worker threads, the CPU will also
+utilize more than 100%. The visible percentage is always the combination of all
+these factors together.
+
 ## Supported Node.js versions
 
 Clinic relies heavily on Node.js core instrumentation available in later versions.

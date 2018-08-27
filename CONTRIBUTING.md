@@ -30,7 +30,7 @@ After the upload has finished, add the printed upload id to your issue.
 
 ## For Developers
 
-All constributings should fit the [standard](https://github.com/standard/standard) linter, and pass the tests.
+All contributions should fit the [standard](https://github.com/standard/standard) linter, and pass the tests.
 You can test this by running:
 
 ```

@@ -12,7 +12,7 @@ test('clinic bubbleprof --collect-only - no issues', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    t.ok(/output file is (\d+).clinic-bubbleprof/.test(stdout))
+    t.ok(/Output file is (\d+).clinic-bubbleprof/.test(stdout))
     const dirname = stdout.match(/(\d+.clinic-bubbleprof)/)[1]
     const dirpath = path.resolve(tempdir, dirname)
 
@@ -21,7 +21,12 @@ test('clinic bubbleprof --collect-only - no issues', function (t) {
       'clinic', 'bubbleprof', '--visualize-only', dirpath
     ], function (err, stdout) {
       t.ifError(err)
-      t.strictEqual(stdout, `Generated HTML file is ${dirpath}.html\nYou can use this command to upload it:\nclinic upload ${dirpath}\n`)
+      t.strictEqual(
+        stdout,
+        `Generated HTML file is ${dirpath}.html
+You can use this command to upload it:
+clinic upload ${dirpath}
+`)
 
       // check that HTML file exists
       fs.access(dirpath + '.html', function (err) {

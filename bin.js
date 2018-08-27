@@ -88,7 +88,8 @@ const result = commist()
         'help',
         'version',
         'collect-only',
-        'open'
+        'open',
+        'debug'
       ],
       string: [
         'visualize-only',
@@ -97,7 +98,8 @@ const result = commist()
       ],
       default: {
         'sample-interval': '10',
-        'open': true
+        'open': true,
+        'debug': false
       },
       '--': true
     })
@@ -124,13 +126,15 @@ const result = commist()
         'help',
         'version',
         'collect-only',
-        'open'
+        'open',
+        'debug'
       ],
       string: [
         'visualize-only'
       ],
       default: {
-        'open': true
+        open: true,
+        debug: false
       },
       '--': true
     })
@@ -157,13 +161,15 @@ const result = commist()
         'help',
         'version',
         'collect-only',
-        'open'
+        'open',
+        'debug'
       ],
       string: [
         'visualize-only'
       ],
       default: {
-        'open': true
+        open: true,
+        debug: false
       },
       '--': true
     })
@@ -208,9 +214,18 @@ if (result !== null) {
 function runTool (args, Tool, version) {
   const onPort = args['on-port']
 
+  if (!onPort && !args['visualize-only']) {
+    if (args['collect-only']) {
+      console.log('To stop data collection press: Ctrl + C')
+    } else {
+      console.log('To generate the report press: Ctrl + C')
+    }
+  }
+
   const tool = new Tool({
     sampleInterval: parseInt(args['sample-interval'], 10),
-    detectPort: !!onPort
+    detectPort: !!onPort,
+    debug: args.debug
   })
 
   /* istanbul ignore next */
@@ -227,7 +242,7 @@ function runTool (args, Tool, version) {
   if (args['collect-only']) {
     tool.collect(args['--'], function (err, filename) {
       if (err) throw err
-      console.log(`output file is ${filename}`)
+      console.log(`Output file is ${filename}`)
     })
   } else if (args['visualize-only']) {
     viz(args['visualize-only'], function (err) {

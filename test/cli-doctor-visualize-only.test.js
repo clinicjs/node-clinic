@@ -12,7 +12,7 @@ test('clinic doctor --visualize-only - no issues', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    t.ok(/output file is (\d+).clinic-doctor/.test(stdout))
+    t.ok(/Output file is (\d+).clinic-doctor/.test(stdout))
     const dirname = stdout.match(/(\d+.clinic-doctor)/)[1]
     const dirpath = path.resolve(tempdir, dirname)
 
@@ -21,7 +21,12 @@ test('clinic doctor --visualize-only - no issues', function (t) {
       'clinic', 'doctor', '--visualize-only', dirpath
     ], function (err, stdout) {
       t.ifError(err)
-      t.strictEqual(stdout, `Generated HTML file is ${dirpath}.html\nYou can use this command to upload it:\nclinic upload ${dirpath}\n`)
+      t.strictEqual(
+        stdout,
+        `Generated HTML file is ${dirpath}.html
+You can use this command to upload it:
+clinic upload ${dirpath}
+`)
 
       // check that HTML file exists
       fs.access(dirpath + '.html', function (err) {

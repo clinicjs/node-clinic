@@ -39,7 +39,7 @@ test('clinic flame -- node - bad status code', function (t) {
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, '')
+    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\n')
     t.ok(stderr.includes('subprocess error, code: 1'))
     t.end()
   })

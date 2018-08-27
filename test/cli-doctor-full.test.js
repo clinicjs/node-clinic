@@ -15,8 +15,8 @@ test('clinic doctor -- node - no issues', function (t) {
     t.ifError(err)
     const dirname = stdout.match(/(\d+.clinic-doctor)/)[1]
 
-    t.strictEqual(stdout.split('\n')[0], 'Analysing data')
-    t.ok(stdout.split('\n')[1], `generated HTML file is ${dirname}.html`)
+    t.strictEqual(stdout.split('\n')[1], 'Analysing data')
+    t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${dirname}.html`)
 
     // check that files exists
     async.parallel({
@@ -40,7 +40,7 @@ test('clinic doctor -- node - bad status code', function (t) {
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, '')
+    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\n')
     t.ok(stderr.includes('process exited with exit code 1'))
     t.end()
   })
@@ -62,7 +62,7 @@ test('clinic doctor -- node - visualization error', function (t) {
     `
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, 'Analysing data\n')
+    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\nAnalysing data\n')
     t.ok(stderr.includes('ENOENT: no such file or directory'))
     t.end()
   })

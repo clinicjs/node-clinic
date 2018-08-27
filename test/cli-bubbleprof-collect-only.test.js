@@ -7,11 +7,11 @@ const cli = require('./cli.js')
 
 test('clinic bubbleprof --collect-only - no issues', function (t) {
   cli({}, [
-    'clinic', 'bubbleprof', '--collect-only',
+    'clinic', 'bubbleprof', '--collect-only', '--debug',
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    t.ok(/output file is (\d+).clinic-bubbleprof/.test(stdout))
+    t.ok(/Output file is (\d+).clinic-bubbleprof/.test(stdout))
 
     const dirname = stdout.match(/(\d+.clinic-bubbleprof)/)[1]
     fs.access(path.resolve(tempdir, dirname), function (err) {
@@ -31,7 +31,7 @@ test('clinic bubbleprof --collect-only - bad status code', function (t) {
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, '')
+    t.strictEqual(stdout, 'To stop data collection press: Ctrl + C\n')
     t.ok(stderr.includes('process exited with exit code 1'))
     t.end()
   })

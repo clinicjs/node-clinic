@@ -23,10 +23,10 @@ test('clinic doctor --visualize-only - no issues', function (t) {
       t.ifError(err)
       t.strictEqual(
         stdout,
-        'To generate the report press: Ctrl + C\n' +
-        `Generated HTML file is ${dirpath}.html\n` +
-          'You can use this command to upload it:\n' +
-          `clinic upload ${dirpath}\n`)
+        `Generated HTML file is ${dirpath}.html
+You can use this command to upload it:
+clinic upload ${dirpath}
+`)
 
       // check that HTML file exists
       fs.access(dirpath + '.html', function (err) {
@@ -43,7 +43,7 @@ test('clinic doctor --visualize-only - missing data', function (t) {
     'clinic', 'doctor', '--visualize-only', arg
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\n')
+    t.strictEqual(stdout, '')
     t.ok(stderr.includes(`Unknown argument "${arg}". Pattern: {pid}.clinic-{command}`))
     t.end()
   })

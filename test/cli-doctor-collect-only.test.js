@@ -31,7 +31,7 @@ test('clinic doctor --collect-only - bad status code', function (t) {
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\n')
+    t.strictEqual(stdout, 'To stop data collection press: Ctrl + C\n')
     t.ok(stderr.includes('process exited with exit code 1'))
     t.end()
   })

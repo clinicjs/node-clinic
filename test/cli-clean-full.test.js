@@ -18,7 +18,7 @@ test('clinic clean', function (t) {
       t.equal(files.length, 2) // the folder and html file
       fs.writeFileSync(path.join(tempdir, 'some-other-file'), 'sup')
 
-      cli({cwd: tempdir}, ['clinic', 'clean'], function (err) {
+      cli({ cwd: tempdir }, ['clinic', 'clean'], function (err) {
         t.ifError(err)
 
         fs.readdir(tempdir, function (err, files) {
@@ -32,7 +32,7 @@ test('clinic clean', function (t) {
 })
 
 test('clinic clean on bad dir', function (t) {
-  cli({relayStderr: false}, [
+  cli({ relayStderr: false }, [
     'clinic', 'clean', '--path', 'path/does/not/exist'
   ], function (err, stdout, stderr) {
     t.ok(err)

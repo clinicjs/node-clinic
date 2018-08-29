@@ -236,7 +236,7 @@ function runTool (args, Tool, version) {
   tool.on('port', function (port, proc, cb) {
     process.env.PORT = port
     // inline the PORT env to make it easier for cross platform usage
-    execspawn(envString(onPort, {PORT: port}), {stdio: 'inherit'}).on('exit', cb)
+    execspawn(envString(onPort, { PORT: port }), { stdio: 'inherit' }).on('exit', cb)
   })
 
   if (args['collect-only']) {
@@ -266,7 +266,7 @@ function runTool (args, Tool, version) {
 
         // open HTML file in default browser
         /* istanbul ignore if: we don't want to open a browser in `npm test` */
-        if (args.open) opn('file://' + path.resolve(filename + '.html'), {wait: false})
+        if (args.open) opn('file://' + path.resolve(filename + '.html'), { wait: false })
       })
     })
   }

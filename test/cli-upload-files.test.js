@@ -127,7 +127,7 @@ test('clinic upload - bad status code', function (t) {
 test('clinic upload bad-folder', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {
-    cli({relayStderr: false}, [
+    cli({ relayStderr: false }, [
       'clinic', 'upload',
       '--upload-url', server.uploadUrl,
       doctorBadDirectory

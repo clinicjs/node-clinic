@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "autocannon": "^2.0.0",
-    "snazzy": "^7.0.0",
+    "snazzy": "^8.0.0",
     "standard": "^11.0.0",
     "tap": "^12.0.0",
     "tar-stream": "^1.5.5"

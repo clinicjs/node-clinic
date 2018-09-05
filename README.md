@@ -6,6 +6,10 @@
 [![npm version][npm-version]][npm-url] [![Stability Stable][stability-stable]][stability-docs] [![CircleCI build status][circleci-status]][circleci-url] [![Appveyor build status][appveyor-status]][appveyor-url]
 [![Downloads][npm-downloads]][npm-url] [![Code style][lint-standard]][lint-standard-url]
 
+An Open Source Node.js performance profiling suite by [NearForm][].
+
+Demo and detailed documentation: https://clinicjs.org/
+
 ## Install
 
 ```
@@ -130,3 +134,4 @@ Each of the tools has a programmable interface which you can read about in their
 [lint-standard-url]: https://github.com/feross/standard
 [appveyor-status]: https://ci.appveyor.com/api/projects/status/ex654mc4b3dq3vf4?svg=true
 [appveyor-url]: https://ci.appveyor.com/project/nearForm/node-clinic
+[NearForm]: https://www.nearform.com

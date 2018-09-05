@@ -3,9 +3,8 @@
 # node-clinic
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/nearform/node-clinic.svg)](https://greenkeeper.io/)
-
-[![npm version][2]][3] [![build status][4]][5] [![build status][12]][13]
-[![downloads][8]][9] [![js-standard-style][10]][11]
+[![npm version][npm-version]][npm-url] [![Stability Stable][stability-stable]][stability-docs] [![CircleCI build status][circleci-status]][circleci-url] [![Appveyor build status][appveyor-status]][appveyor-url]
+[![Downloads][npm-downloads]][npm-url] [![Code style][lint-standard]][lint-standard-url]
 
 ## Install
 
@@ -120,17 +119,14 @@ Each of the tools has a programmable interface which you can read about in their
 
 [GPL 3.0](LICENSE)
 
-[0]: https://img.shields.io/badge/stability-experimental-orange.svg?style=flat-square
-[1]: https://nodejs.org/api/documentation.html#documentation_stability_index
-[2]: https://img.shields.io/npm/v/clinic.svg?style=flat-square
-[3]: https://npmjs.org/package/clinic
-[4]: https://circleci.com/gh/nearform/node-clinic/tree/master.svg?style=shield&circle-token=898867ce2715cb4b51018bb20c7798c1dd306250
-[5]: https://circleci.com/gh/nearform/node-clinic
-[6]: https://img.shields.io/codecov/c/github/nearform/node-clinic/master.svg?style=flat-square
-[7]: https://codecov.io/github/nearform/node-clinic
-[8]: http://img.shields.io/npm/dm/clinic.svg?style=flat-square
-[9]: https://www.npmjs.org/package/clinic
-[10]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square
-[11]: https://github.com/feross/standard
-[12]: https://ci.appveyor.com/api/projects/status/ex654mc4b3dq3vf4?svg=true
-[13]: https://ci.appveyor.com/project/nearForm/node-clinic
+[stability-stable]: https://img.shields.io/badge/stability-stable-green.svg?style=flat-square
+[stability-docs]: https://nodejs.org/api/documentation.html#documentation_stability_index
+[npm-version]: https://img.shields.io/npm/v/clinic.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/clinic
+[circleci-status]: https://circleci.com/gh/nearform/node-clinic/tree/master.svg?style=shield&circle-token=898867ce2715cb4b51018bb20c7798c1dd306250
+[circleci-url]: https://circleci.com/gh/nearform/node-clinic
+[npm-downloads]: http://img.shields.io/npm/dm/clinic.svg?style=flat-square
+[lint-standard]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square
+[lint-standard-url]: https://github.com/feross/standard
+[appveyor-status]: https://ci.appveyor.com/api/projects/status/ex654mc4b3dq3vf4?svg=true
+[appveyor-url]: https://ci.appveyor.com/project/nearForm/node-clinic

@@ -23,4 +23,5 @@
   --collect-only             Do not process data on terminiation
   --visualize-only datapath  Build or rebuild visualization from data
   --sample-interval interval Sample interval in milliseconds
-  --on-port                  Run a script when the server starts listening on a port.  --dest                     Destination for the collect data (default .).
+  --on-port                  Run a script when the server starts listening on a port.
+  --dest                     Destination for the collect data (default .).

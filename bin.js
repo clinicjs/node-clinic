@@ -92,7 +92,7 @@ const result = commist()
         'debug'
       ],
       string: [
-        'data-path',
+        'dest',
         'visualize-only',
         'sample-interval',
         'on-port'
@@ -226,7 +226,7 @@ function runTool (args, Tool, version) {
   const tool = new Tool({
     sampleInterval: parseInt(args['sample-interval'], 10),
     detectPort: !!onPort,
-    dataPath: args['data-path'],
+    dest: args.dest,
     debug: args.debug
   })
 

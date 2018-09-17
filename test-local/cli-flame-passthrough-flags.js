@@ -14,7 +14,7 @@ test('clinic flame --name', function (t) {
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
 
-    const htmlFilename = stderr.match(/\/(\d+.custom-name)/)[1]
+    const htmlFilename = stdout.match(/(\d+\.custom-name)/)[1]
     const dirname = path.dirname(htmlFilename)
 
     // check that files exists

@@ -14,7 +14,7 @@ test('clinic flame -- node - no issues', function (t) {
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
 
-    const htmlFilename = stderr.match(/\/(\d+.clinic-flame\.html)/)[1]
+    const htmlFilename = stdout.match(/(\d+\.clinic-flame\.html)/)[1]
     const dirname = path.dirname(htmlFilename)
 
     // check that files exists

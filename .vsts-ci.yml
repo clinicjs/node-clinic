@@ -1,0 +1,44 @@
+queue:
+  name: Hosted Ubuntu 1604
+  demands: npm
+
+jobs:
+- job: build
+  steps:
+  - script: npm config set package-lock false
+  - script: npm install
+  # persist to workspace
+
+- job: lint
+  steps:
+  # attach workspace
+  - script: npm run ci-lint
+
+- job: test
+  steps:
+  # attach workspace
+  - script: npm run ci-test
+
+- job: coverage
+  steps:
+  # attach workspace
+  - script: npm run ci-cov
+
+#- task: Npm@1
+#  displayName: 'npm install'
+#  inputs:
+#    verbose: false
+
+#- task: ArchiveFiles@2
+#  displayName: 'Archive files'
+#  inputs:
+#    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+#    includeRootFolder: false
+
+#- task: PublishBuildArtifacts@1
+#  displayName: 'Publish artifacts: drop'
+
+
+
+
+

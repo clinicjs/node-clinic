@@ -8,7 +8,8 @@ steps:
     npm install
     npm run ci-lint
     npm run ci-test
-  workingDirectory: ~/workspace
+    # workingDirectory would be good, if container builds worked
+#  workingDirectory: ~/workspace
 - task: ArchiveFiles@2
   inputs:
     rootFolderOrFile: '$(System.DefaultWorkingDirectory)'

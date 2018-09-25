@@ -1,44 +1,60 @@
-queue:
-  name: Hosted Ubuntu 1604
-  demands: npm
+#queue:
+#  name: Hosted Ubuntu 1604
+#  demands: npm
 
 jobs:
 - job: build
+  continueOnError: false
+  demands:
+  - npm
   steps:
   - script: npm config set package-lock false
+    workingDirectory: ~/workspace
   - script: npm install
+    workingDirectory: ~/workspace
   # persist to workspace
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(System.DefaultWorkingDirectory)'
+      artifactName: WebSite
 
 - job: lint
+  demands:
+  - npm
   steps:
   # attach workspace
   - script: npm run ci-lint
+    workingDirectory: ~/workspace
+  dependsOn: build
+  condition: succeeded()
 
 - job: test
+  demands:
+  - npm
   steps:
   # attach workspace
   - script: npm run ci-test
+    workingDirectory: ~/workspace
+  dependsOn: build
+  condition: succeeded()
 
 - job: coverage
+  demands:
+  - npm
   steps:
   # attach workspace
   - script: npm run ci-cov
+    workingDirectory: ~/workspace
+  dependsOn: build
+  condition: succeeded()
 
-#- task: Npm@1
-#  displayName: 'npm install'
-#  inputs:
-#    verbose: false
-
-#- task: ArchiveFiles@2
-#  displayName: 'Archive files'
-#  inputs:
-#    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-#    includeRootFolder: false
-
-#- task: PublishBuildArtifacts@1
-#  displayName: 'Publish artifacts: drop'
-
-
-
-
-
+- job: deploy
+  steps:
+  - checkout: none #skip checking out the default repository resource
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download Build Artifacts'
+    inputs:
+      artifactName: WebSite
+      downloadPath: $(System.DefaultWorkingDirectory)
+  dependsOn: build
+  condition: succeeded()

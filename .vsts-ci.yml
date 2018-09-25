@@ -7,7 +7,7 @@ phases:
 #################################################
 - phase: windows
 #################################################
-  condition: and(succeeded(), eq(variables.Agent.OS, 'Windows_NT'))
+  condition: and(succeeded(), eq(variables, 'Windows_NT'))
   queue: Hosted VS2017
 
   steps:
@@ -35,7 +35,7 @@ phases:
 #################################################
 - phase: linux
 #################################################
-  condition: and(succeeded(), eq(variables.Agent.OS, 'Linux'))
+  condition: and(succeeded(), eq(variables, 'Linux'))
   queue: Hosted Linux Preview
 
   steps:

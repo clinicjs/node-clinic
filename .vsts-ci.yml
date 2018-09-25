@@ -1,16 +1,87 @@
-queue:
-  name: Hosted Ubuntu 1604
-  demands: npm
+trigger:
+- master
+- features/*
+- azure-devops
 
-steps:
-- script: |
-    npm config set package-lock false
-    npm install
-    npm run ci-lint
-    npm run ci-test
-    # workingDirectory would be good, if container builds worked
-#  workingDirectory: ~/workspace
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-    includeRootFolder: false
+phases:
+#################################################
+- phase: windows
+#################################################
+  condition: and(succeeded(), eq(variables.os, 'Windows_NT'))
+  queue: Hosted VS2017
+
+  steps:
+  ################################################################################
+
+
+  # install
+  - script: npm config set package-lock false
+  - task: Npm@1
+    displayName: npm install
+    inputs:
+      command: install
+
+  # lint
+  - script: npm run ci-lint
+    displayName: npm lint
+#    workingDirectory: powershell
+
+  # test
+  - script: npm run ci-test
+    displayName: npm test
+#    workingDirectory: powershell
+
+
+#################################################
+- phase: linux
+#################################################
+  condition: and(succeeded(), eq(variables.os, 'Linux'))
+  queue: Hosted Linux Preview
+
+  steps:
+  ################################################################################
+
+  # install
+  - script: npm config set package-lock false
+  - task: Npm@1
+    displayName: npm install
+    inputs:
+      command: install
+#      workingDir: node
+
+  # lint
+  - script: npm run ci-lint
+#    workingDirectory: node
+    displayName: npm lint
+
+  # test
+  - script: npm run ci-test
+    displayName: npm test
+#    workingDirectory: node
+
+#################################################
+- phase: macOS
+#################################################
+  condition: and(succeeded(), eq(variables.os, 'Darwin'))
+  queue: Hosted macOS Preview
+
+  steps:
+  ################################################################################
+
+  # install
+  - script: npm config set package-lock false
+  - task: Npm@1
+    displayName: npm install
+    inputs:
+      command: install
+#      workingDir: node
+
+  # lint
+  - script: npm run ci-lint
+#    workingDirectory: node
+    displayName: npm lint
+
+  # test
+  - script: npm run ci-test
+    displayName: npm test
+#    workingDirectory: node

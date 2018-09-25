@@ -7,7 +7,7 @@ phases:
 #################################################
 - phase: windows
 #################################################
-  condition: and(succeeded(), eq(Agent.OS, 'Windows_NT'))
+  condition: and(succeeded(), eq($(Agent.OS), 'Windows_NT'))
   queue: Hosted VS2017
 
   steps:

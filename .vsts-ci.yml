@@ -1,6 +1,5 @@
 trigger:
 - master
-- features/*
 - azure-devops
 
 phases:
@@ -10,10 +9,18 @@ phases:
   condition: succeeded()
   queue: Hosted VS2017
 
+  strategy:
+    matrix:
+      node_8_x:
+        node_version: 8.x
+      node_9_x:
+        node_version: 9.x
+################################################################################
   steps:
-  ################################################################################
-
-
+  # set Node.JS version
+  - task: NodeTool@0
+    inputs:
+      version: $(node_version)
   # install
   - script: npm config set package-lock false
   - task: Npm@1
@@ -38,9 +45,18 @@ phases:
   condition: succeeded()
   queue: Hosted Linux Preview
 
+  strategy:
+    matrix:
+      node_8_x:
+        node_version: 8.x
+      node_9_x:
+        node_version: 9.x
+################################################################################
   steps:
-  ################################################################################
-
+  # set Node.JS version
+  - task: NodeTool@0
+    inputs:
+      version: $(node_version)
   # install
   - script: npm config set package-lock false
   - task: Npm@1
@@ -78,8 +94,8 @@ phases:
 
   # lint
   - script: npm run ci-lint
-#    workingDirectory: node
     displayName: npm lint
+#    workingDirectory: node
 
   # test
   - script: npm run ci-test

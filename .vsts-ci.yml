@@ -2,19 +2,19 @@ trigger:
 - master
 - azure-devops
 
+strategy:
+  matrix:
+    node_8_x:
+      node_version: 8.x
+    node_9_x:
+      node_version: 9.x
+
 phases:
 #################################################
 - phase: windows
 #################################################
   condition: succeeded()
   queue: Hosted VS2017
-
-  strategy:
-    matrix:
-      node_8_x:
-        node_version: 8.x
-      node_9_x:
-        node_version: 9.x
 ################################################################################
   steps:
   # set Node.JS version
@@ -44,13 +44,6 @@ phases:
 #################################################
   condition: succeeded()
   queue: Hosted Linux Preview
-
-  strategy:
-    matrix:
-      node_8_x:
-        node_version: 8.x
-      node_9_x:
-        node_version: 9.x
 ################################################################################
   steps:
   # set Node.JS version

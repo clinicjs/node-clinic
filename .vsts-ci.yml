@@ -3,6 +3,8 @@ queue:
   demands: npm
 
 steps:
-- script: npm config set package-lock false
-- script: npm install
-- script: npm run ci-lint
+- script: |
+    npm config set package-lock false
+    npm install
+    npm run ci-lint
+    npm run ci-test

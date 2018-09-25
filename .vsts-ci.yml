@@ -1,60 +1,26 @@
-#queue:
-#  name: Hosted Ubuntu 1604
-#  demands: npm
+queue:
+  name: Hosted Ubuntu 1604
+  demands: npm
 
-jobs:
-- job: build
-  continueOnError: false
-  demands:
-  - npm
-  steps:
-  - script: npm config set package-lock false
-    workingDirectory: ~/workspace
-  - script: npm install
-    workingDirectory: ~/workspace
-  # persist to workspace
-  - task: PublishBuildArtifacts@1
+steps:
+- task: Npm@1
+    displayName: NPM Configure
     inputs:
-      pathtoPublish: '$(System.DefaultWorkingDirectory)'
-      artifactName: WebSite
-
-- job: lint
-  demands:
-  - npm
-  steps:
-  # attach workspace
-  - script: npm run ci-lint
-    workingDirectory: ~/workspace
-  dependsOn: build
-  condition: succeeded()
-
-- job: test
-  demands:
-  - npm
-  steps:
-  # attach workspace
-  - script: npm run ci-test
-    workingDirectory: ~/workspace
-  dependsOn: build
-  condition: succeeded()
-
-- job: coverage
-  demands:
-  - npm
-  steps:
-  # attach workspace
-  - script: npm run ci-cov
-    workingDirectory: ~/workspace
-  dependsOn: build
-  condition: succeeded()
-
-- job: deploy
-  steps:
-  - checkout: none #skip checking out the default repository resource
-  - task: DownloadBuildArtifacts@0
-    displayName: 'Download Build Artifacts'
+      command: custom
+      workingDir: '~/workspace'
+#      verbose: false
+      customCommand: 'config set package-lock false'
+- task: Npm@1
+    displayName: NPM install
     inputs:
-      artifactName: WebSite
-      downloadPath: $(System.DefaultWorkingDirectory)
-  dependsOn: build
-  condition: succeeded()
+      command: custom
+      workingDir: '~/workspace'
+#      verbose: false
+      customCommand: 'install' # you could use NPM ci as command too
+- task: Npm@1
+    displayName: NPM install
+    inputs:
+      command: custom
+      workingDir: '~/workspace'
+#      verbose: false
+      customCommand: 'run ci-lint'

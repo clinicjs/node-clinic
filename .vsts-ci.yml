@@ -3,24 +3,6 @@ queue:
   demands: npm
 
 steps:
-- task: Npm@1
-#    displayName: NPM Configure
-    inputs:
-      command: custom
-      workingDir: '~/workspace'
-#      verbose: false
-      customCommand: 'config set package-lock false'
-- task: Npm@1
-#    displayName: NPM install
-    inputs:
-      command: custom
-      workingDir: '~/workspace'
-#      verbose: false
-      customCommand: 'install' # you could use NPM ci as command too
-- task: Npm@1
-#    displayName: Lint
-    inputs:
-      command: custom
-      workingDir: '~/workspace'
-#      verbose: false
-      customCommand: 'run ci-lint'
+- script: npm config set package-lock false
+- script: npm install
+- script: npm run ci-lint

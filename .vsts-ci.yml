@@ -19,8 +19,8 @@ phases:
   condition: and(succeeded(), ne(variables.skip_windows, true))
   queue: Hosted VS2017
 ################################################################################
-  variables:
-    node_version: $(variables.node_version)
+#  variables:
+#    node_version: $(variables.node_version)
   steps:
   # set Node.JS version
   - task: NodeTool@0
@@ -51,8 +51,8 @@ phases:
   condition: and(succeeded(), ne(variables.skip_linux, true))
   queue: Hosted Linux Preview
 ################################################################################
-  variables:
-    node_version: $(variables.node_version)
+#  variables:
+#    node_version: $(variables.node_version)
   steps:
   # set Node.JS version
   - task: NodeTool@0

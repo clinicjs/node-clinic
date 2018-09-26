@@ -16,7 +16,7 @@ phases:
 #################################################
 - phase: windows
 #################################################
-  condition: and(succeeded(), ne(variables.skip_windows, true)
+  condition: and(succeeded(), ne(variables.skip_windows, true))
   queue: Hosted VS2017
 ################################################################################
   steps:
@@ -46,7 +46,7 @@ phases:
 #################################################
 - phase: linux
 #################################################
-  condition: and(succeeded(), ne(variables.skip_linux, true)
+  condition: and(succeeded(), ne(variables.skip_linux, true))
   queue: Hosted Linux Preview
 ################################################################################
   variables:
@@ -78,7 +78,7 @@ phases:
 #################################################
 - phase: macOS
 #################################################
-  condition: and(succeeded(), ne(variables.skip_darwin, true)
+  condition: and(succeeded(), ne(variables.skip_darwin, true))
   queue: Hosted macOS Preview
 
   steps:

@@ -92,7 +92,6 @@ const result = commist()
         'debug'
       ],
       string: [
-        'dest',
         'visualize-only',
         'sample-interval',
         'on-port',

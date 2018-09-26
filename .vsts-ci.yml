@@ -16,14 +16,14 @@ phases:
 #################################################
 - phase: windows
 #################################################
-  condition: succeeded()
+  condition: and(succeeded(), ne(variables.skip_windows, true)
   queue: Hosted VS2017
 ################################################################################
   steps:
   # set Node.JS version
   - task: NodeTool@0
     inputs:
-      version: variables.node_version
+      versionSpec: 10.x
 #      version: $(node_version)
   # install
   - script: npm config set package-lock false
@@ -46,7 +46,7 @@ phases:
 #################################################
 - phase: linux
 #################################################
-  condition: succeeded()
+  condition: and(succeeded(), ne(variables.skip_linux, true)
   queue: Hosted Linux Preview
 ################################################################################
   variables:
@@ -56,7 +56,7 @@ phases:
   - script: echo "node_version:" $(node_version)
   - task: NodeTool@0
     inputs:
-      version: 10.x
+      versionSpec: 10.x
   # install
   - script: npm config set package-lock false
   - task: Npm@1
@@ -78,7 +78,7 @@ phases:
 #################################################
 - phase: macOS
 #################################################
-  condition: succeeded()
+  condition: and(succeeded(), ne(variables.skip_darwin, true)
   queue: Hosted macOS Preview
 
   steps:

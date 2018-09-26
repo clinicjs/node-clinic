@@ -23,7 +23,7 @@ phases:
   # set Node.JS version
   - task: NodeTool@0
     inputs:
-      versionSpec: variables.node_version
+      versionSpec: $(variables.node_version)
 #      versionSpec: 10.x
 #      version: $(node_version)
   # install
@@ -57,7 +57,7 @@ phases:
   - script: echo "node_version:" $(node_version)
   - task: NodeTool@0
     inputs:
-      versionSpec: variables.node_version
+      versionSpec: $(variables.node_version)
   # install
   - script: npm config set package-lock false
   - task: Npm@1

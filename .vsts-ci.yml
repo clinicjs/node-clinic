@@ -2,12 +2,14 @@ trigger:
 - master
 - azure-devops
 
-strategy:
-  matrix:
-    node_8_x:
-      node_version: 8.x
-    node_9_x:
-      node_version: 9.x
+#strategy:
+#  matrix:
+#    node_8_x:
+#      node_version: 8.x
+#    node_9_x:
+#      node_version: 9.x
+#    node_10_x:
+#      node_version: 10.x
 
 phases:
 #################################################
@@ -20,7 +22,8 @@ phases:
   # set Node.JS version
   - task: NodeTool@0
     inputs:
-      version: $(node_version)
+      version: $(variables.node_version)
+#      version: $(node_version)
   # install
   - script: npm config set package-lock false
   - task: Npm@1
@@ -49,7 +52,8 @@ phases:
   # set Node.JS version
   - task: NodeTool@0
     inputs:
-      version: $(node_version)
+      version: $(variables.node_version)
+#      version: $(node_version)
   # install
   - script: npm config set package-lock false
   - task: Npm@1

@@ -95,7 +95,8 @@ const result = commist()
         'dest',
         'visualize-only',
         'sample-interval',
-        'on-port'
+        'on-port',
+        'dest'
       ],
       default: {
         'sample-interval': '10',

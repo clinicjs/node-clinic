@@ -12,7 +12,7 @@ test('clinic flame --visualize-only - no issues', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 300)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    const dirname = stderr.match(/\/(\d+.clinic-flame)/)[1]
+    const dirname = stdout.match(/(\d+\.clinic-flame)/)[1]
     const dirpath = path.resolve(tempdir, dirname)
 
     // visualize data
@@ -20,7 +20,7 @@ test('clinic flame --visualize-only - no issues', function (t) {
       'clinic', 'flame', '--visualize-only', dirpath
     ], function (err, stdout) {
       t.ifError(err)
-      const htmlFilename = stderr.match(/\/(\d+.clinic-flame)/)[1]
+      const htmlFilename = stdout.match(/(\d+\.clinic-flame)/)[1]
 
       // check that HTML file exists
       fs.access(path.resolve(tempdir, htmlFilename), function (err) {
@@ -36,8 +36,8 @@ test('clinic flame --collect-only - missing data', function (t) {
     'clinic', 'flame', '--visualize-only', 'missing.flamegraph'
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\n')
-    t.ok(stderr.includes('Invalid data path provided'))
+    t.strictEqual(stdout, '')
+    t.match(stderr, /Unknown argument "missing\.flamegraph"\. Pattern: {pid}\.clinic-{command}/)
     t.end()
   })
 })

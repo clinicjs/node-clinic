@@ -1,3 +1,4 @@
+# run our pipeline on changes to the below branch[es]
 trigger:
 - master
 
@@ -34,6 +35,9 @@ phases:
   # test
   - script: npm run ci-test
     displayName: npm test
+  # coverage
+  - script: npm run ci-cov
+    displayName: coverage
 
 
 #################################################
@@ -62,6 +66,9 @@ phases:
   - script: npm run ci-test
     displayName: npm test
 #    workingDirectory: node
+  # coverage
+  - script: npm run ci-cov
+    displayName: coverage
 
 #################################################
 - phase: macOS
@@ -87,3 +94,6 @@ phases:
   # test
   - script: npm run ci-test
     displayName: npm test
+  # coverage
+  - script: npm run ci-cov
+    displayName: coverage

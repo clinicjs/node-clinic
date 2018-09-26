@@ -49,6 +49,7 @@ phases:
 ################################################################################
   steps:
   # set Node.JS version
+  - script: echo "node_version:" $(variables.node_version)
   - task: NodeTool@0
     inputs:
       version: variables.node_version

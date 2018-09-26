@@ -50,7 +50,7 @@ phases:
   queue: Hosted Linux Preview
 ################################################################################
   variables:
-  - node_version: variables.node_version
+    node_version: variables.node_version
   steps:
   # set Node.JS version
   - script: echo "node_version:" $(variables.node_version)

@@ -10,6 +10,8 @@ trigger:
 #    node_10_x:
 #      node_version: 10.x
 
+
+
 phases:
 #################################################
 - phase: windows
@@ -47,13 +49,14 @@ phases:
   condition: succeeded()
   queue: Hosted Linux Preview
 ################################################################################
+  variables:
+  - node_version: variables.node_version
   steps:
   # set Node.JS version
   - script: echo "node_version:" $(variables.node_version)
   - task: NodeTool@0
     inputs:
-      version: variables.node_version
-#      version: $(node_version)
+      version: $(node_version)
   # install
   - script: npm config set package-lock false
   - task: Npm@1

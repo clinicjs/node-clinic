@@ -22,7 +22,7 @@ phases:
   # set Node.JS version
   - task: NodeTool@0
     inputs:
-      version: $(variables.node_version)
+      version: variables.node_version
 #      version: $(node_version)
   # install
   - script: npm config set package-lock false

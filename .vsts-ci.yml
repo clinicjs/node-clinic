@@ -10,8 +10,6 @@ trigger:
 #    node_10_x:
 #      node_version: 10.x
 
-
-
 phases:
 #################################################
 - phase: windows
@@ -19,30 +17,23 @@ phases:
   condition: and(succeeded(), ne(variables.skip_windows, true))
   queue: Hosted VS2017
 ################################################################################
-#  variables:
-#    node_version: $(variables.node_version)
   steps:
   # set Node.JS version
   - task: NodeTool@0
     inputs:
       versionSpec: $(node_version)
-#      versionSpec: 10.x
   # install
   - script: npm config set package-lock false
   - task: Npm@1
     displayName: npm install
     inputs:
       command: install
-
   # lint
   - script: npm run ci-lint
     displayName: npm lint
-#    workingDirectory: powershell
-
   # test
   - script: npm run ci-test
     displayName: npm test
-#    workingDirectory: powershell
 
 
 #################################################
@@ -51,8 +42,6 @@ phases:
   condition: and(succeeded(), ne(variables.skip_linux, true))
   queue: Hosted Linux Preview
 ################################################################################
-#  variables:
-#    node_version: $(variables.node_version)
   steps:
   # set Node.JS version
   - task: NodeTool@0
@@ -65,12 +54,10 @@ phases:
     inputs:
       command: install
 #      workingDir: node
-
   # lint
   - script: npm run ci-lint
 #    workingDirectory: node
     displayName: npm lint
-
   # test
   - script: npm run ci-test
     displayName: npm test
@@ -84,21 +71,19 @@ phases:
 
   steps:
   ################################################################################
-
+  # set Node.JS version
+  - task: NodeTool@0
+    inputs:
+      versionSpec: $(node_version)
   # install
   - script: npm config set package-lock false
   - task: Npm@1
     displayName: npm install
     inputs:
       command: install
-#      workingDir: node
-
   # lint
   - script: npm run ci-lint
     displayName: npm lint
-#    workingDirectory: node
-
   # test
   - script: npm run ci-test
     displayName: npm test
-#    workingDirectory: node

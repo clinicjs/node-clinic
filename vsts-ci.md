@@ -23,4 +23,4 @@ example
 
 ## Setup
 
-Azure Pipelines runs `ci-lint` and `ci-test` scripts on `PR` and merges into the `master` branch.
+Azure Pipelines runs `ci-lint`, `ci-test` and `ci-cov` scripts on `PR` and merges into the `master` branch.

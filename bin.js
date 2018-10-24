@@ -12,21 +12,18 @@ const envString = require('env-string')
 const xargv = require('cross-argv')
 const crypto = require('crypto')
 const Insight = require('insight')
+const GA_TRACKING_CODE = '' // TODO replace with actual.
 const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
 
 const insight = new Insight({
-  trackingCode: 'UA-29381785-7',
+  trackingCode: GA_TRACKING_CODE,
   pkg
 })
 
-if (insight.optOut === undefined) {
-  insight.askPermission()
-}
-
-const result = commist()
+const cli = commist()
   .register('upload', function (argv) {
     const args = minimist(argv, {
       alias: {
@@ -205,10 +202,22 @@ const result = commist()
       process.exit(1)
     }
   })
-  .parse(xargv(process.argv.slice(2)))
 
-// not `clinic doctor`, `clinic flame`, and not `clinic bubbleprof`
-if (result !== null) {
+if (insight.optOut === undefined) {
+  insight.askPermission('May Clinic report anonymous usage statistics to improve the tool over time?', () => {
+    runCLI()
+  })
+} else {
+  runCLI()
+}
+
+function runCLI () {
+  const result = cli.parse(xargv(process.argv.slice(2)))
+
+  // Started a tool, no need to do anything else
+  if (result === null) return
+
+  // not `clinic doctor`, `clinic flame`, and not `clinic bubbleprof`
   const version = require('./package.json').version
   const args = minimist(process.argv.slice(1), {
     alias: {

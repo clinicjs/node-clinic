@@ -27,8 +27,7 @@ const insight = new Insight({
 /* istanbul ignore else: Always used in tests to avoid polluting data */
 if ('NO_INSIGHT' in process.env) {
   Object.defineProperty(insight, 'optOut', {
-    get: () => true,
-    set: (v) => {}
+    get: () => true
   })
 }
 

@@ -27,7 +27,7 @@ const insight = new Insight({
 // For tests.
 if ('NO_INSIGHT' in process.env) {
   Object.defineProperty(insight, 'optOut', {
-    get: () => false,
+    get: () => true,
     set: (v) => {}
   })
 }

@@ -24,6 +24,14 @@ const insight = new Insight({
   pkg
 })
 
+// For tests.
+if ('NO_INSIGHT' in process.env) {
+  Object.defineProperty(insight, 'optOut', {
+    get: () => false,
+    set: (v) => {}
+  })
+}
+
 checkForUpdates()
 
 const result = commist()

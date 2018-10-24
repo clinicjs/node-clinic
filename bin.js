@@ -35,7 +35,7 @@ if ('NO_INSIGHT' in process.env) {
 checkForUpdates()
 
 const result = commist()
-  .register('upload', async function (argv) {
+  .register('upload', function (argv) {
     const args = minimist(argv, {
       alias: {
         help: 'h'
@@ -54,32 +54,35 @@ const result = commist()
     if (args.help) {
       printHelp('clinic-upload')
     } else if (args._.length > 0) {
-      await checkMetricsPermission()
-      insight.trackEvent({
-        category: 'upload',
-        action: 'public'
-      })
+      checkMetricsPermission((err) => {
+        if (err) { /* doesn't matter */ }
 
-      async.eachSeries(args._, function (filename, done) {
-        // filename may either be .clinic-doctor.html or the data directory
-        // .clinic-doctor
-        const filePrefix = path.join(filename).replace(/\.html$/, '')
-        const htmlFile = path.basename(filename) + '.html'
+        insight.trackEvent({
+          category: 'upload',
+          action: 'public'
+        })
 
-        console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
-        tarAndUpload(
-          path.resolve(filePrefix),
-          args['upload-url'],
-          function (err, reply) {
-            if (err) return done(err)
-            console.log('The data has been uploaded')
-            console.log('Use this link to share it:')
-            console.log(`${args['upload-url']}/public/${reply.id}/${htmlFile}`)
-            done(null)
-          }
-        )
-      }, function (err) {
-        if (err) throw err
+        async.eachSeries(args._, function (filename, done) {
+          // filename may either be .clinic-doctor.html or the data directory
+          // .clinic-doctor
+          const filePrefix = path.join(filename).replace(/\.html$/, '')
+          const htmlFile = path.basename(filename) + '.html'
+
+          console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
+          tarAndUpload(
+            path.resolve(filePrefix),
+            args['upload-url'],
+            function (err, reply) {
+              if (err) return done(err)
+              console.log('The data has been uploaded')
+              console.log('Use this link to share it:')
+              console.log(`${args['upload-url']}/public/${reply.id}/${htmlFile}`)
+              done(null)
+            }
+          )
+        }, function (err) {
+          if (err) throw err
+        })
       })
     } else {
       printHelp('clinic-upload')
@@ -102,7 +105,7 @@ const result = commist()
       })
     }
   })
-  .register('doctor', async function (argv) {
+  .register('doctor', function (argv) {
     const version = require('@nearform/doctor/package.json').version
     const args = minimist(argv, {
       alias: {
@@ -135,14 +138,16 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-doctor', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      await trackTool('doctor', args, version)
-      runTool(args, require('@nearform/doctor'), version)
+      trackTool('doctor', args, version, (err) => {
+        if (err) throw err
+        runTool(args, require('@nearform/doctor'), version)
+      })
     } else {
       printHelp('clinic-doctor', version)
       process.exit(1)
     }
   })
-  .register('bubbleprof', async function (argv) {
+  .register('bubbleprof', function (argv) {
     const version = require('@nearform/bubbleprof/package.json').version
     const args = minimist(argv, {
       alias: {
@@ -171,14 +176,16 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-bubbleprof', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      await trackTool('bubbleprof', args, version)
-      runTool(args, require('@nearform/bubbleprof'), version)
+      trackTool('bubbleprof', args, version, (err) => {
+        if (err) throw err
+        runTool(args, require('@nearform/bubbleprof'), version)
+      })
     } else {
       printHelp('clinic-bubbleprof', version)
       process.exit(1)
     }
   })
-  .register('flame', async function (argv) {
+  .register('flame', function (argv) {
     const version = require('@nearform/flame/version')
     const args = minimist(argv, {
       alias: {
@@ -207,8 +214,11 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-flame', version)
     } /* istanbul ignore next */ else if (args['visualize-only'] || args['--'].length > 1) {
-      /* istanbul ignore next */ await trackTool('flame', args, version)
-      /* istanbul ignore next */ runTool(args, require('@nearform/flame'))
+      /* istanbul ignore next */
+      trackTool('flame', args, version, (err) => {
+        if (err) throw err
+        runTool(args, require('@nearform/flame'))
+      })
     } else {
       printHelp('clinic-flame', version)
       process.exit(1)
@@ -240,19 +250,18 @@ if (result !== null) {
   }
 }
 
-function checkMetricsPermission () {
-  return new Promise((resolve) => {
-    if (insight.optOut === undefined) {
-      insight.askPermission('May Clinic report anonymous usage statistics to improve the tool over time?', () => {
-        resolve()
-      })
-    } else {
-      resolve()
-    }
-  })
+function checkMetricsPermission (cb) {
+  if (insight.optOut === undefined) {
+    insight.askPermission(
+      'May Clinic report anonymous usage statistics to improve the tool over time?',
+      cb
+    )
+  } else {
+    cb(null)
+  }
 }
 
-async function trackTool (toolName, args, toolVersion) {
+function trackTool (toolName, args, toolVersion, cb) {
   let action = 'run'
   if (args['visualize-only']) {
     action = 'visualize-only'
@@ -260,11 +269,18 @@ async function trackTool (toolName, args, toolVersion) {
     action = 'collect-only'
   }
 
-  await checkMetricsPermission()
-  insight.trackEvent({
-    category: toolName,
-    action,
-    label: toolVersion
+  checkMetricsPermission((err) => {
+    if (err) {
+      // Guess it's no analytics. continue on anyway!
+    }
+
+    insight.trackEvent({
+      category: toolName,
+      action,
+      label: toolVersion
+    })
+
+    cb(null)
   })
 }
 

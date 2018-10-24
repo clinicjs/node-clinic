@@ -26,8 +26,8 @@ const insight = new Insight({
 
 checkForUpdates()
 
-const cli = commist()
-  .register('upload', function (argv) {
+const result = commist()
+  .register('upload', async function (argv) {
     const args = minimist(argv, {
       alias: {
         help: 'h'
@@ -46,6 +46,7 @@ const cli = commist()
     if (args.help) {
       printHelp('clinic-upload')
     } else if (args._.length > 0) {
+      await checkMetricsPermission()
       insight.trackEvent({
         category: 'upload',
         action: 'public'
@@ -93,7 +94,7 @@ const cli = commist()
       })
     }
   })
-  .register('doctor', function (argv) {
+  .register('doctor', async function (argv) {
     const version = require('@nearform/doctor/package.json').version
     const args = minimist(argv, {
       alias: {
@@ -126,14 +127,14 @@ const cli = commist()
     } else if (args.help) {
       printHelp('clinic-doctor', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      trackTool('doctor', args, version)
+      await trackTool('doctor', args, version)
       runTool(args, require('@nearform/doctor'), version)
     } else {
       printHelp('clinic-doctor', version)
       process.exit(1)
     }
   })
-  .register('bubbleprof', function (argv) {
+  .register('bubbleprof', async function (argv) {
     const version = require('@nearform/bubbleprof/package.json').version
     const args = minimist(argv, {
       alias: {
@@ -162,14 +163,14 @@ const cli = commist()
     } else if (args.help) {
       printHelp('clinic-bubbleprof', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      trackTool('bubbleprof', args, version)
+      await trackTool('bubbleprof', args, version)
       runTool(args, require('@nearform/bubbleprof'), version)
     } else {
       printHelp('clinic-bubbleprof', version)
       process.exit(1)
     }
   })
-  .register('flame', function (argv) {
+  .register('flame', async function (argv) {
     const version = require('@nearform/flame/version')
     const args = minimist(argv, {
       alias: {
@@ -198,29 +199,17 @@ const cli = commist()
     } else if (args.help) {
       printHelp('clinic-flame', version)
     } /* istanbul ignore next */ else if (args['visualize-only'] || args['--'].length > 1) {
-      trackTool('flame', args, version)
+      /* istanbul ignore next */ await trackTool('flame', args, version)
       /* istanbul ignore next */ runTool(args, require('@nearform/flame'))
     } else {
       printHelp('clinic-flame', version)
       process.exit(1)
     }
   })
+  .parse(xargv(process.argv.slice(2)))
 
-if (insight.optOut === undefined) {
-  insight.askPermission('May Clinic report anonymous usage statistics to improve the tool over time?', () => {
-    runCLI()
-  })
-} else {
-  runCLI()
-}
-
-function runCLI () {
-  const result = cli.parse(xargv(process.argv.slice(2)))
-
-  // Started a tool, no need to do anything else
-  if (result === null) return
-
-  // not `clinic doctor`, `clinic flame`, and not `clinic bubbleprof`
+// not `clinic doctor`, `clinic flame`, and not `clinic bubbleprof`
+if (result !== null) {
   const version = require('./package.json').version
   const args = minimist(process.argv.slice(1), {
     alias: {
@@ -243,7 +232,19 @@ function runCLI () {
   }
 }
 
-function trackTool (toolName, args, toolVersion) {
+function checkMetricsPermission () {
+  return new Promise((resolve) => {
+    if (insight.optOut === undefined) {
+      insight.askPermission('May Clinic report anonymous usage statistics to improve the tool over time?', () => {
+        resolve()
+      })
+    } else {
+      resolve()
+    }
+  })
+}
+
+async function trackTool (toolName, args, toolVersion) {
   let action = 'run'
   if (args['visualize-only']) {
     action = 'visualize-only'
@@ -251,6 +252,7 @@ function trackTool (toolName, args, toolVersion) {
     action = 'collect-only'
   }
 
+  await checkMetricsPermission()
   insight.trackEvent({
     category: toolName,
     action,

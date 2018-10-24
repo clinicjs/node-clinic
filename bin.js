@@ -13,6 +13,7 @@ const xargv = require('cross-argv')
 const crypto = require('crypto')
 const Insight = require('insight')
 const GA_TRACKING_CODE = '' // TODO replace with actual.
+const updateNotifier = require('update-notifier')
 const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
@@ -22,6 +23,8 @@ const insight = new Insight({
   trackingCode: GA_TRACKING_CODE,
   pkg
 })
+
+checkForUpdates()
 
 const cli = commist()
   .register('upload', function (argv) {
@@ -356,4 +359,13 @@ function printHelp (name, version) {
   const filepath = path.resolve(__dirname, 'docs', name + '.txt')
   const usage = helpFormatter(fs.readFileSync(filepath), version)
   console.log(usage)
+}
+
+function checkForUpdates () {
+  updateNotifier({
+    pkg
+  }).notify({
+    isGlobal: true,
+    defer: false
+  })
 }

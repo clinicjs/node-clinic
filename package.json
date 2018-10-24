@@ -33,7 +33,8 @@
     "rimraf": "^2.6.2",
     "simple-get": "^3.0.0",
     "stream-collector": "^1.0.1",
-    "tar-fs": "^1.16.0"
+    "tar-fs": "^1.16.0",
+    "update-notifier": "^2.5.0"
   },
   "devDependencies": {
     "autocannon": "^3.0.0",

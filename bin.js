@@ -12,12 +12,13 @@ const envString = require('env-string')
 const xargv = require('cross-argv')
 const crypto = require('crypto')
 const Insight = require('insight')
-const GA_TRACKING_CODE = 'UA-0000000-3' // TODO replace with actual.
 const updateNotifier = require('update-notifier')
 const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
+
+const GA_TRACKING_CODE = 'UA-29381785-7'
 
 const insight = new Insight({
   trackingCode: GA_TRACKING_CODE,

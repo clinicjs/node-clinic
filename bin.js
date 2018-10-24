@@ -24,7 +24,7 @@ const insight = new Insight({
   pkg
 })
 
-// For tests.
+/* istanbul ignore else: Always used in tests to avoid polluting data */
 if ('NO_INSIGHT' in process.env) {
   Object.defineProperty(insight, 'optOut', {
     get: () => true,
@@ -54,9 +54,7 @@ const result = commist()
     if (args.help) {
       printHelp('clinic-upload')
     } else if (args._.length > 0) {
-      checkMetricsPermission((err) => {
-        if (err) { /* doesn't matter */ }
-
+      checkMetricsPermission(() => {
         insight.trackEvent({
           category: 'upload',
           action: 'public'
@@ -138,8 +136,7 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-doctor', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      trackTool('doctor', args, version, (err) => {
-        if (err) throw err
+      trackTool('doctor', args, version, () => {
         runTool(args, require('@nearform/doctor'), version)
       })
     } else {
@@ -176,8 +173,7 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-bubbleprof', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      trackTool('bubbleprof', args, version, (err) => {
-        if (err) throw err
+      trackTool('bubbleprof', args, version, () => {
         runTool(args, require('@nearform/bubbleprof'), version)
       })
     } else {
@@ -215,8 +211,7 @@ const result = commist()
       printHelp('clinic-flame', version)
     } /* istanbul ignore next */ else if (args['visualize-only'] || args['--'].length > 1) {
       /* istanbul ignore next */
-      trackTool('flame', args, version, (err) => {
-        if (err) throw err
+      trackTool('flame', args, version, () => {
         runTool(args, require('@nearform/flame'))
       })
     } else {
@@ -251,13 +246,14 @@ if (result !== null) {
 }
 
 function checkMetricsPermission (cb) {
+  /* istanbul ignore if: tracking intentionally disabled when running tests */
   if (insight.optOut === undefined) {
     insight.askPermission(
       'May Clinic report anonymous usage statistics to improve the tool over time?',
       cb
     )
   } else {
-    cb(null)
+    cb()
   }
 }
 
@@ -269,18 +265,14 @@ function trackTool (toolName, args, toolVersion, cb) {
     action = 'collect-only'
   }
 
-  checkMetricsPermission((err) => {
-    if (err) {
-      // Guess it's no analytics. continue on anyway!
-    }
-
+  checkMetricsPermission(() => {
     insight.trackEvent({
       category: toolName,
       action,
       label: toolVersion
     })
 
-    cb(null)
+    cb()
   })
 }
 

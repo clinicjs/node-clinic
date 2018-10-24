@@ -11,9 +11,20 @@ const execspawn = require('execspawn')
 const envString = require('env-string')
 const xargv = require('cross-argv')
 const crypto = require('crypto')
+const Insight = require('insight')
+const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
+
+const insight = new Insight({
+  trackingCode: 'UA-29381785-7',
+  pkg
+})
+
+if (insight.optOut === undefined) {
+  insight.askPermission()
+}
 
 const result = commist()
   .register('upload', function (argv) {
@@ -35,6 +46,11 @@ const result = commist()
     if (args.help) {
       printHelp('clinic-upload')
     } else if (args._.length > 0) {
+      insight.trackEvent({
+        category: 'upload',
+        action: 'public'
+      })
+
       async.eachSeries(args._, function (filename, done) {
         // filename may either be .clinic-doctor.html or the data directory
         // .clinic-doctor
@@ -110,6 +126,7 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-doctor', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
+      trackTool('doctor', args, version)
       runTool(args, require('@nearform/doctor'), version)
     } else {
       printHelp('clinic-doctor', version)
@@ -145,6 +162,7 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-bubbleprof', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
+      trackTool('bubbleprof', args, version)
       runTool(args, require('@nearform/bubbleprof'), version)
     } else {
       printHelp('clinic-bubbleprof', version)
@@ -180,6 +198,7 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-flame', version)
     } /* istanbul ignore next */ else if (args['visualize-only'] || args['--'].length > 1) {
+      trackTool('flame', args, version)
       /* istanbul ignore next */ runTool(args, require('@nearform/flame'))
     } else {
       printHelp('clinic-flame', version)
@@ -210,6 +229,21 @@ if (result !== null) {
     printHelp('clinic', version)
     process.exit(1)
   }
+}
+
+function trackTool (toolName, args, toolVersion) {
+  let action = 'run'
+  if (args['visualize-only']) {
+    action = 'visualize-only'
+  } else if (args['collect-only']) {
+    action = 'collect-only'
+  }
+
+  insight.trackEvent({
+    category: toolName,
+    action,
+    label: toolVersion
+  })
 }
 
 function runTool (args, Tool, version) {

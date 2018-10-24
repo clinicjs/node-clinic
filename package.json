@@ -26,6 +26,7 @@
     "cross-argv": "^1.0.0",
     "env-string": "^1.0.0",
     "execspawn": "^1.0.1",
+    "insight": "^0.10.1",
     "minimist": "^1.2.0",
     "opn": "^5.2.0",
     "pumpify": "^1.4.0",

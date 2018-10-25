@@ -11,9 +11,28 @@ const execspawn = require('execspawn')
 const envString = require('env-string')
 const xargv = require('cross-argv')
 const crypto = require('crypto')
+const Insight = require('insight')
+const updateNotifier = require('update-notifier')
+const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
+
+const GA_TRACKING_CODE = 'UA-29381785-7'
+
+const insight = new Insight({
+  trackingCode: GA_TRACKING_CODE,
+  pkg
+})
+
+/* istanbul ignore else: Always used in tests to avoid polluting data */
+if ('NO_INSIGHT' in process.env) {
+  Object.defineProperty(insight, 'optOut', {
+    get: () => true
+  })
+}
+
+checkForUpdates()
 
 const result = commist()
   .register('upload', function (argv) {
@@ -35,26 +54,33 @@ const result = commist()
     if (args.help) {
       printHelp('clinic-upload')
     } else if (args._.length > 0) {
-      async.eachSeries(args._, function (filename, done) {
-        // filename may either be .clinic-doctor.html or the data directory
-        // .clinic-doctor
-        const filePrefix = path.join(filename).replace(/\.html$/, '')
-        const htmlFile = path.basename(filename) + '.html'
+      checkMetricsPermission(() => {
+        insight.trackEvent({
+          category: 'upload',
+          action: 'public'
+        })
 
-        console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
-        tarAndUpload(
-          path.resolve(filePrefix),
-          args['upload-url'],
-          function (err, reply) {
-            if (err) return done(err)
-            console.log('The data has been uploaded')
-            console.log('Use this link to share it:')
-            console.log(`${args['upload-url']}/public/${reply.id}/${htmlFile}`)
-            done(null)
-          }
-        )
-      }, function (err) {
-        if (err) throw err
+        async.eachSeries(args._, function (filename, done) {
+          // filename may either be .clinic-doctor.html or the data directory
+          // .clinic-doctor
+          const filePrefix = path.join(filename).replace(/\.html$/, '')
+          const htmlFile = path.basename(filename) + '.html'
+
+          console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
+          tarAndUpload(
+            path.resolve(filePrefix),
+            args['upload-url'],
+            function (err, reply) {
+              if (err) return done(err)
+              console.log('The data has been uploaded')
+              console.log('Use this link to share it:')
+              console.log(`${args['upload-url']}/public/${reply.id}/${htmlFile}`)
+              done(null)
+            }
+          )
+        }, function (err) {
+          if (err) throw err
+        })
       })
     } else {
       printHelp('clinic-upload')
@@ -110,7 +136,9 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-doctor', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      runTool(args, require('@nearform/doctor'), version)
+      trackTool('doctor', args, version, () => {
+        runTool(args, require('@nearform/doctor'), version)
+      })
     } else {
       printHelp('clinic-doctor', version)
       process.exit(1)
@@ -145,7 +173,9 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-bubbleprof', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      runTool(args, require('@nearform/bubbleprof'), version)
+      trackTool('bubbleprof', args, version, () => {
+        runTool(args, require('@nearform/bubbleprof'), version)
+      })
     } else {
       printHelp('clinic-bubbleprof', version)
       process.exit(1)
@@ -180,7 +210,10 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-flame', version)
     } /* istanbul ignore next */ else if (args['visualize-only'] || args['--'].length > 1) {
-      /* istanbul ignore next */ runTool(args, require('@nearform/flame'))
+      /* istanbul ignore next */
+      trackTool('flame', args, version, () => {
+        runTool(args, require('@nearform/flame'))
+      })
     } else {
       printHelp('clinic-flame', version)
       process.exit(1)
@@ -210,6 +243,37 @@ if (result !== null) {
     printHelp('clinic', version)
     process.exit(1)
   }
+}
+
+function checkMetricsPermission (cb) {
+  /* istanbul ignore if: tracking intentionally disabled when running tests */
+  if (insight.optOut === undefined) {
+    insight.askPermission(
+      'May Clinic report anonymous usage statistics to improve the tool over time?',
+      cb
+    )
+  } else {
+    cb()
+  }
+}
+
+function trackTool (toolName, args, toolVersion, cb) {
+  let action = 'run'
+  if (args['visualize-only']) {
+    action = 'visualize-only'
+  } else if (args['collect-only']) {
+    action = 'collect-only'
+  }
+
+  checkMetricsPermission(() => {
+    insight.trackEvent({
+      category: toolName,
+      action,
+      label: toolVersion
+    })
+
+    cb()
+  })
 }
 
 function runTool (args, Tool, version) {
@@ -313,4 +377,13 @@ function printHelp (name, version) {
   const filepath = path.resolve(__dirname, 'docs', name + '.txt')
   const usage = helpFormatter(fs.readFileSync(filepath), version)
   console.log(usage)
+}
+
+function checkForUpdates () {
+  updateNotifier({
+    pkg
+  }).notify({
+    isGlobal: true,
+    defer: false
+  })
 }

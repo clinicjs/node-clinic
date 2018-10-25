@@ -26,13 +26,15 @@
     "cross-argv": "^1.0.0",
     "env-string": "^1.0.0",
     "execspawn": "^1.0.1",
+    "insight": "^0.10.1",
     "minimist": "^1.2.0",
     "opn": "^5.2.0",
     "pumpify": "^1.4.0",
     "rimraf": "^2.6.2",
     "simple-get": "^3.0.0",
     "stream-collector": "^1.0.1",
-    "tar-fs": "^1.16.0"
+    "tar-fs": "^1.16.0",
+    "update-notifier": "^2.5.0"
   },
   "devDependencies": {
     "autocannon": "^3.0.0",

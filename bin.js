@@ -14,12 +14,21 @@ const execspawn = require('execspawn')
 const envString = require('env-string')
 const xargv = require('cross-argv')
 const crypto = require('crypto')
+const jwt = require('jsonwebtoken')
 const Insight = require('insight')
 const updateNotifier = require('update-notifier')
 const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
+const authenticate = require('./lib/authenticate.js')
+const authMethods = {
+  authenticate,
+  // for testing success, email in token test@test.com
+  simpleSuccess: () => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJlbWFpbCI6InRlc3RAdGVzdC5jb20ifQ.04BSkxtfqwws2v893h2CDJHFtc7bqn0CGmdDIGI80TA',
+  // for testing failure
+  fail: () => { throw new Error('Auth artificially failed') }
+}
 
 const GA_TRACKING_CODE = 'UA-29381785-8'
 
@@ -38,7 +47,7 @@ if ('NO_INSIGHT' in process.env) {
 checkForUpdates()
 
 const result = commist()
-  .register('upload', function (argv) {
+  .register('upload', async function (argv) {
     const args = minimist(argv, {
       alias: {
         help: 'h'
@@ -73,6 +82,7 @@ const result = commist()
           tarAndUpload(
             path.resolve(filePrefix),
             args['upload-url'],
+            null,
             function (err, reply) {
               if (err) return done(err)
               console.log('The data has been uploaded')
@@ -87,6 +97,64 @@ const result = commist()
       })
     } else {
       printHelp('clinic-upload')
+      process.exit(1)
+    }
+  })
+  .register('ask', async function (argv) {
+    const defaultUploadURL = 'https://upload.clinicjs.org'
+    const args = minimist(argv, {
+      alias: {
+        help: 'h'
+      },
+      string: [
+        'upload-url'
+      ],
+      boolean: [
+        'help'
+      ],
+      default: {
+        'upload-url': defaultUploadURL
+      }
+    })
+
+    if (args.help) {
+      printHelp('clinic-ask')
+    } else if (args._.length > 0) {
+      checkMetricsPermission(async () => {
+        insight.trackEvent({
+          category: 'upload',
+          action: 'ask'
+        })
+        const uploadURL = args['upload-url']
+        // ignore the next line since authenticate is covered by it's own test
+        const authMethod = authMethods[args['auth-method']] || /* istanbul ignore next */ authenticate
+        const authToken = await authMethod(uploadURL)
+        const { email } = jwt.decode(authToken)
+
+        async.eachSeries(args._, function (filename, done) {
+          // filename may either be .clinic-doctor.html or the data directory
+          // .clinic-doctor
+          const filePrefix = path.join(filename).replace(/\.html$/, '')
+
+          console.log(`Uploading private data for user ${email} for ${filePrefix} and ${filePrefix}.html to ${uploadURL}`)
+          tarAndUpload(
+            path.resolve(filePrefix),
+            uploadURL,
+            authToken,
+            function (err) {
+              if (err) return done(err)
+              console.log(`The data has been uploaded to private area for user ${email}`)
+              // TODO: Define the server URL for private stuff
+              console.log(`Thanks for contacting NearForm, we will reply as soon as possible.`)
+              done(null)
+            }
+          )
+        }, function (err) {
+          if (err) throw err
+        })
+      })
+    } else {
+      printHelp('clinic-ask')
       process.exit(1)
     }
   })

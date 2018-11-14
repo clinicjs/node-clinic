@@ -62,3 +62,17 @@ test('clinic flame --on-port', function (t) {
     t.end()
   })
 })
+
+test('clinic flame -- node - configure output destination', function (t) {
+  cli({ relayStderr: false }, [
+    'clinic', 'flame', '--no-open',
+    '--dest', 'test-flame-destination',
+    '--', 'node', '-e', 'require("util").inspect(process)'
+  ], function (err, stdout, stderr, tempdir) {
+    t.ifError(err)
+    const basename = stdout.match(/(\d+.clinic-flame)/)[1]
+    t.ok(fs.statSync(path.join(tempdir, 'test-flame-destination', basename)).isDirectory())
+    t.ok(fs.statSync(path.join(tempdir, 'test-flame-destination', `${basename}.html`)).isFile())
+    t.end()
+  })
+})

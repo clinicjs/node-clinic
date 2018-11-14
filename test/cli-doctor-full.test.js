@@ -84,3 +84,17 @@ test('clinic doctor --on-port', function (t) {
     t.end()
   })
 })
+
+test('clinic doctor -- node - configure output destination', function (t) {
+  cli({ relayStderr: false }, [
+    'clinic', 'doctor', '--no-open',
+    '--dest', 'test-doctor-destination',
+    '--', 'node', '-e', 'setTimeout(() => {}, 200)'
+  ], function (err, stdout, stderr, tempdir) {
+    t.ifError(err)
+    const basename = stdout.match(/(\d+.clinic-doctor)/)[1]
+    t.ok(fs.statSync(path.join(tempdir, 'test-doctor-destination', basename)).isDirectory())
+    t.ok(fs.statSync(path.join(tempdir, 'test-doctor-destination', `${basename}.html`)).isFile())
+    t.end()
+  })
+})

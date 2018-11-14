@@ -17,6 +17,7 @@ const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 const Insight = require('insight')
 const updateNotifier = require('update-notifier')
+const { promisify } = require('util')
 const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
@@ -25,10 +26,11 @@ const authenticate = require('./lib/authenticate.js')
 const authMethods = {
   authenticate,
   // for testing success, email in token test@test.com
-  simpleSuccess: () => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJlbWFpbCI6InRlc3RAdGVzdC5jb20ifQ.04BSkxtfqwws2v893h2CDJHFtc7bqn0CGmdDIGI80TA',
+  simpleSuccess: async () => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1NDIyMjI5MzMsImV4cCI6MTg4OTM3ODEzMywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSJ9.FO0v4OM2V23lAXIcv-qcfFo0snOrOmsrY82kmcYlrJI',
   // for testing failure
-  fail: () => { throw new Error('Auth artificially failed') }
+  fail: async () => { throw new Error('Auth artificially failed') }
 }
+const tarAndUploadPromisified = promisify(tarAndUpload)
 
 const GA_TRACKING_CODE = 'UA-29381785-8'
 
@@ -47,7 +49,7 @@ if ('NO_INSIGHT' in process.env) {
 checkForUpdates()
 
 const result = commist()
-  .register('upload', async function (argv) {
+  .register('upload', function (argv) {
     const args = minimist(argv, {
       alias: {
         help: 'h'
@@ -73,8 +75,8 @@ const result = commist()
         })
 
         async.eachSeries(args._, function (filename, done) {
-          // filename may either be .clinic-doctor.html or the data directory
-          // .clinic-doctor
+        // filename may either be .clinic-doctor.html or the data directory
+        // .clinic-doctor
           const filePrefix = path.join(filename).replace(/\.html$/, '')
           const htmlFile = path.basename(filename) + '.html'
 
@@ -100,7 +102,7 @@ const result = commist()
       process.exit(1)
     }
   })
-  .register('ask', async function (argv) {
+  .register('ask', function (argv) {
     const defaultUploadURL = 'https://upload.clinicjs.org'
     const args = minimist(argv, {
       alias: {
@@ -125,33 +127,13 @@ const result = commist()
           category: 'upload',
           action: 'ask'
         })
-        const uploadURL = args['upload-url']
         // ignore the next line since authenticate is covered by it's own test
         const authMethod = authMethods[args['auth-method']] || /* istanbul ignore next */ authenticate
-        const authToken = await authMethod(uploadURL)
-        const { email } = jwt.decode(authToken)
-
-        async.eachSeries(args._, function (filename, done) {
-          // filename may either be .clinic-doctor.html or the data directory
-          // .clinic-doctor
-          const filePrefix = path.join(filename).replace(/\.html$/, '')
-
-          console.log(`Uploading private data for user ${email} for ${filePrefix} and ${filePrefix}.html to ${uploadURL}`)
-          tarAndUpload(
-            path.resolve(filePrefix),
-            uploadURL,
-            authToken,
-            function (err) {
-              if (err) return done(err)
-              console.log(`The data has been uploaded to private area for user ${email}`)
-              // TODO: Define the server URL for private stuff
-              console.log(`Thanks for contacting NearForm, we will reply as soon as possible.`)
-              done(null)
-            }
-          )
-        }, function (err) {
-          if (err) throw err
-        })
+        return processAsk(args, authMethod)
+          .catch(function (err) {
+            console.error('Unexpected Error', err)
+            process.exit(1)
+          })
       })
     } else {
       printHelp('clinic-ask')
@@ -468,4 +450,33 @@ function checkForUpdates () {
     isGlobal: true,
     defer: false
   })
+}
+
+function tarAndUploadFile (uploadURL, authToken, email) {
+  return async (filename) => {
+    // filename may either be .clinic-doctor.html or the data directory
+    // .clinic-doctor
+    const filePrefix = path.join(filename).replace(/\.html$/, '')
+
+    console.log(`Uploading private data for user ${email} for ${filePrefix} and ${filePrefix}.html to ${uploadURL}`)
+
+    return tarAndUploadPromisified(path.resolve(filePrefix), uploadURL, authToken)
+  }
+}
+
+function processAsk (args, authMethod) {
+  return authMethod(args['upload-url'])
+    .then(function (authToken) {
+      const { email } = jwt.decode(authToken)
+      const uploadURL = args['upload-url']
+      const uploaderFunc = tarAndUploadFile(uploadURL, authToken, email)
+
+      return new Promise((resolve, reject) => {
+        async.eachSeries(args._, uploaderFunc, err => err ? reject(err) : resolve())
+      })
+        .then(() => {
+          console.log(`The data has been uploaded to private area for user ${email}`)
+          console.log(`Thanks for contacting NearForm, we will reply as soon as possible.`)
+        })
+    })
 }

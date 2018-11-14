@@ -72,7 +72,7 @@ test('clinic ask 10000.clinic-doctor auth failure', function (t) {
     doctorADirectory
   ], function (err, stdout, stderr) {
     t.plan(2)
-    t.notOk(err)
+    t.ok(err)
     t.ok(stderr.includes('Auth artificially failed'))
   })
 })

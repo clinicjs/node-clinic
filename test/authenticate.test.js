@@ -15,7 +15,7 @@ test('authenticate', function (t) {
   const authenticate = proxyquire('../lib/authenticate', { 'opn': opnStub }) // mocking the browser opening
 
   const server = http.createServer(() => {})
-  websocket.createServer({ server }, async conn => {
+  websocket.createServer({ server }, conn => {
     conn.pipe(split2())
       .on('data', token => {
         cliToken = token

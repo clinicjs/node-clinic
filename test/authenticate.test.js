@@ -83,6 +83,29 @@ test('authenticate no auth token', function (t) {
     })
 })
 
+test('authenticate failure', function (t) {
+  const authenticate = proxyquire('../lib/authenticate',
+    { 'opn': url => url,
+      'split2': function () {
+        return {
+          on () {
+            return []
+          }
+        }
+      }
+    })
+
+  return authenticate(`http://127.0.0.1:${server.address().port}`)
+    .then(() => {
+      t.fail('it should reject')
+    })
+    .catch(err => {
+      t.plan(1)
+      console.log('err', err)
+      t.ok(err)
+    })
+})
+
 test('After all', function (t) {
   t.plan(0)
   server.close()

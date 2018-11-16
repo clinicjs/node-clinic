@@ -58,6 +58,7 @@ test('clinic ask 10000.clinic-doctor with default upload url', function (t) {
     t.plan(2)
     // error is expected because the actual server on upload.clinicjs.org will return 404
     t.ok(err)
+    console.log('stdout', stdout)
     t.strictDeepEqual(stdout.trim().split('\n'), [
       `Uploading private data for user test@test.com for ${doctorADirectory} and ${doctorADirectory}.html to https://upload.clinicjs.org`
     ])

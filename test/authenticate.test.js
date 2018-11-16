@@ -31,79 +31,70 @@ test('Before all', function (t) {
   })
 })
 
-test('authenticate', function (t) {
-  let openedUrl
+test('authenticate', async function (t) {
+  let openedUrl = ''
   const opnStub = url => {
     openedUrl = url
   }
 
   const authenticate = proxyquire('../lib/authenticate', { 'opn': opnStub }) // mocking the browser opening
 
-  return authenticate(`http://127.0.0.1:${server.address().port}`)
-    .then(jwtToken => {
-      t.plan(2)
-      t.strictEqual(openedUrl.split('token=')[1], cliToken)
-      t.strictEqual(jwtToken, 'jwtToken')
-    })
+  const jwtToken = await authenticate(`http://127.0.0.1:${server.address().port}`)
+  t.plan(2)
+  t.strictEqual(openedUrl.split('token=')[1], cliToken)
+  t.strictEqual(jwtToken, 'jwtToken')
 })
 
-test('authenticate timeout', function (t) {
+test('authenticate timeout', async function (t) {
   const opnStub = url => url
 
   const authenticate = proxyquire('../lib/authenticate', { 'opn': opnStub }) // mocking the browser opening
 
   simulateTimeout = true
-  return authenticate(`http://127.0.0.1:${server.address().port}`)
-    .then(() => {
-      simulateTimeout = false
-      t.fail('it should reject')
-    })
-    .catch(err => {
-      t.plan(2)
-      t.ok(err)
-      t.ok(err.message.includes('Authentication timed out'))
-      simulateTimeout = false
-    })
+
+  try {
+    await authenticate(`http://127.0.0.1:${server.address().port}`)
+    simulateTimeout = false
+    t.fail('it should reject')
+  } catch (err) {
+    t.plan(2)
+    t.ok(err)
+    t.ok(err.message.includes('Authentication timed out'))
+    simulateTimeout = false
+  }
 })
 
-test('authenticate no auth token', function (t) {
+test('authenticate no auth token', async function (t) {
   const authenticate = proxyquire('../lib/authenticate', { 'opn': url => url }) // mocking the browser opening
 
   simulateNoToken = true
-  return authenticate(`http://127.0.0.1:${server.address().port}`)
-    .then(() => {
-      simulateNoToken = false
-      t.fail('it should reject')
-    })
-    .catch(err => {
-      t.plan(2)
-      t.ok(err)
-      t.ok(err.message.includes('Authentication failed. No token obtained'))
-      simulateNoToken = false
-    })
+  try {
+    await authenticate(`http://127.0.0.1:${server.address().port}`)
+    simulateNoToken = false
+    t.fail('it should reject')
+  } catch (err) {
+    t.plan(2)
+    t.ok(err)
+    t.ok(err.message.includes('Authentication failed. No token obtained'))
+    simulateNoToken = false
+  }
 })
 
-test('authenticate failure', function (t) {
-  const authenticate = proxyquire('../lib/authenticate',
-    { 'opn': url => url,
-      'split2': function () {
-        return {
-          on () {
-            return []
-          }
-        }
-      }
+test('authenticate failure', async function (t) {
+  const authenticate = proxyquire(
+    '../lib/authenticate',
+    {
+      'opn': url => url,
+      'split2': () => ({ on: () => [] })
     })
 
-  return authenticate(`http://127.0.0.1:${server.address().port}`)
-    .then(() => {
-      t.fail('it should reject')
-    })
-    .catch(err => {
-      t.plan(1)
-      console.log('err', err)
-      t.ok(err)
-    })
+  try {
+    await authenticate(`http://127.0.0.1:${server.address().port}`)
+    t.fail('it should reject')
+  } catch (err) {
+    t.plan(1)
+    t.ok(err)
+  }
 })
 
 test('After all', function (t) {

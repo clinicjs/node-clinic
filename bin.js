@@ -186,21 +186,24 @@ const result = commist()
     const args = minimist(argv, {
       alias: {
         help: 'h',
-        version: 'v'
+        version: 'v',
+        presentationMode: 'pm'
       },
       boolean: [
         'help',
         'version',
         'collect-only',
         'open',
-        'debug'
+        'debug',
+        'presentationMode'
       ],
       string: [
         'visualize-only'
       ],
       default: {
         open: true,
-        debug: false
+        debug: false,
+        presentationMode: false
       },
       '--': true
     })
@@ -291,7 +294,8 @@ function runTool (args, Tool, version) {
     sampleInterval: parseInt(args['sample-interval'], 10),
     detectPort: !!onPort,
     dest: args.dest,
-    debug: args.debug
+    debug: args.debug,
+    presentationMode: args.presentationMode
   })
 
   /* istanbul ignore next */

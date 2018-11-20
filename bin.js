@@ -313,12 +313,13 @@ function runTool (args, Tool, version) {
       console.log(`Output file is ${filename}`)
     })
   } else if (args['visualize-only']) {
-    viz(args['visualize-only'], function (err) {
+    const dataPath = args['visualize-only'].replace(/\/$/, '')
+    viz(dataPath, function (err) {
       if (err) throw err
 
-      console.log(`Generated HTML file is ${args['visualize-only']}.html`)
+      console.log(`Generated HTML file is ${dataPath}.html`)
       console.log('You can use this command to upload it:')
-      console.log(`clinic upload ${args['visualize-only']}`)
+      console.log(`clinic upload ${dataPath}`)
     })
   } else {
     tool.collect(args['--'], function (err, filename) {

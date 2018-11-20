@@ -62,7 +62,7 @@ test('clinic flame --visualize-only - supports trailing slash', function (t) {
 
     // visualize data
     cli({}, [
-      'clinic', 'flame', '--visualize-only', `${dirpath}/`
+      'clinic', 'flame', '--visualize-only', `${dirpath}${path.sep}`
     ], function (err, stdout) {
       t.ifError(err)
       t.strictEqual(

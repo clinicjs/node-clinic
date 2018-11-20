@@ -62,7 +62,7 @@ test('clinic bubbleprof --visualize-only - with trailing /', function (t) {
 
     // visualize data
     cli({}, [
-      'clinic', 'bubbleprof', '--visualize-only', `${dirpath}/`
+      'clinic', 'bubbleprof', '--visualize-only', `${dirpath}${path.sep}`
     ], function (err, stdout) {
       t.ifError(err)
       t.strictEqual(

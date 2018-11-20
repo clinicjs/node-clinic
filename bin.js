@@ -313,7 +313,7 @@ function runTool (args, Tool, version) {
       console.log(`Output file is ${filename}`)
     })
   } else if (args['visualize-only']) {
-    const dataPath = args['visualize-only'].replace(/\/$/, '')
+    const dataPath = args['visualize-only'].replace(/[\\/]$/, '')
     viz(dataPath, function (err) {
       if (err) throw err
 

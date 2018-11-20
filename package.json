@@ -18,9 +18,9 @@
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {
-    "@nearform/bubbleprof": "^1.6.1",
-    "@nearform/doctor": "^3.4.0",
-    "@nearform/flame": "^3.0.0",
+    "@nearform/bubbleprof": "^1.7.1",
+    "@nearform/doctor": "^3.6.0",
+    "@nearform/flame": "^3.2.0",
     "async": "^2.6.0",
     "commist": "^1.0.0",
     "cross-argv": "^1.0.0",

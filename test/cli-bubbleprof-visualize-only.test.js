@@ -48,3 +48,35 @@ test('clinic bubbleprof --collect-only - missing data', function (t) {
     t.end()
   })
 })
+
+test('clinic bubbleprof --visualize-only - with trailing /', function (t) {
+  // collect data
+  cli({}, [
+    'clinic', 'bubbleprof', '--collect-only',
+    '--', 'node', '-e', 'setTimeout(() => {}, 100)'
+  ], function (err, stdout, stderr, tempdir) {
+    t.ifError(err)
+    t.ok(/Output file is (\d+).clinic-bubbleprof/.test(stdout))
+    const dirname = stdout.match(/(\d+.clinic-bubbleprof)/)[1]
+    const dirpath = path.resolve(tempdir, dirname)
+
+    // visualize data
+    cli({}, [
+      'clinic', 'bubbleprof', '--visualize-only', `${dirpath}${path.sep}`
+    ], function (err, stdout) {
+      t.ifError(err)
+      t.strictEqual(
+        stdout,
+        `Generated HTML file is ${dirpath}.html
+You can use this command to upload it:
+clinic upload ${dirpath}
+`)
+
+      // check that HTML file exists
+      fs.access(dirpath + '.html', function (err) {
+        t.ifError(err)
+        t.end()
+      })
+    })
+  })
+})

@@ -5,20 +5,20 @@ const path = require('path')
 const test = require('tap').test
 const cli = require('./cli.js')
 
-test('clinic doctor --visualize-only - no issues', function (t) {
+test('clinic flame --visualize-only - no issues', function (t) {
   // collect data
   cli({}, [
-    'clinic', 'doctor', '--collect-only',
-    '--', 'node', '-e', 'setTimeout(() => {}, 100)'
+    'clinic', 'flame', '--collect-only',
+    '--', 'node', '-e', 'require("util").inspect(process)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    t.ok(/Output file is (\d+).clinic-doctor/.test(stdout))
-    const dirname = stdout.match(/(\d+.clinic-doctor)/)[1]
+    t.ok(/Output file is (\d+).clinic-flame/.test(stdout))
+    const dirname = stdout.match(/(\d+.clinic-flame)/)[1]
     const dirpath = path.resolve(tempdir, dirname)
 
     // visualize data
     cli({}, [
-      'clinic', 'doctor', '--visualize-only', dirpath
+      'clinic', 'flame', '--visualize-only', dirpath
     ], function (err, stdout) {
       t.ifError(err)
       t.strictEqual(
@@ -37,10 +37,10 @@ clinic upload ${dirpath}
   })
 })
 
-test('clinic doctor --visualize-only - missing data', function (t) {
-  const arg = 'missing.clinic-doctor'
+test('clinic flame --visualize-only - missing data', function (t) {
+  const arg = 'missing.clinic-flame'
   cli({ relayStderr: false }, [
-    'clinic', 'doctor', '--visualize-only', arg
+    'clinic', 'flame', '--visualize-only', arg
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
     t.strictEqual(stdout, '')
@@ -49,20 +49,20 @@ test('clinic doctor --visualize-only - missing data', function (t) {
   })
 })
 
-test('clinic doctor --visualize-only - supports trailing slash', function (t) {
+test('clinic flame --visualize-only - supports trailing slash', function (t) {
   // collect data
   cli({}, [
-    'clinic', 'doctor', '--collect-only',
-    '--', 'node', '-e', 'setTimeout(() => {}, 100)'
+    'clinic', 'flame', '--collect-only',
+    '--', 'node', '-e', 'require("util").inspect(process)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    t.ok(/Output file is (\d+).clinic-doctor/.test(stdout))
-    const dirname = stdout.match(/(\d+.clinic-doctor)/)[1]
+    t.ok(/Output file is (\d+).clinic-flame/.test(stdout))
+    const dirname = stdout.match(/(\d+.clinic-flame)/)[1]
     const dirpath = path.resolve(tempdir, dirname)
 
     // visualize data
     cli({}, [
-      'clinic', 'doctor', '--visualize-only', `${dirpath}${path.sep}`
+      'clinic', 'flame', '--visualize-only', `${dirpath}${path.sep}`
     ], function (err, stdout) {
       t.ifError(err)
       t.strictEqual(

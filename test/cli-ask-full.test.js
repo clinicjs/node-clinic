@@ -34,6 +34,7 @@ test('clinic ask 10000.clinic-doctor with custom upload url', function (t) {
     t.strictDeepEqual(stdout.trim().split('\n'), [
       `Uploading private data for user test@test.com for ${doctorADirectory} and ${doctorADirectory}.html to ${server.uploadUrl}`,
       `The data has been uploaded to private area for user test@test.com`,
+      `${server.uploadUrl}/private/some-id/10000.clinic-doctor.html`,
       `Thanks for contacting NearForm, we will reply as soon as possible.`
     ])
 

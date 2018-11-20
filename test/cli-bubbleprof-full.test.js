@@ -67,3 +67,17 @@ test('clinic bubbleprof -- node - visualization error', function (t) {
     t.end()
   })
 })
+
+test('clinic bubbleprof -- node - configure output destination', function (t) {
+  cli({ relayStderr: false }, [
+    'clinic', 'bubbleprof', '--no-open',
+    '--dest', 'test-bubbleprof-destination',
+    '--', 'node', '-e', 'setTimeout(() => {}, 200)'
+  ], function (err, stdout, stderr, tempdir) {
+    t.ifError(err)
+    const basename = stdout.match(/(\d+.clinic-bubbleprof)/)[1]
+    t.ok(fs.statSync(path.join(tempdir, 'test-bubbleprof-destination', basename)).isDirectory())
+    t.ok(fs.statSync(path.join(tempdir, 'test-bubbleprof-destination', `${basename}.html`)).isFile())
+    t.end()
+  })
+})

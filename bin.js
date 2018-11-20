@@ -159,7 +159,8 @@ const result = commist()
         'debug'
       ],
       string: [
-        'visualize-only'
+        'visualize-only',
+        'dest'
       ],
       default: {
         open: true,
@@ -196,7 +197,8 @@ const result = commist()
         'debug'
       ],
       string: [
-        'visualize-only'
+        'visualize-only',
+        'dest'
       ],
       default: {
         open: true,

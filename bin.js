@@ -1,4 +1,5 @@
 #! /usr/bin/env node
+
 'use strict'
 
 const fs = require('fs')
@@ -18,7 +19,7 @@ const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
 
-const GA_TRACKING_CODE = 'UA-29381785-7'
+const GA_TRACKING_CODE = 'UA-29381785-8'
 
 const insight = new Insight({
   trackingCode: GA_TRACKING_CODE,
@@ -211,7 +212,8 @@ const result = commist()
       printVersion(version)
     } else if (args.help) {
       printHelp('clinic-flame', version)
-    } /* istanbul ignore next */ else if (args['visualize-only'] || args['--'].length > 1) {
+    } /* istanbul ignore next */
+    else if (args['visualize-only'] || args['--'].length > 1) {
       /* istanbul ignore next */
       trackTool('flame', args, version, () => {
         runTool(args, require('@nearform/flame'))
@@ -247,7 +249,7 @@ if (result !== null) {
   }
 }
 
-function checkMetricsPermission (cb) {
+function checkMetricsPermission(cb) {
   /* istanbul ignore if: tracking intentionally disabled when running tests */
   if (insight.optOut === undefined) {
     insight.askPermission(
@@ -259,7 +261,7 @@ function checkMetricsPermission (cb) {
   }
 }
 
-function trackTool (toolName, args, toolVersion, cb) {
+function trackTool(toolName, args, toolVersion, cb) {
   let action = 'run'
   if (args['visualize-only']) {
     action = 'visualize-only'
@@ -278,7 +280,7 @@ function trackTool (toolName, args, toolVersion, cb) {
   })
 }
 
-function runTool (args, Tool, version) {
+function runTool(args, Tool, version) {
   const onPort = args['on-port']
 
   if (!onPort && !args['visualize-only']) {
@@ -304,7 +306,11 @@ function runTool (args, Tool, version) {
   tool.on('port', function (port, proc, cb) {
     process.env.PORT = port
     // inline the PORT env to make it easier for cross platform usage
-    execspawn(envString(onPort, { PORT: port }), { stdio: 'inherit' }).on('exit', cb)
+    execspawn(envString(onPort, {
+      PORT: port
+    }), {
+      stdio: 'inherit'
+    }).on('exit', cb)
   })
 
   if (args['collect-only']) {
@@ -335,12 +341,14 @@ function runTool (args, Tool, version) {
 
         // open HTML file in default browser
         /* istanbul ignore if: we don't want to open a browser in `npm test` */
-        if (args.open) opn('file://' + path.resolve(filename + '.html'), { wait: false })
+        if (args.open) opn('file://' + path.resolve(filename + '.html'), {
+          wait: false
+        })
       })
     })
   }
 
-  function viz (filename, cb) {
+  function viz(filename, cb) {
     if (!/\d+\.clinic-.+$/.test(filename)) {
       return cb(new Error(`Unknown argument "${filename}". Pattern: {pid}.clinic-{command}`))
     }
@@ -349,7 +357,8 @@ function runTool (args, Tool, version) {
     tool.visualize(filename, html, function (err) {
       if (err) return cb(err)
       hash(html, function (err, h) {
-        /* istanbul ignore next */ if (err) return cb(err)
+        /* istanbul ignore next */
+        if (err) return cb(err)
 
         const info = {
           tool: name,
@@ -363,7 +372,7 @@ function runTool (args, Tool, version) {
   }
 }
 
-function hash (filename, cb) {
+function hash(filename, cb) {
   const sha = crypto.createHash('sha512')
   sha.update('clinic\n')
   fs.createReadStream(filename)
@@ -372,17 +381,17 @@ function hash (filename, cb) {
     .on('error', cb)
 }
 
-function printVersion (version) {
+function printVersion(version) {
   console.log('v' + version)
 }
 
-function printHelp (name, version) {
+function printHelp(name, version) {
   const filepath = path.resolve(__dirname, 'docs', name + '.txt')
   const usage = helpFormatter(fs.readFileSync(filepath), version)
   console.log(usage)
 }
 
-function checkForUpdates () {
+function checkForUpdates() {
   updateNotifier({
     pkg
   }).notify({

@@ -18,7 +18,7 @@ const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
 
-const GA_TRACKING_CODE = 'UA-29381785-7'
+const GA_TRACKING_CODE = 'UA-29381785-8'
 
 const insight = new Insight({
   trackingCode: GA_TRACKING_CODE,

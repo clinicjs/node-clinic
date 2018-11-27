@@ -211,8 +211,7 @@ const result = commist()
       printVersion(version)
     } else if (args.help) {
       printHelp('clinic-flame', version)
-    } /* istanbul ignore next */ else if (args['visualize-only'] || args['--'].length > 1) {
-      /* istanbul ignore next */
+    } else if (args['visualize-only'] || args['--'].length > 1) {
       trackTool('flame', args, version, () => {
         runTool(args, require('@nearform/flame'))
       })

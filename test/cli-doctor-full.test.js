@@ -60,6 +60,18 @@ test('clinic doctor -- node - bad status code', function (t) {
   })
 })
 
+test('clinic doctor - signal', function (t) {
+  cli({ relayStderr: false }, [
+    'clinic', 'doctor', '--no-open',
+    '--', 'node', '-e', 'process.kill(process.pid, 9)'
+  ], function (err, stdout, stderr) {
+    t.strictDeepEqual(err, new Error('process exited by signal SIGKILL'))
+    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\n')
+    t.ok(stderr.includes('process exited by signal SIGKILL'))
+    t.end()
+  })
+})
+
 test('clinic doctor -- node - visualization error', function (t) {
   // collect data
   cli({ relayStderr: false }, [

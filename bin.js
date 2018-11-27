@@ -283,13 +283,13 @@ function trackTool (toolName, args, toolVersion, cb) {
 function runTool (args, Tool, version) {
   const autocannonOpts = typeof args['autocannon'] === 'string'
     // --autocannon /url
-    ? [args['autocannon']]
+    ? { _: [args['autocannon']] }
     // --autocannon [ /url -m POST --flags... ]
-    : dargs(args['autocannon'])
+    : args['autocannon']
   const autocannonPath = require.resolve('autocannon')
 
   const onPort = autocannonOpts
-    ? `node ${shellEscape(autocannonPath)} ${shellEscape(autocannonOpts)}`
+    ? `node ${shellEscape(autocannonPath)} ${shellEscape(dargs(autocannonOpts))}`
     : args['on-port']
 
   if (!onPort && !args['visualize-only']) {

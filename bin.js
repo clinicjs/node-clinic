@@ -141,7 +141,7 @@ const result = commist()
       printHelp('clinic-doctor', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
       trackTool('doctor', args, version, () => {
-        runTool(args, require('@nearform/doctor'), version, { spinner: 'green' })
+        runTool(args, require('@nearform/doctor'), version, { color: 'green' })
       })
     } else {
       printHelp('clinic-doctor', version)
@@ -179,7 +179,7 @@ const result = commist()
       printHelp('clinic-bubbleprof', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
       trackTool('bubbleprof', args, version, () => {
-        runTool(args, require('@nearform/bubbleprof'), version, { spinner: 'blue' })
+        runTool(args, require('@nearform/bubbleprof'), version, { color: 'blue' })
       })
     } else {
       printHelp('clinic-bubbleprof', version)
@@ -217,7 +217,7 @@ const result = commist()
       printHelp('clinic-flame', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
       trackTool('flame', args, version, () => {
-        runTool(args, require('@nearform/flame'), version, { spinner: 'yellow' })
+        runTool(args, require('@nearform/flame'), version, { color: 'yellow' })
       })
     } else {
       printHelp('clinic-flame', version)
@@ -310,7 +310,7 @@ function runTool (args, Tool, version, uiOptions) {
 
   const spinner = ora({
     text: 'Analysing data',
-    color: uiOptions.spinner,
+    color: uiOptions.color,
     stream: process.stdout,
     spinner: 'bouncingBar'
   })

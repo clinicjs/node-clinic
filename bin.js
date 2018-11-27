@@ -4,6 +4,7 @@
 const fs = require('fs')
 const path = require('path')
 const opn = require('opn')
+const ora = require('ora')
 const async = require('async')
 const shellEscape = require('any-shell-escape')
 const commist = require('commist')
@@ -140,7 +141,7 @@ const result = commist()
       printHelp('clinic-doctor', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
       trackTool('doctor', args, version, () => {
-        runTool(args, require('@nearform/doctor'), version)
+        runTool(args, require('@nearform/doctor'), version, { spinner: 'green' })
       })
     } else {
       printHelp('clinic-doctor', version)
@@ -178,7 +179,7 @@ const result = commist()
       printHelp('clinic-bubbleprof', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
       trackTool('bubbleprof', args, version, () => {
-        runTool(args, require('@nearform/bubbleprof'), version)
+        runTool(args, require('@nearform/bubbleprof'), version, { spinner: 'blue' })
       })
     } else {
       printHelp('clinic-bubbleprof', version)
@@ -216,7 +217,7 @@ const result = commist()
       printHelp('clinic-flame', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
       trackTool('flame', args, version, () => {
-        runTool(args, require('@nearform/flame'))
+        runTool(args, require('@nearform/flame'), version, { spinner: 'yellow' })
       })
     } else {
       printHelp('clinic-flame', version)
@@ -280,7 +281,7 @@ function trackTool (toolName, args, toolVersion, cb) {
   })
 }
 
-function runTool (args, Tool, version) {
+function runTool (args, Tool, version, uiOptions) {
   const autocannonOpts = typeof args['autocannon'] === 'string'
     // --autocannon /url
     ? { _: [args['autocannon']] }
@@ -335,10 +336,17 @@ function runTool (args, Tool, version) {
   } else {
     tool.collect(args['--'], function (err, filename) {
       if (err) throw err
-      console.log('Analysing data')
+      const spinner = ora({
+        text: 'Analysing data',
+        color: uiOptions.spinner,
+        stream: process.stdout,
+        spinner: 'bouncingbar'
+      }).start()
 
       viz(filename, function (err) {
         if (err) throw err
+        spinner.stop()
+        spinner.stream.write(`${spinner.text}\n`)
 
         console.log(`Generated HTML file is ${filename}.html`)
         console.log('You can use this command to upload it:')

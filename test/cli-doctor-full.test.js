@@ -5,6 +5,7 @@ const path = require('path')
 const async = require('async')
 const test = require('tap').test
 const cli = require('./cli.js')
+const os = require('os')
 
 test('clinic doctor -- node - no issues', function (t) {
   // collect data
@@ -37,11 +38,39 @@ test('clinic doctor -- node - bad status code', function (t) {
   // collect data
   cli({ relayStderr: false }, [
     'clinic', 'doctor', '--no-open',
-    '--', 'node', '-e', 'process.exit(1)'
+    '--', 'node', '-e', 'setTimeout(() => { process.exit(1) }, 100)'
+  ], function (err, stdout, stderr, tempdir) {
+    t.ifError(err)
+    const dirname = stdout.match(/(\d+.clinic-doctor)/)[1]
+
+    t.strictEqual(stdout.split('\n')[1], 'Analysing data')
+    t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${dirname}.html`)
+
+    // check that files exists
+    async.parallel({
+      sourceData (done) {
+        fs.access(path.resolve(tempdir, dirname), done)
+      },
+      htmlFile (done) {
+        fs.access(path.resolve(tempdir, dirname + '.html'), done)
+      }
+    }, function (err) {
+      t.ifError(err)
+      t.end()
+    })
+  })
+})
+
+test('clinic doctor - signal', function (t) {
+  cli({ relayStderr: false }, [
+    'clinic', 'doctor', '--no-open',
+    '--', 'node', '-e', 'process.kill(process.pid, 9)'
   ], function (err, stdout, stderr) {
-    t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\n')
-    t.ok(stderr.includes('process exited with exit code 1'))
+    t.strictDeepEqual(err, new Error('process exited by signal SIGKILL'))
+    t.includes(stdout, 'To generate the report press: Ctrl + C')
+    if (os.platform().indexOf('win') !== 0) {
+      t.ok(stderr.includes('process exited by signal SIGKILL'))
+    }
     t.end()
   })
 })
@@ -62,7 +91,8 @@ test('clinic doctor -- node - visualization error', function (t) {
     `
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\nAnalysing data\n')
+    t.includes(stdout, 'To generate the report press: Ctrl + C')
+    t.includes(stdout, 'Analysing data')
     t.ok(stderr.includes('ENOENT: no such file or directory'))
     t.end()
   })

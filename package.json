@@ -10,17 +10,17 @@
     "clinic": "./bin.js"
   },
   "scripts": {
-    "test": "standard | snazzy && tap --no-cov test/*.test.js",
-    "test-local": "standard | snazzy && tap --no-cov test/*.test.js test-local/*.test.js",
+    "test": "standard | snazzy && tap --timeout 0 --no-cov test/*.test.js",
+    "test-local": "standard | snazzy && tap --timeout 0 --no-cov test/*.test.js test-local/*.test.js",
     "ci-lint": "standard | snazzy",
-    "ci-test": "tap test/*.test.js",
-    "ci-cov": "tap --100 test/*.test.js",
+    "ci-test": "tap --timeout 0 test/*.test.js",
+    "ci-cov": "tap --timeout 0 --100 test/*.test.js",
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {
-    "@nearform/bubbleprof": "^1.7.1",
-    "@nearform/doctor": "^3.6.0",
-    "@nearform/flame": "^3.2.0",
+    "@nearform/bubbleprof": "^1.8.0",
+    "@nearform/doctor": "^3.7.1",
+    "@nearform/flame": "^3.4.1",
     "async": "^2.6.0",
     "commist": "^1.0.0",
     "cross-argv": "^1.0.0",
@@ -40,7 +40,7 @@
     "autocannon": "^3.1.0",
     "snazzy": "^8.0.0",
     "standard": "^12.0.0",
-    "tap": "^12.0.0",
+    "tap": "^12.1.0",
     "tar-stream": "^1.6.2"
   },
   "keywords": [],

@@ -29,12 +29,18 @@ wrk http://localhost:3000
 autocannon http://localhost:3000
 ```
 
-If you want to run autocannon or wrk as soon as your server starts listening you can
-use the `--on-port` option
+If you want to run autocannon as soon as your server starts listening you can
+use the `--autocannon` option using [subarg][] syntax.
+
+```sh
+clinic doctor --autocannon [ / --method POST ] -- node server.js
+```
+
+Other benchmarking tools like wrk can be started in a similar way using the `--on-port` flag
 
 ```sh
 # $PORT is the port the server is listening on
-clinic doctor --on-port 'autocannon http://localhost:$PORT' -- node server.js
+clinic doctor --on-port 'wrk http://localhost:$PORT' -- node server.js
 ```
 
 Finally shut down your server (Ctrl+C). Once the server process has shutdown
@@ -135,3 +141,4 @@ Each of the tools has a programmable interface which you can read about in their
 [appveyor-status]: https://ci.appveyor.com/api/projects/status/ex654mc4b3dq3vf4?svg=true
 [appveyor-url]: https://ci.appveyor.com/project/nearForm/node-clinic
 [NearForm]: https://www.nearform.com
+[subarg]: https://npmjs.com/package/subarg

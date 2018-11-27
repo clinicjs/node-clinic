@@ -5,8 +5,11 @@ const fs = require('fs')
 const path = require('path')
 const opn = require('opn')
 const async = require('async')
+const shellEscape = require('any-shell-escape')
 const commist = require('commist')
 const minimist = require('minimist')
+const subarg = require('subarg')
+const dargs = require('dargs')
 const execspawn = require('execspawn')
 const envString = require('env-string')
 const xargv = require('cross-argv')
@@ -105,7 +108,7 @@ const result = commist()
   })
   .register('doctor', function (argv) {
     const version = require('@nearform/doctor/package.json').version
-    const args = minimist(argv, {
+    const args = subarg(argv, {
       alias: {
         help: 'h',
         version: 'v'
@@ -146,7 +149,7 @@ const result = commist()
   })
   .register('bubbleprof', function (argv) {
     const version = require('@nearform/bubbleprof/package.json').version
-    const args = minimist(argv, {
+    const args = subarg(argv, {
       alias: {
         help: 'h',
         version: 'v'
@@ -184,7 +187,7 @@ const result = commist()
   })
   .register('flame', function (argv) {
     const version = require('@nearform/flame/version')
-    const args = minimist(argv, {
+    const args = subarg(argv, {
       alias: {
         help: 'h',
         version: 'v'
@@ -278,7 +281,16 @@ function trackTool (toolName, args, toolVersion, cb) {
 }
 
 function runTool (args, Tool, version) {
-  const onPort = args['on-port']
+  const autocannonOpts = typeof args['autocannon'] === 'string'
+    // --autocannon /url
+    ? { _: [args['autocannon']] }
+    // --autocannon [ /url -m POST --flags... ]
+    : args['autocannon']
+  const autocannonPath = require.resolve('autocannon')
+
+  const onPort = autocannonOpts
+    ? `node ${shellEscape(autocannonPath)} ${shellEscape(dargs(autocannonOpts))}`
+    : args['on-port']
 
   if (!onPort && !args['visualize-only']) {
     if (args['collect-only']) {

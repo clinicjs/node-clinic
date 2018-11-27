@@ -77,6 +77,25 @@ test('clinic flame --on-port', function (t) {
   })
 })
 
+test('clinic flame --autocannon', function (t) {
+  cli({ relayStderr: false }, [
+    'clinic', 'flame', '--no-open',
+    // this defaults to 10s which is a long time but need to make sure that
+    // using this flag without [] works
+    '--autocannon', '/test',
+    '--', 'node', '-e', `
+      const http = require('http')
+
+      http.createServer((req, res) => res.end(req.url)).listen(0)
+    `
+  ], function (err, stdout, stderr) {
+    t.ifError(err)
+    t.ok(stderr.indexOf('Running 10s test @ http://localhost:') > -1)
+    t.strictEqual(stdout.split('\n')[0], 'Analysing data')
+    t.end()
+  })
+})
+
 test('clinic flame -- node - configure output destination', function (t) {
   cli({ relayStderr: false }, [
     'clinic', 'flame', '--no-open',

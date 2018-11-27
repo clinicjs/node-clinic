@@ -61,7 +61,7 @@ test('clinic flame -- node - bad status code', function (t) {
 })
 
 test('clinic flame --on-port', function (t) {
-  cli({ relayStderr: false }, [
+  cli({ relayStderr: true }, [
     'clinic', 'flame', '--no-open',
     '--on-port', 'autocannon localhost:$PORT -d 1',
     '--', 'node', '-e', `
@@ -71,6 +71,7 @@ test('clinic flame --on-port', function (t) {
     `
   ], function (err, stdout, stderr) {
     t.ifError(err)
+    console.log(stdout)
     t.ok(stderr.indexOf('Running 1s test @ http://localhost:') > -1)
     t.strictEqual(stdout.split('\n')[0], 'Analysing data')
     t.end()

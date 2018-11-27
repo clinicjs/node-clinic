@@ -308,6 +308,13 @@ function runTool (args, Tool, version, uiOptions) {
     debug: args.debug
   })
 
+  const spinner = ora({
+    text: 'Analysing data',
+    color: uiOptions.spinner,
+    stream: process.stdout,
+    spinner: 'bouncingBar'
+  })
+
   /* istanbul ignore next */
   tool.on('warning', function (warning) {
     console.log('Warning: ' + warning)
@@ -317,6 +324,10 @@ function runTool (args, Tool, version, uiOptions) {
     process.env.PORT = port
     // inline the PORT env to make it easier for cross platform usage
     execspawn(envString(onPort, { PORT: port }), { stdio: 'inherit' }).on('exit', cb)
+  })
+
+  tool.on('analysing', function () {
+    spinner.start()
   })
 
   if (args['collect-only']) {
@@ -336,12 +347,7 @@ function runTool (args, Tool, version, uiOptions) {
   } else {
     tool.collect(args['--'], function (err, filename) {
       if (err) throw err
-      const spinner = ora({
-        text: 'Analysing data',
-        color: uiOptions.spinner,
-        stream: process.stdout,
-        spinner: 'bouncingbar'
-      }).start()
+      spinner.start()
 
       viz(filename, function (err) {
         if (err) throw err

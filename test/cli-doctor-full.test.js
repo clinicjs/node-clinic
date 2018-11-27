@@ -5,6 +5,7 @@ const path = require('path')
 const async = require('async')
 const test = require('tap').test
 const cli = require('./cli.js')
+const os = require('os')
 
 test('clinic doctor -- node - no issues', function (t) {
   // collect data
@@ -66,8 +67,10 @@ test('clinic doctor - signal', function (t) {
     '--', 'node', '-e', 'process.kill(process.pid, 9)'
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited by signal SIGKILL'))
-    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\n')
-    t.ok(stderr.includes('process exited by signal SIGKILL'))
+    t.includes(stdout, 'To generate the report press: Ctrl + C')
+    if (os.platform().indexOf('win') !== 0) {
+      t.ok(stderr.includes('process exited by signal SIGKILL'))
+    }
     t.end()
   })
 })
@@ -88,7 +91,8 @@ test('clinic doctor -- node - visualization error', function (t) {
     `
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\nAnalysing data\n')
+    t.includes(stdout, 'To generate the report press: Ctrl + C')
+    t.includes(stdout, 'Analysing data')
     t.ok(stderr.includes('ENOENT: no such file or directory'))
     t.end()
   })

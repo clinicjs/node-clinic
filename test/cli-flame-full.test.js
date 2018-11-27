@@ -38,11 +38,25 @@ test('clinic flame -- node - bad status code', function (t) {
   cli({ relayStderr: false }, [
     'clinic', 'flame', '--no-open',
     '--', 'node', '-e', 'process.exit(1)'
-  ], function (err, stdout, stderr) {
-    t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\n')
-    t.ok(stderr.includes('Target subprocess error, code: 1'))
-    t.end()
+  ], function (err, stdout, stderr, tempdir) {
+    t.ifError(err)
+    const dirname = stdout.match(/(\d+.clinic-flame)/)[1]
+
+    t.strictEqual(stdout.split('\n')[1], 'Analysing data')
+    t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${dirname}.html`)
+
+    // check that files exists
+    async.parallel({
+      sourceData (done) {
+        fs.access(path.resolve(tempdir, dirname), done)
+      },
+      htmlFile (done) {
+        fs.access(path.resolve(tempdir, dirname + '.html'), done)
+      }
+    }, function (err) {
+      t.ifError(err)
+      t.end()
+    })
   })
 })
 

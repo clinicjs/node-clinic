@@ -11,10 +11,10 @@
   },
   "scripts": {
     "test": "standard | snazzy && tap --no-cov test/*.test.js",
-    "test-local": "standard | snazzy && tap --no-cov test/*.test.js test-local/*.test.js",
+    "test-local": "standard | snazzy && tap --timeout 10000 --no-cov test/*.test.js test-local/*.test.js",
     "ci-lint": "standard | snazzy",
-    "ci-test": "tap test/*.test.js",
-    "ci-cov": "tap --100 test/*.test.js",
+    "ci-test": "tap --timeout 10000 test/*.test.js",
+    "ci-cov": "tap --timeout 10000 --100 test/*.test.js",
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {

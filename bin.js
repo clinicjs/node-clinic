@@ -326,8 +326,12 @@ function runTool (args, Tool, version, uiOptions) {
     execspawn(envString(onPort, { PORT: port }), { stdio: 'inherit' }).on('exit', cb)
   })
 
-  tool.on('analysing', function () {
+  tool.on('analysing', function (message) {
     spinner.start()
+    if (message) spinner.text = message
+  })
+  tool.on('status', function (message) {
+    spinner.text = message
   })
 
   if (args['collect-only']) {

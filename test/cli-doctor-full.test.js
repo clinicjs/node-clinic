@@ -118,7 +118,7 @@ test('clinic doctor --on-port', function (t) {
 test('clinic doctor --autocannon', function (t) {
   cli({ relayStderr: false }, [
     'clinic', 'doctor', '--no-open',
-    '--autocannon', '[ / -d 1 ]',
+    '--autocannon', '[', '/', '-d', '1', ']',
     '--', 'node', '-e', `
       const http = require('http')
 

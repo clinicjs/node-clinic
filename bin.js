@@ -327,11 +327,19 @@ function runTool (args, Tool, version, uiOptions) {
   })
 
   tool.on('analysing', function (message) {
-    spinner.start()
-    if (message) spinner.text = message
+    if (spinner.isEnabled) {
+      spinner.start()
+      if (message) spinner.text = message
+    } else {
+      console.log(message || 'Analysing data')
+    }
   })
   tool.on('status', function (message) {
-    spinner.text = message
+    if (spinner.isEnabled) {
+      spinner.text = message
+    } else {
+      console.log(message)
+    }
   })
 
   if (args['collect-only']) {
@@ -351,12 +359,13 @@ function runTool (args, Tool, version, uiOptions) {
   } else {
     tool.collect(args['--'], function (err, filename) {
       if (err) throw err
-      spinner.start()
 
       viz(filename, function (err) {
         if (err) throw err
-        spinner.stop()
-        spinner.stream.write(`${spinner.text}\n`)
+        if (spinner.isEnabled) {
+          spinner.stop()
+          spinner.stream.write(`${spinner.text}\n`)
+        }
 
         console.log(`Generated HTML file is ${filename}.html`)
         console.log('You can use this command to upload it:')

@@ -13,7 +13,7 @@
     "test": "standard | snazzy && tap --timeout 0 --no-cov test/*.test.js",
     "test-local": "standard | snazzy && tap --timeout 0 --no-cov test/*.test.js test-local/*.test.js",
     "ci-lint": "standard | snazzy",
-    "ci-test": "tap --timeout 0 test/*.test.js | tee output.tap",
+    "ci-test": "tap --timeout 0 test/*.test.js | tee output.tap || echo failing tests",
     "ci-azure-report": "tap-junit > test/junit-testresults.xml < output.tap",
     "ci-cov": "tap --timeout 0 --100 test/*.test.js",
     "lint": "standard --fix | snazzy"

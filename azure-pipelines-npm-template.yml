@@ -30,3 +30,5 @@ jobs:
     inputs:
       testResultsFiles: "**test/junit-testresults.xml"
       testRunTitle: TestRun ${{ parameters.name }} $(node_version)
+  - bash: grep "not ok" output.tap
+    displayName: Are tests failing?

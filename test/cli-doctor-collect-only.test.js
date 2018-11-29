@@ -4,7 +4,6 @@ const fs = require('fs')
 const path = require('path')
 const test = require('tap').test
 const cli = require('./cli.js')
-const os = require('os')
 
 test('clinic doctor --collect-only - no issues', function (t) {
   cli({}, [
@@ -53,9 +52,6 @@ test('clinic doctor --collect-only - signal', function (t) {
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited by signal SIGKILL'))
     t.strictEqual(stdout, 'To stop data collection press: Ctrl + C\n')
-    if (os.platform().indexOf('win') !== 0) {
-      t.ok(stderr.includes('process exited by signal SIGKILL'))
-    }
     t.end()
   })
 })

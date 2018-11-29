@@ -18,5 +18,13 @@ jobs:
     displayName: Install Node.js
   - bash: npm i
     displayName: Install dependencies
-  - bash: npm test
+  - bash: npm run ci-lint
+    displayName: Check linting
+  - bash: npm run ci-test
     displayName: Run tests
+  - task: PublishTestResults@2
+    displayName: "Publish Test Results"
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFiles: "**test/junit-testresults.xml"
+      testRunTitle: TestRun ${{ parameters.name }} $(node_version)

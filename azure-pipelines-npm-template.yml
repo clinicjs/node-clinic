@@ -22,6 +22,8 @@ jobs:
     displayName: Check linting
   - bash: npm run ci-test
     displayName: Run tests
+  - bash: npm run ci-azure-report
+    displayName: Generate azure report
   - task: PublishTestResults@2
     displayName: "Publish Test Results"
     condition: succeededOrFailed()

@@ -11,5 +11,5 @@ jobs:
 
 - template: azure-pipelines-npm-template.yml
   parameters:
-    name: Windows
+    name: Mac OS X
     vmImage: macOS-10.13

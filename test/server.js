@@ -2,4 +2,8 @@
 
 const http = require('http')
 
-http.createServer((req, res) => res.end('ok')).listen(0)
+http.createServer(handler).listen(0)
+
+function handler (req, res) {
+  res.end('ok')
+}

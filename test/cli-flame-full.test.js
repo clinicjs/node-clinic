@@ -64,11 +64,7 @@ test('clinic flame --on-port', function (t) {
   cli({ relayStderr: false }, [
     'clinic', 'flame', '--no-open',
     '--on-port', 'autocannon localhost:$PORT -d 2',
-    '--', 'node', '-e', `
-      const http = require('http')
-
-      http.createServer((req, res) => res.end('ok')).listen(0)
-    `
+    '--', 'node', path.join(__dirname, 'server.js')
   ], function (err, stdout, stderr) {
     t.ifError(err)
     t.ok(stderr.indexOf('Running 2s test @ http://localhost:') > -1)
@@ -83,11 +79,7 @@ test('clinic flame --autocannon', function (t) {
     // this defaults to 10s which is a long time but need to make sure that
     // using this flag without [] works
     '--autocannon', '/test',
-    '--', 'node', '-e', `
-      const http = require('http')
-
-      http.createServer((req, res) => res.end(req.url)).listen(0)
-    `
+    '--', 'node', path.join(__dirname, 'server.js')
   ], function (err, stdout, stderr) {
     t.ifError(err)
     t.ok(stderr.indexOf('Running 10s test @ http://localhost:') > -1)

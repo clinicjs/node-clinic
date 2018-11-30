@@ -22,13 +22,3 @@ jobs:
     displayName: Check linting
   - bash: npm run ci-test
     displayName: Run tests
-  - bash: npm run ci-azure-report
-    displayName: Generate azure report
-  - task: PublishTestResults@2
-    displayName: "Publish Test Results"
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFiles: "**test/junit-testresults.xml"
-      testRunTitle: TestRun ${{ parameters.name }} $(node_version)
-  - bash: grep "not ok" output.tap
-    displayName: Are tests failing?

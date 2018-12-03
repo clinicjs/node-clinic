@@ -136,7 +136,7 @@ Each of the tools has a programmable interface which you can read about in their
 [npm-downloads]: http://img.shields.io/npm/dm/clinic.svg?style=flat-square
 [lint-standard]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square
 [lint-standard-url]: https://github.com/feross/standard
-[azure-status]: https://dev.azure.com/fastify/fastify/_apis/build/status/fastify.fastify
-[azure-url]: https://dev.azure.com/fastify/fastify/_build/latest?definitionId=1
+[azure-status]: https://dev.azure.com/node-clinic/node-clinic/_apis/build/status/nearform.node-clinic
+[azure-url]: https://dev.azure.com/node-clinic/node-clinic/_apis/build/status/nearform.node-clinic?branchName=master
 [NearForm]: https://www.nearform.com
 [subarg]: https://npmjs.com/package/subarg

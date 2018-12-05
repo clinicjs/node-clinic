@@ -18,9 +18,9 @@
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {
-    "@nearform/bubbleprof": "^1.8.0",
-    "@nearform/doctor": "^3.7.1",
-    "@nearform/flame": "^3.4.1",
+    "@nearform/bubbleprof": "^1.9.0",
+    "@nearform/doctor": "^3.8.0",
+    "@nearform/flame": "^3.4.6",
     "any-shell-escape": "^0.1.1",
     "async": "^2.6.0",
     "autocannon": "^3.2.0",
@@ -32,6 +32,7 @@
     "insight": "^0.10.1",
     "minimist": "^1.2.0",
     "opn": "^5.4.0",
+    "ora": "^3.0.0",
     "pumpify": "^1.4.0",
     "rimraf": "^2.6.2",
     "simple-get": "^3.0.3",

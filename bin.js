@@ -326,23 +326,33 @@ function runTool (args, Tool, version, uiOptions) {
     execspawn(envString(onPort, { PORT: port }), { stdio: 'inherit' }).on('exit', cb)
   })
 
-  tool.on('analysing', function (message) {
+  tool.on('analysing', function (message = 'Analysing data') {
     if (spinner.isEnabled) {
-      spinner.start()
-      if (message) spinner.text = message
+      spinner.text = message
+      if (!spinner.isSpinning) {
+        spinner.start()
+      }
     } else {
-      console.log(message || 'Analysing data')
+      console.log(message)
     }
   })
-  tool.on('status', function (message) {
+  tool.on('status', status)
+
+  function status (message) {
     if (spinner.isEnabled) {
       spinner.text = message
     } else {
       console.log(message)
     }
-  })
+  }
+
+  function onsigint () {
+    status('Received Ctrl+C, closing process...')
+    if (!spinner.isSpinning) spinner.start()
+  }
 
   if (args['collect-only']) {
+    process.once('SIGINT', onsigint)
     tool.collect(args['--'], function (err, filename) {
       if (err) throw err
       console.log(`Output file is ${filename}`)
@@ -357,6 +367,7 @@ function runTool (args, Tool, version, uiOptions) {
       console.log(`clinic upload ${dataPath}`)
     })
   } else {
+    process.once('SIGINT', onsigint)
     tool.collect(args['--'], function (err, filename) {
       if (err) throw err
 

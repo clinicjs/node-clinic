@@ -45,7 +45,9 @@ test('clinic doctor --collect-only - bad status code', function (t) {
   })
 })
 
-test('clinic doctor --collect-only - signal', function (t) {
+test('clinic doctor --collect-only - signal', {
+  skip: process.platform === 'win32' ? 'SIGKILL cannot be identified on windows' : false
+}, function (t) {
   cli({ relayStderr: false }, [
     'clinic', 'doctor', '--collect-only',
     '--', 'node', '-e', 'process.kill(process.pid, "SIGKILL")'

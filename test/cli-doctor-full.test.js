@@ -63,7 +63,7 @@ test('clinic doctor -- node - bad status code', function (t) {
 test('clinic doctor - signal', function (t) {
   cli({ relayStderr: false }, [
     'clinic', 'doctor', '--no-open',
-    '--', 'node', '-e', 'process.kill(process.pid, 9)'
+    '--', 'node', '-e', 'process.kill(process.pid, "SIGKILL")'
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited by signal SIGKILL'))
     t.includes(stdout, 'To generate the report press: Ctrl + C')

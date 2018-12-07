@@ -18,8 +18,8 @@
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {
-    "@nearform/bubbleprof": "^1.9.0",
-    "@nearform/doctor": "^3.8.0",
+    "@nearform/bubbleprof": "^1.9.1",
+    "@nearform/doctor": "^3.9.0",
     "@nearform/flame": "^3.4.6",
     "any-shell-escape": "^0.1.1",
     "async": "^2.6.0",
@@ -48,6 +48,16 @@
     "tap-junit": "^2.1.0",
     "tar-stream": "^1.6.2"
   },
-  "keywords": [],
+  "keywords": [
+    "performance",
+    "tool",
+    "analysis",
+    "clinic",
+    "bubbleprof",
+    "doctor",
+    "flamegraph",
+    "flame",
+    "bubble"
+  ],
   "license": "GPL-3.0-or-later"
 }

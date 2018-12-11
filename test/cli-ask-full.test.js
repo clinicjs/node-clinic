@@ -13,6 +13,9 @@ const doctorADirectory = path.resolve(
   '10000.clinic-doctor'
 )
 
+// JWT containing test@test.com
+const successfulJwt = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1NDIyMjI5MzMsImV4cCI6MTg4OTM3ODEzMywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSJ9.FO0v4OM2V23lAXIcv-qcfFo0snOrOmsrY82kmcYlrJI'
+
 test('Before all', function (t) {
   server = new FakeUploadServer()
   server.listen(function () {
@@ -22,10 +25,11 @@ test('Before all', function (t) {
 })
 
 test('clinic ask 10000.clinic-doctor with custom upload url', function (t) {
-  cli({}, [
+  cli({
+    env: { CLINIC_ASK_MOCK_JWT: successfulJwt }
+  }, [
     'clinic', 'ask',
     '--upload-url', server.uploadUrl,
-    '--auth-method', 'simpleSuccess',
     doctorADirectory
   ], function (err, stdout) {
     t.plan(3)
@@ -51,9 +55,10 @@ test('clinic ask 10000.clinic-doctor with custom upload url', function (t) {
 })
 
 test('clinic ask 10000.clinic-doctor with default upload url', function (t) {
-  cli({}, [
+  cli({
+    env: { CLINIC_ASK_MOCK_JWT: successfulJwt }
+  }, [
     'clinic', 'ask',
-    '--auth-method', 'simpleSuccess',
     doctorADirectory
   ], function (err, stdout) {
     t.plan(2)
@@ -67,10 +72,11 @@ test('clinic ask 10000.clinic-doctor with default upload url', function (t) {
 })
 
 test('clinic ask 10000.clinic-doctor auth failure', function (t) {
-  cli({}, [
+  cli({
+    env: { CLINIC_ASK_MOCK_FAIL: 'true' }
+  }, [
     'clinic', 'ask',
     '--upload-url', server.uploadUrl,
-    '--auth-method', 'fail',
     doctorADirectory
   ], function (err, stdout, stderr) {
     t.plan(2)

@@ -24,13 +24,6 @@ const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
 const authenticate = require('./lib/authenticate.js')
-const authMethods = {
-  authenticate,
-  // for testing success, email in token test@test.com
-  simpleSuccess: async () => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1NDIyMjI5MzMsImV4cCI6MTg4OTM3ODEzMywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSJ9.FO0v4OM2V23lAXIcv-qcfFo0snOrOmsrY82kmcYlrJI',
-  // for testing failure
-  fail: async () => { throw new Error('Auth artificially failed') }
-}
 const tarAndUploadPromisified = promisify(tarAndUpload)
 
 const GA_TRACKING_CODE = 'UA-29381785-8'
@@ -128,10 +121,9 @@ const result = commist()
           category: 'upload',
           action: 'ask'
         })
-        // ignore the next line since authenticate is covered by it's own test
-        const authMethod = authMethods[args['auth-method']] || /* istanbul ignore next */ authenticate
+
         try {
-          await processAsk(args, authMethod)
+          await processAsk(args)
         } catch (err) {
           if (err.code === 'ECONNREFUSED') {
             console.error(`Connection refused to the Upload Server at ${args['upload-url']}.`)
@@ -513,8 +505,8 @@ function tarAndUploadFile (uploadURL, authToken, email) {
   }
 }
 
-async function processAsk (args, authMethod) {
-  const authToken = await authMethod(args['upload-url'])
+async function processAsk (args) {
+  const authToken = await authenticate(args['upload-url'])
   const { email } = jwt.decode(authToken)
   const uploadURL = args['upload-url']
   const uploaderFunc = tarAndUploadFile(uploadURL, authToken, email)

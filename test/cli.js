@@ -35,10 +35,11 @@ function cli (settings, args, callback) {
 
     const program = spawn(process.execPath, [BIN_PATH, ...args.slice(1)], {
       cwd: tempdir,
-      env: Object.assign({}, process.env, {
-        NO_INSIGHT: '1',
-        NO_UPDATE_NOTIFIER: '1'
-      })
+      env: Object.assign(
+        {},
+        process.env,
+        settings.env,
+        { NO_INSIGHT: '1', NO_UPDATE_NOTIFIER: '1' })
     })
     if (settings.relayStderr) {
       program.stderr.pipe(process.stderr)

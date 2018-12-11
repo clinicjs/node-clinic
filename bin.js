@@ -355,6 +355,10 @@ function runTool (args, Tool, version, uiOptions) {
     process.once('SIGINT', onsigint)
     tool.collect(args['--'], function (err, filename) {
       if (err) throw err
+      if (spinner.isEnabled) {
+        spinner.stop()
+        spinner.stream.write(`${spinner.text}\n`)
+      }
       console.log(`Output file is ${filename}`)
     })
   } else if (args['visualize-only']) {

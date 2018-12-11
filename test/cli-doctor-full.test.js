@@ -5,7 +5,6 @@ const path = require('path')
 const async = require('async')
 const test = require('tap').test
 const cli = require('./cli.js')
-const os = require('os')
 
 test('clinic doctor -- node - no issues', function (t) {
   // collect data
@@ -61,16 +60,15 @@ test('clinic doctor -- node - bad status code', function (t) {
   })
 })
 
-test('clinic doctor - signal', function (t) {
+test('clinic doctor - signal', {
+  skip: process.platform === 'win32' ? 'SIGKILL cannot be identified on windows' : false
+}, function (t) {
   cli({ relayStderr: false }, [
     'clinic', 'doctor', '--no-open',
-    '--', 'node', '-e', 'process.kill(process.pid, 9)'
+    '--', 'node', '-e', 'process.kill(process.pid, "SIGKILL")'
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited by signal SIGKILL'))
     t.includes(stdout, 'To generate the report press: Ctrl + C')
-    if (os.platform().indexOf('win') !== 0) {
-      t.ok(stderr.includes('process exited by signal SIGKILL'))
-    }
     t.end()
   })
 })

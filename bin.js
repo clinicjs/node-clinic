@@ -4,6 +4,7 @@
 const fs = require('fs')
 const path = require('path')
 const opn = require('opn')
+const ora = require('ora')
 const async = require('async')
 const shellEscape = require('any-shell-escape')
 const commist = require('commist')
@@ -191,7 +192,7 @@ const result = commist()
       printHelp('clinic-doctor', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
       trackTool('doctor', args, version, () => {
-        runTool(args, require('@nearform/doctor'), version)
+        runTool(args, require('@nearform/doctor'), version, { color: 'green' })
       })
     } else {
       printHelp('clinic-doctor', version)
@@ -229,7 +230,7 @@ const result = commist()
       printHelp('clinic-bubbleprof', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
       trackTool('bubbleprof', args, version, () => {
-        runTool(args, require('@nearform/bubbleprof'), version)
+        runTool(args, require('@nearform/bubbleprof'), version, { color: 'blue' })
       })
     } else {
       printHelp('clinic-bubbleprof', version)
@@ -267,7 +268,7 @@ const result = commist()
       printHelp('clinic-flame', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
       trackTool('flame', args, version, () => {
-        runTool(args, require('@nearform/flame'))
+        runTool(args, require('@nearform/flame'), version, { color: 'yellow' })
       })
     } else {
       printHelp('clinic-flame', version)
@@ -331,7 +332,7 @@ function trackTool (toolName, args, toolVersion, cb) {
   })
 }
 
-function runTool (args, Tool, version) {
+function runTool (args, Tool, version, uiOptions) {
   const autocannonOpts = typeof args['autocannon'] === 'string'
     // --autocannon /url
     ? { _: [args['autocannon']] }
@@ -358,6 +359,13 @@ function runTool (args, Tool, version) {
     debug: args.debug
   })
 
+  const spinner = ora({
+    text: 'Analysing data',
+    color: uiOptions.color,
+    stream: process.stdout,
+    spinner: 'bouncingBar'
+  })
+
   /* istanbul ignore next */
   tool.on('warning', function (warning) {
     console.log('Warning: ' + warning)
@@ -369,7 +377,33 @@ function runTool (args, Tool, version) {
     execspawn(envString(onPort, { PORT: port }), { stdio: 'inherit' }).on('exit', cb)
   })
 
+  tool.on('analysing', function (message = 'Analysing data') {
+    if (spinner.isEnabled) {
+      spinner.text = message
+      if (!spinner.isSpinning) {
+        spinner.start()
+      }
+    } else {
+      console.log(message)
+    }
+  })
+  tool.on('status', status)
+
+  function status (message) {
+    if (spinner.isEnabled) {
+      spinner.text = message
+    } else {
+      console.log(message)
+    }
+  }
+
+  function onsigint () {
+    status('Received Ctrl+C, closing process...')
+    if (!spinner.isSpinning) spinner.start()
+  }
+
   if (args['collect-only']) {
+    process.once('SIGINT', onsigint)
     tool.collect(args['--'], function (err, filename) {
       if (err) throw err
       console.log(`Output file is ${filename}`)
@@ -384,12 +418,16 @@ function runTool (args, Tool, version) {
       console.log(`clinic upload ${dataPath}`)
     })
   } else {
+    process.once('SIGINT', onsigint)
     tool.collect(args['--'], function (err, filename) {
       if (err) throw err
-      console.log('Analysing data')
 
       viz(filename, function (err) {
         if (err) throw err
+        if (spinner.isEnabled) {
+          spinner.stop()
+          spinner.stream.write(`${spinner.text}\n`)
+        }
 
         console.log(`Generated HTML file is ${filename}.html`)
         console.log('You can use this command to upload it:')

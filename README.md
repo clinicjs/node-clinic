@@ -3,7 +3,7 @@
 # node-clinic
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/nearform/node-clinic.svg)](https://greenkeeper.io/)
-[![npm version][npm-version]][npm-url] [![Stability Stable][stability-stable]][stability-docs] [![CircleCI build status][circleci-status]][circleci-url] [![Appveyor build status][appveyor-status]][appveyor-url]
+[![npm version][npm-version]][npm-url] [![Stability Stable][stability-stable]][stability-docs] [![Azure build status][azure-status]][azure-url]
 [![Downloads][npm-downloads]][npm-url] [![Code style][lint-standard]][lint-standard-url]
 
 An Open Source Node.js performance profiling suite by [NearForm][].
@@ -134,12 +134,10 @@ Each of the tools has a programmable interface which you can read about in their
 [stability-docs]: https://nodejs.org/api/documentation.html#documentation_stability_index
 [npm-version]: https://img.shields.io/npm/v/clinic.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/clinic
-[circleci-status]: https://circleci.com/gh/nearform/node-clinic/tree/master.svg?style=shield&circle-token=898867ce2715cb4b51018bb20c7798c1dd306250
-[circleci-url]: https://circleci.com/gh/nearform/node-clinic
 [npm-downloads]: http://img.shields.io/npm/dm/clinic.svg?style=flat-square
 [lint-standard]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square
 [lint-standard-url]: https://github.com/feross/standard
-[appveyor-status]: https://ci.appveyor.com/api/projects/status/ex654mc4b3dq3vf4?svg=true
-[appveyor-url]: https://ci.appveyor.com/project/nearForm/node-clinic
+[azure-status]: https://dev.azure.com/node-clinic/node-clinic/_apis/build/status/nearform.node-clinic
+[azure-url]: https://dev.azure.com/node-clinic/node-clinic/_apis/build/status/nearform.node-clinic?branchName=master
 [NearForm]: https://www.nearform.com
 [subarg]: https://npmjs.com/package/subarg

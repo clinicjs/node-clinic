@@ -133,7 +133,14 @@ const result = commist()
         try {
           await processAsk(args, authMethod)
         } catch (err) {
-          console.error('Unexpected Error', err)
+          if (err.code === 'ECONNREFUSED') {
+            console.error(`Connection refused to the Upload Server at ${args['upload-url']}.`)
+            if (/localhost/.test(args['upload-url'])) {
+              console.error('Make sure the data server is running.')
+            }
+          } else {
+            console.error('Unexpected Error:', err.stack)
+          }
           process.exit(1)
         }
       })

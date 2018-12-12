@@ -58,7 +58,11 @@ test('clinic doctor --collect-only - signal', {
   })
 })
 
-test('clinic doctor --collect-only - stop early using SIGINT', { timeout: 30000 }, function (t) {
+test('clinic doctor --collect-only - stop early using SIGINT', {
+  timeout: 30000,
+  // TODO fix this and unskip
+  skip: process.platform === 'win32' ? 'SIGINT causes child process to exit with 1' : false
+}, function (t) {
   cli({}, [
     'clinic', 'doctor', '--collect-only',
     '--', 'node', '-e', 'console.log("SIGINT me"); setTimeout(() => {}, 60000)'

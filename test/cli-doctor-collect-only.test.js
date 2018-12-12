@@ -57,3 +57,27 @@ test('clinic doctor --collect-only - signal', {
     t.end()
   })
 })
+
+test('clinic doctor --collect-only - stop early using SIGINT', { timeout: 30000 }, function (t) {
+  cli({}, [
+    'clinic', 'doctor', '--collect-only',
+    '--', 'node', '-e', 'console.log("SIGINT me"); setTimeout(() => {}, 60000)'
+  ], function (err, stdout, stderr, tempdir) {
+    t.ifError(err)
+    t.ok(/Output file is (\d+).clinic-doctor/.test(stdout))
+    t.ok(/Received Ctrl\+C/.test(stdout))
+
+    const dirname = stdout.match(/(\d+.clinic-doctor)/)[1]
+    fs.access(path.resolve(tempdir, dirname), function (err) {
+      t.ifError(err)
+      t.end()
+    })
+  }).on('spawn', (program) => {
+    program.stdout.on('data', function ondata (line) {
+      if (/SIGINT me/.test(line + '')) {
+        program.stdout.removeListener('data', ondata)
+        program.kill('SIGINT')
+      }
+    })
+  })
+})

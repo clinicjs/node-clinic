@@ -6,17 +6,21 @@ const async = require('async')
 const path = require('path')
 const { spawn } = require('child_process')
 const collect = require('stream-collector')
+const EventEmitter = require('events')
 
 const BIN_PATH = path.resolve(__dirname, '..', 'bin.js')
 
 function cli (settings, args, callback) {
   settings = Object.assign({ relayStderr: true }, settings)
 
+  const api = new EventEmitter()
+
   if (args[0] !== 'clinic') {
-    return process.nextTick(
+    process.nextTick(
       callback,
       new Error('expected first cli argument to be clinic')
     )
+    return api
   }
 
   // replace `-- node` with `-- process.execPath`
@@ -29,6 +33,8 @@ function cli (settings, args, callback) {
 
   if (settings.cwd) ondir(null, settings.cwd)
   else fs.mkdtemp(path.resolve(os.tmpdir(), 'foo-'), ondir)
+
+  return api
 
   function ondir (err, tempdir) {
     if (err) return callback(err)
@@ -43,6 +49,7 @@ function cli (settings, args, callback) {
     if (settings.relayStderr) {
       program.stderr.pipe(process.stderr)
     }
+    api.emit('spawn', program)
 
     async.parallel({
       stderr (done) {

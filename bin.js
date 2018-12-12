@@ -351,7 +351,9 @@ function runTool (args, Tool, version, uiOptions) {
   function onsigint () {
     status('Received Ctrl+C, closing process...')
     /* istanbul ignore if: spinner is disabled in non-tty env */
-    if (!spinner.isSpinning) spinner.start()
+    if (!spinner.isSpinning) {
+      spinner.start()
+    }
   }
 
   if (args['collect-only']) {

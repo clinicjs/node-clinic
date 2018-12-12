@@ -327,6 +327,7 @@ function runTool (args, Tool, version, uiOptions) {
   })
 
   tool.on('analysing', function (message = 'Analysing data') {
+    /* istanbul ignore if: spinner is disabled in non-tty env */
     if (spinner.isEnabled) {
       spinner.text = message
       if (!spinner.isSpinning) {
@@ -339,6 +340,7 @@ function runTool (args, Tool, version, uiOptions) {
   tool.on('status', status)
 
   function status (message) {
+    /* istanbul ignore if: spinner is disabled in non-tty env */
     if (spinner.isEnabled) {
       spinner.text = message
     } else {
@@ -348,6 +350,7 @@ function runTool (args, Tool, version, uiOptions) {
 
   function onsigint () {
     status('Received Ctrl+C, closing process...')
+    /* istanbul ignore if: spinner is disabled in non-tty env */
     if (!spinner.isSpinning) spinner.start()
   }
 
@@ -355,6 +358,7 @@ function runTool (args, Tool, version, uiOptions) {
     process.once('SIGINT', onsigint)
     tool.collect(args['--'], function (err, filename) {
       if (err) throw err
+      /* istanbul ignore if: spinner is disabled in non-tty env */
       if (spinner.isEnabled) {
         spinner.stop()
         spinner.stream.write(`${spinner.text}\n`)
@@ -377,6 +381,7 @@ function runTool (args, Tool, version, uiOptions) {
 
       viz(filename, function (err) {
         if (err) throw err
+        /* istanbul ignore if: spinner is disabled in non-tty env */
         if (spinner.isEnabled) {
           spinner.stop()
           spinner.stream.write(`${spinner.text}\n`)

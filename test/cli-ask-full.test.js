@@ -36,9 +36,11 @@ test('clinic ask 10000.clinic-doctor with custom upload url', function (t) {
     t.ifError(err)
 
     t.strictDeepEqual(stdout.trim().split('\n'), [
-      `Uploading private data for user test@test.com for ${doctorADirectory} and ${doctorADirectory}.html to ${server.uploadUrl}`,
-      `The data has been uploaded to private area for user test@test.com`,
+      'Signed in as test@test.com.',
+      `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`,
+      `The data has been uploaded to your private area.`,
       `${server.uploadUrl}/private/some-id/10000.clinic-doctor.html`,
+      '',
       `Thanks for contacting NearForm, we will reply as soon as possible.`
     ])
 
@@ -66,7 +68,8 @@ test('clinic ask 10000.clinic-doctor with default upload url', function (t) {
     t.ok(err)
     console.log('stdout', stdout)
     t.strictDeepEqual(stdout.trim().split('\n'), [
-      `Uploading private data for user test@test.com for ${doctorADirectory} and ${doctorADirectory}.html to https://upload.clinicjs.org`
+      'Signed in as test@test.com.',
+      `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`
     ])
   })
 })

@@ -15,12 +15,16 @@ const execspawn = require('execspawn')
 const envString = require('env-string')
 const xargv = require('cross-argv')
 const crypto = require('crypto')
+const jwt = require('jsonwebtoken')
 const Insight = require('insight')
 const updateNotifier = require('update-notifier')
+const { promisify } = require('util')
 const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
+const authenticate = require('./lib/authenticate.js')
+const tarAndUploadPromisified = promisify(tarAndUpload)
 
 const GA_TRACKING_CODE = 'UA-29381785-8'
 
@@ -65,8 +69,8 @@ const result = commist()
         })
 
         async.eachSeries(args._, function (filename, done) {
-          // filename may either be .clinic-doctor.html or the data directory
-          // .clinic-doctor
+        // filename may either be .clinic-doctor.html or the data directory
+        // .clinic-doctor
           const filePrefix = path.join(filename).replace(/\.html$/, '')
           const htmlFile = path.basename(filename) + '.html'
 
@@ -74,6 +78,7 @@ const result = commist()
           tarAndUpload(
             path.resolve(filePrefix),
             args['upload-url'],
+            null,
             function (err, reply) {
               if (err) return done(err)
               console.log('The data has been uploaded')
@@ -91,6 +96,51 @@ const result = commist()
       process.exit(1)
     }
   })
+  .register('ask', function (argv) {
+    const defaultUploadURL = 'https://upload.clinicjs.org'
+    const args = minimist(argv, {
+      alias: {
+        help: 'h'
+      },
+      string: [
+        'upload-url'
+      ],
+      boolean: [
+        'help'
+      ],
+      default: {
+        'upload-url': defaultUploadURL
+      }
+    })
+
+    if (args.help) {
+      printHelp('clinic-ask')
+    } else if (args._.length > 0) {
+      checkMetricsPermission(async () => {
+        insight.trackEvent({
+          category: 'upload',
+          action: 'ask'
+        })
+
+        try {
+          await processAsk(args)
+        } catch (err) {
+          if (err.code === 'ECONNREFUSED') {
+            console.error(`Connection refused to the Upload Server at ${args['upload-url']}.`)
+            if (/localhost/.test(args['upload-url'])) {
+              console.error('Make sure the data server is running.')
+            }
+          } else {
+            console.error('Unexpected Error:', err.stack)
+          }
+          process.exit(1)
+        }
+      })
+    } else {
+      printHelp('clinic-ask')
+      process.exit(1)
+    }
+  })
   .register('clean', function (argv) {
     const args = minimist(argv, {
       alias: {
@@ -101,7 +151,7 @@ const result = commist()
     if (args.help) {
       printHelp('clinic-clean')
     } else {
-      // support --path to support failure testing
+    // support --path to support failure testing
       clean(args.path || '.', function (err) {
         if (err) throw err
       })
@@ -442,4 +492,36 @@ function checkForUpdates () {
     isGlobal: true,
     defer: false
   })
+}
+
+function tarAndUploadFile (uploadURL, authToken, email) {
+  return async (filename) => {
+    // filename may either be .clinic-doctor.html or the data directory
+    // .clinic-doctor
+    const filePrefix = path.join(filename).replace(/\.html$/, '')
+    const htmlFile = path.basename(filename) + '.html'
+
+    console.log(`Uploading private data for user ${email} for ${filePrefix} and ${filePrefix}.html to ${uploadURL}`)
+
+    const result = await tarAndUploadPromisified(path.resolve(filePrefix), uploadURL, authToken)
+
+    return { id: result.id, url: `${uploadURL}/private/${result.id}/${htmlFile}` }
+  }
+}
+
+async function processAsk (args) {
+  const authToken = await authenticate(args['upload-url'])
+  const { email } = jwt.decode(authToken)
+  const uploadURL = args['upload-url']
+  const uploaderFunc = tarAndUploadFile(uploadURL, authToken, email)
+
+  // run in series
+  const results = await args._.reduce((p, item) => p.then(results => uploaderFunc(item).then(result => {
+    results.push(result)
+    return results
+  })), Promise.resolve([]))
+
+  console.log(`The data has been uploaded to private area for user ${email}`)
+  results.forEach(result => console.log(result.url))
+  console.log(`Thanks for contacting NearForm, we will reply as soon as possible.`)
 }

@@ -6,6 +6,9 @@ const http = require('http')
 const cli = require('./cli.js')
 const FakeUploadServer = require('./fake-upload-server.js')
 
+// JWT containing test@test.com
+const successfulJwt = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1NDIyMjI5MzMsImV4cCI6MTg4OTM3ODEzMywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSJ9.FO0v4OM2V23lAXIcv-qcfFo0snOrOmsrY82kmcYlrJI'
+
 const doctorADirectory = path.resolve(
   __dirname,
   'fixtures',
@@ -30,7 +33,9 @@ const doctorBadDirectory = path.resolve(
 test('clinic upload 10000.clinic-doctor', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {
-    cli({}, [
+    cli({
+      env: { CLINIC_ASK_JWT: successfulJwt }
+    }, [
       'clinic', 'upload',
       '--upload-url', server.uploadUrl,
       doctorADirectory
@@ -38,8 +43,9 @@ test('clinic upload 10000.clinic-doctor', function (t) {
       t.ifError(err)
 
       t.strictDeepEqual(stdout.trim().split('\n'), [
+        'Signed in as test@test.com.',
         `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`,
-        `The data has been uploaded`,
+        `The data has been uploaded.`,
         `Use this link to share it:`,
         `http://127.0.0.1:${server.server.address().port}/public/some-id/${path.basename(doctorADirectory)}.html`
       ])
@@ -62,7 +68,9 @@ test('clinic upload 10000.clinic-doctor', function (t) {
 test('clinic upload 10000.clinic-doctor 10001.clinic-doctor', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {
-    cli({}, [
+    cli({
+      env: { CLINIC_ASK_JWT: successfulJwt }
+    }, [
       'clinic', 'upload',
       '--upload-url', server.uploadUrl,
       doctorADirectory, doctorBDirectory
@@ -70,13 +78,12 @@ test('clinic upload 10000.clinic-doctor 10001.clinic-doctor', function (t) {
       t.ifError(err)
 
       t.strictDeepEqual(stdout.trim().split('\n'), [
+        'Signed in as test@test.com.',
         `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`,
-        `The data has been uploaded`,
-        `Use this link to share it:`,
-        `http://127.0.0.1:${server.server.address().port}/public/some-id/${path.basename(doctorADirectory)}.html`,
         `Uploading data for ${doctorBDirectory} and ${doctorBDirectory}.html`,
-        `The data has been uploaded`,
-        `Use this link to share it:`,
+        `The data has been uploaded.`,
+        `Use these links to share the profiles:`,
+        `http://127.0.0.1:${server.server.address().port}/public/some-id/${path.basename(doctorADirectory)}.html`,
         `http://127.0.0.1:${server.server.address().port}/public/some-id/${path.basename(doctorBDirectory)}.html`
       ])
 
@@ -109,13 +116,17 @@ test('clinic upload - bad status code', function (t) {
     res.end()
   })
   server.listen(function () {
-    cli({ relayStderr: false }, [
+    cli({
+      env: { CLINIC_ASK_JWT: successfulJwt },
+      relayStderr: false
+    }, [
       'clinic', 'upload',
       '--upload-url', `http://127.0.0.1:${server.address().port}`,
       doctorADirectory
     ], function (err, stdout, stderr) {
       t.strictDeepEqual(err, new Error('process exited with exit code 1'))
       t.strictDeepEqual(stdout.trim().split('\n'), [
+        'Signed in as test@test.com.',
         `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`
       ])
       t.ok(stderr.includes('Bad status code: 500'))
@@ -127,7 +138,10 @@ test('clinic upload - bad status code', function (t) {
 test('clinic upload bad-folder', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {
-    cli({ relayStderr: false }, [
+    cli({
+      env: { CLINIC_ASK_JWT: successfulJwt },
+      relayStderr: false
+    }, [
       'clinic', 'upload',
       '--upload-url', server.uploadUrl,
       doctorBadDirectory

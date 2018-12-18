@@ -474,14 +474,14 @@ function checkForUpdates () {
   })
 }
 
-async function uploadData (uploadURL, authToken, email, filename, opts) {
+async function uploadData (uploadURL, authToken, filename, opts) {
   // filename may either be .clinic-doctor.html or the data directory
   // .clinic-doctor
   const filePrefix = path.join(filename).replace(/\.html$/, '')
   const htmlFile = path.basename(filename) + '.html'
   const isPrivate = opts && opts.private
 
-  console.log(`Uploading data for user ${email} for ${filePrefix} and ${filePrefix}.html to ${uploadURL}`)
+  console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
 
   const result = await tarAndUploadPromisified(path.resolve(filePrefix), uploadURL, authToken, { private: isPrivate })
 
@@ -502,12 +502,13 @@ async function processUpload (args, opts = { private: false, ask: false }) {
   try {
     const authToken = await authenticate(args['upload-url'])
     const { email } = jwt.decode(authToken)
+    console.log(`Signed in as ${email}.`)
     const uploadURL = args['upload-url']
 
     const results = []
     for (let i = 0; i < args._.length; i++) {
       const filename = args._[i]
-      const result = await uploadData(uploadURL, authToken, email, filename, opts)
+      const result = await uploadData(uploadURL, authToken, filename, opts)
       if (opts.ask) {
         await ask(result.url)
       }

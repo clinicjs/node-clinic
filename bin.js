@@ -69,9 +69,12 @@ const result = commist()
           action: 'public'
         })
 
-        processUpload(args, { private: args.private }).catch(() => {
+        try {
+          await processUpload(args, { private: args.private })
+        } catch (err) {
+          // message already printed in processUpload
           process.exit(1)
-        })
+        }
       })
     } else {
       printHelp('clinic-upload')
@@ -103,9 +106,15 @@ const result = commist()
           action: 'ask'
         })
 
-        processUpload(args, { private: true }).catch(() => {
+        try {
+          await processUpload(args, {
+            private: true,
+            ask: true
+          })
+        } catch (err) {
+          // message already printed in processUpload
           process.exit(1)
-        })
+        }
       })
     } else {
       printHelp('clinic-ask')
@@ -485,7 +494,11 @@ async function uploadData (uploadURL, authToken, email, filename, opts) {
   }
 }
 
-async function processUpload (args, opts = { private: false }) {
+async function ask () {
+  // TODO hit /ask endpoint
+}
+
+async function processUpload (args, opts = { private: false, ask: false }) {
   try {
     const authToken = await authenticate(args['upload-url'])
     const { email } = jwt.decode(authToken)
@@ -493,12 +506,12 @@ async function processUpload (args, opts = { private: false }) {
 
     const results = []
     for (let i = 0; i < args._.length; i++) {
-      results.push(await uploadData(
-        uploadURL,
-        authToken,
-        email,
-        args._[i],
-        opts))
+      const filename = args._[i]
+      const result = await uploadData(uploadURL, authToken, email, filename, opts)
+      if (opts.ask) {
+        await ask(result.url)
+      }
+      results.push(result)
     }
 
     if (opts && opts.private) {
@@ -512,6 +525,11 @@ async function processUpload (args, opts = { private: false }) {
         console.log('Use this link to share it:')
       }
       results.forEach(result => console.log(result.url))
+    }
+
+    if (opts.ask) {
+      console.log('')
+      console.log('Thanks for contacting NearForm, we will reply as soon as possible.')
     }
   } catch (err) {
     if (err.code === 'ECONNREFUSED') {

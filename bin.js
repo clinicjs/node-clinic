@@ -5,7 +5,6 @@ const fs = require('fs')
 const path = require('path')
 const opn = require('opn')
 const ora = require('ora')
-const async = require('async')
 const shellEscape = require('any-shell-escape')
 const commist = require('commist')
 const minimist = require('minimist')
@@ -27,6 +26,7 @@ const authenticate = require('./lib/authenticate.js')
 const tarAndUploadPromisified = promisify(tarAndUpload)
 
 const GA_TRACKING_CODE = 'UA-29381785-8'
+const DEFAULT_UPLOAD_URL = 'https://upload.clinicjs.org'
 
 const insight = new Insight({
   trackingCode: GA_TRACKING_CODE,
@@ -52,43 +52,25 @@ const result = commist()
         'upload-url'
       ],
       boolean: [
-        'help'
+        'help',
+        'private'
       ],
       default: {
-        'upload-url': 'https://upload.clinicjs.org'
+        'upload-url': DEFAULT_UPLOAD_URL
       }
     })
 
     if (args.help) {
       printHelp('clinic-upload')
     } else if (args._.length > 0) {
-      checkMetricsPermission(() => {
+      checkMetricsPermission(async () => {
         insight.trackEvent({
           category: 'upload',
           action: 'public'
         })
 
-        async.eachSeries(args._, function (filename, done) {
-        // filename may either be .clinic-doctor.html or the data directory
-        // .clinic-doctor
-          const filePrefix = path.join(filename).replace(/\.html$/, '')
-          const htmlFile = path.basename(filename) + '.html'
-
-          console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
-          tarAndUpload(
-            path.resolve(filePrefix),
-            args['upload-url'],
-            null,
-            function (err, reply) {
-              if (err) return done(err)
-              console.log('The data has been uploaded')
-              console.log('Use this link to share it:')
-              console.log(`${args['upload-url']}/public/${reply.id}/${htmlFile}`)
-              done(null)
-            }
-          )
-        }, function (err) {
-          if (err) throw err
+        processUpload(args, { private: args.private }).catch(() => {
+          process.exit(1)
         })
       })
     } else {
@@ -97,7 +79,6 @@ const result = commist()
     }
   })
   .register('ask', function (argv) {
-    const defaultUploadURL = 'https://upload.clinicjs.org'
     const args = minimist(argv, {
       alias: {
         help: 'h'
@@ -109,7 +90,7 @@ const result = commist()
         'help'
       ],
       default: {
-        'upload-url': defaultUploadURL
+        'upload-url': DEFAULT_UPLOAD_URL
       }
     })
 
@@ -122,19 +103,9 @@ const result = commist()
           action: 'ask'
         })
 
-        try {
-          await processAsk(args)
-        } catch (err) {
-          if (err.code === 'ECONNREFUSED') {
-            console.error(`Connection refused to the Upload Server at ${args['upload-url']}.`)
-            if (/localhost/.test(args['upload-url'])) {
-              console.error('Make sure the data server is running.')
-            }
-          } else {
-            console.error('Unexpected Error:', err.stack)
-          }
+        processUpload(args, { private: true }).catch(() => {
           process.exit(1)
-        }
+        })
       })
     } else {
       printHelp('clinic-ask')
@@ -494,34 +465,63 @@ function checkForUpdates () {
   })
 }
 
-function tarAndUploadFile (uploadURL, authToken, email) {
-  return async (filename) => {
-    // filename may either be .clinic-doctor.html or the data directory
-    // .clinic-doctor
-    const filePrefix = path.join(filename).replace(/\.html$/, '')
-    const htmlFile = path.basename(filename) + '.html'
+async function uploadData (uploadURL, authToken, email, filename, opts) {
+  // filename may either be .clinic-doctor.html or the data directory
+  // .clinic-doctor
+  const filePrefix = path.join(filename).replace(/\.html$/, '')
+  const htmlFile = path.basename(filename) + '.html'
+  const isPrivate = opts && opts.private
 
-    console.log(`Uploading private data for user ${email} for ${filePrefix} and ${filePrefix}.html to ${uploadURL}`)
+  console.log(`Uploading data for user ${email} for ${filePrefix} and ${filePrefix}.html to ${uploadURL}`)
 
-    const result = await tarAndUploadPromisified(path.resolve(filePrefix), uploadURL, authToken)
+  const result = await tarAndUploadPromisified(path.resolve(filePrefix), uploadURL, authToken, { private: isPrivate })
 
-    return { id: result.id, url: `${uploadURL}/private/${result.id}/${htmlFile}` }
+  const url = isPrivate
+    ? `${uploadURL}/private/${result.id}/${htmlFile}`
+    : `${uploadURL}/public/${result.id}/${htmlFile}`
+  return {
+    id: result.id,
+    url: url
   }
 }
 
-async function processAsk (args) {
-  const authToken = await authenticate(args['upload-url'])
-  const { email } = jwt.decode(authToken)
-  const uploadURL = args['upload-url']
-  const uploaderFunc = tarAndUploadFile(uploadURL, authToken, email)
+async function processUpload (args, opts = { private: false }) {
+  try {
+    const authToken = await authenticate(args['upload-url'])
+    const { email } = jwt.decode(authToken)
+    const uploadURL = args['upload-url']
 
-  // run in series
-  const results = await args._.reduce((p, item) => p.then(results => uploaderFunc(item).then(result => {
-    results.push(result)
-    return results
-  })), Promise.resolve([]))
+    const results = []
+    for (let i = 0; i < args._.length; i++) {
+      results.push(await uploadData(
+        uploadURL,
+        authToken,
+        email,
+        args._[i],
+        opts))
+    }
 
-  console.log(`The data has been uploaded to private area for user ${email}`)
-  results.forEach(result => console.log(result.url))
-  console.log(`Thanks for contacting NearForm, we will reply as soon as possible.`)
+    if (opts && opts.private) {
+      console.log('The data has been uploaded to your private area.')
+      results.forEach(result => console.log(result.url))
+    } else {
+      console.log('The data has been uploaded.')
+      if (results.length > 1) {
+        console.log('Use these links to share the profiles:')
+      } else {
+        console.log('Use this link to share it:')
+      }
+      results.forEach(result => console.log(result.url))
+    }
+  } catch (err) {
+    if (err.code === 'ECONNREFUSED') {
+      console.error(`Connection refused to the Upload Server at ${args['upload-url']}.`)
+      if (/localhost/.test(args['upload-url'])) {
+        console.error('Make sure the data server is running.')
+      }
+    } else {
+      console.error('Unexpected Error:', err.stack)
+    }
+    throw err
+  }
 }

@@ -14,5 +14,11 @@
 
   Replace 13242 with your pid.
 
+  If your profile contains potentially sensitive data, you can upload it
+  privately to your account using <code>--private</code>.
+
+    <code>clinic upload --private 13242.clinic-flame</code>
+
   <h1>Flags</h1>
   -h | --help                Display Help
+  --private                  Upload data privately to your account.

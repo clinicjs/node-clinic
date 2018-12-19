@@ -64,12 +64,13 @@ const result = commist()
       printHelp('clinic-upload')
     } else if (args._.length > 0) {
       checkMetricsPermission(async () => {
-        insight.trackEvent({
-          category: 'upload',
-          action: 'public'
-        })
-
+        // checkMP does not handle Promise rejections, so we try-catch this entire thing
         try {
+          insight.trackEvent({
+            category: 'upload',
+            action: 'public'
+          })
+
           await processUpload(args, { private: args.private })
         } catch (err) {
           // message already printed in processUpload
@@ -101,12 +102,13 @@ const result = commist()
       printHelp('clinic-ask')
     } else if (args._.length > 0) {
       checkMetricsPermission(async () => {
-        insight.trackEvent({
-          category: 'upload',
-          action: 'ask'
-        })
-
+        // checkMP does not handle Promise rejections, so we try-catch this entire thing
         try {
+          insight.trackEvent({
+            category: 'upload',
+            action: 'ask'
+          })
+
           await processUpload(args, {
             private: true,
             ask: true

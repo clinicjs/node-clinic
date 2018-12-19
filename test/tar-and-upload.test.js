@@ -28,6 +28,7 @@ function testFixtureUpload (type, html) {
         path.resolve(__dirname, dataDrectory),
         server.uploadUrl,
         null,
+        {},
         function (err, data) {
           t.ifError(err)
 
@@ -65,7 +66,7 @@ test('upload - bad response', function (t) {
 
   server.listen(0, '127.0.0.1', function () {
     const uploadUrl = `http://localhost:${server.address().port}`
-    tarAndUpload(dataDirectory, uploadUrl, null, function (err) {
+    tarAndUpload(dataDirectory, uploadUrl, null, {}, function (err) {
       t.strictEqual(err.message, 'socket hang up')
       server.close(() => t.end())
     })
@@ -86,7 +87,7 @@ test('upload - bad body encoding', function (t) {
 
   server.listen(0, '127.0.0.1', function () {
     const uploadUrl = `http://localhost:${server.address().port}`
-    tarAndUpload(dataDirectory, uploadUrl, null, function (err) {
+    tarAndUpload(dataDirectory, uploadUrl, null, {}, function (err) {
       t.strictEqual(err.name, 'SyntaxError')
       server.close(() => t.end())
     })
@@ -108,7 +109,7 @@ test('upload - bad status code', function (t) {
 
   server.listen(0, '127.0.0.1', function () {
     const uploadUrl = `http://localhost:${server.address().port}`
-    tarAndUpload(dataDirectory, uploadUrl, null, function (err) {
+    tarAndUpload(dataDirectory, uploadUrl, null, {}, function (err) {
       t.strictDeepEqual(err, new Error('Bad status code: 500'))
       server.close(() => t.end())
     })
@@ -147,7 +148,7 @@ test('upload fixtures/empty-directory.tmp/10000.clinic-doctor', function (t) {
     t.ifError(err)
 
     const uploadUrl = `http://localhost:${server.address().port}`
-    tarAndUpload(emptyDataDirectory, uploadUrl, null, function (err) {
+    tarAndUpload(emptyDataDirectory, uploadUrl, null, {}, function (err) {
       t.strictDeepEqual(err, new Error('No data to upload'))
       server.close(() => t.end())
     })
@@ -190,7 +191,7 @@ test('upload fixtures/too-big-should-fail', function (t) {
     t.ifError(err)
 
     const uploadUrl = `http://localhost:${server.address().port}`
-    tarAndUpload(bigFileDirectory, uploadUrl, null, function (err) {
+    tarAndUpload(bigFileDirectory, uploadUrl, null, {}, function (err) {
       t.strictDeepEqual(err, new Error('Too much data. Should be less than 32MB'))
       server.close(() => t.end())
     })

@@ -65,6 +65,41 @@ test('clinic upload 10000.clinic-doctor', function (t) {
   })
 })
 
+test('clinic upload 10000.clinic-doctor privately', function (t) {
+  const server = new FakeUploadServer()
+  server.listen(function () {
+    cli({
+      env: { CLINIC_ASK_JWT: successfulJwt }
+    }, [
+      'clinic', 'upload',
+      '--private',
+      '--upload-url', server.uploadUrl,
+      doctorADirectory
+    ], function (err, stdout) {
+      t.ifError(err)
+
+      t.strictDeepEqual(stdout.trim().split('\n'), [
+        'Signed in as test@test.com.',
+        `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`,
+        `The data has been uploaded to your private area.`,
+        `http://127.0.0.1:${server.server.address().port}/private/some-id/${path.basename(doctorADirectory)}.html`
+      ])
+
+      t.strictDeepEqual(server.requests, [{
+        method: 'POST',
+        url: '/protected/data',
+        files: {
+          '10000.clinic-doctor/a.txt': 'a',
+          '10000.clinic-doctor/b.txt': 'b',
+          '10000.clinic-doctor/c.txt': 'c'
+        }
+      }])
+
+      server.close(() => t.end())
+    })
+  })
+})
+
 test('clinic upload 10000.clinic-doctor 10001.clinic-doctor', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {

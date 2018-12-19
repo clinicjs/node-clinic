@@ -26,7 +26,7 @@ test('Before all', function (t) {
 
 test('clinic ask 10000.clinic-doctor with custom upload url', function (t) {
   cli({
-    env: { CLINIC_ASK_JWT: successfulJwt }
+    env: { CLINIC_JWT: successfulJwt }
   }, [
     'clinic', 'ask',
     '--upload-url', server.uploadUrl,
@@ -58,7 +58,7 @@ test('clinic ask 10000.clinic-doctor with custom upload url', function (t) {
 
 test('clinic ask 10000.clinic-doctor with default upload url', function (t) {
   cli({
-    env: { CLINIC_ASK_JWT: successfulJwt }
+    env: { CLINIC_JWT: successfulJwt }
   }, [
     'clinic', 'ask',
     doctorADirectory
@@ -76,7 +76,7 @@ test('clinic ask 10000.clinic-doctor with default upload url', function (t) {
 
 test('clinic ask 10000.clinic-doctor auth failure', function (t) {
   cli({
-    env: { CLINIC_ASK_FORCE_FAIL: 'true' }
+    env: { CLINIC_JWT_FORCE_FAIL: 'true' }
   }, [
     'clinic', 'ask',
     '--upload-url', server.uploadUrl,

@@ -34,7 +34,7 @@ test('clinic upload 10000.clinic-doctor', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {
     cli({
-      env: { CLINIC_ASK_JWT: successfulJwt }
+      env: { CLINIC_JWT: successfulJwt }
     }, [
       'clinic', 'upload',
       '--upload-url', server.uploadUrl,
@@ -69,7 +69,7 @@ test('clinic upload 10000.clinic-doctor privately', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {
     cli({
-      env: { CLINIC_ASK_JWT: successfulJwt }
+      env: { CLINIC_JWT: successfulJwt }
     }, [
       'clinic', 'upload',
       '--private',
@@ -104,7 +104,7 @@ test('clinic upload 10000.clinic-doctor 10001.clinic-doctor', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {
     cli({
-      env: { CLINIC_ASK_JWT: successfulJwt }
+      env: { CLINIC_JWT: successfulJwt }
     }, [
       'clinic', 'upload',
       '--upload-url', server.uploadUrl,
@@ -152,7 +152,7 @@ test('clinic upload - bad status code', function (t) {
   })
   server.listen(function () {
     cli({
-      env: { CLINIC_ASK_JWT: successfulJwt },
+      env: { CLINIC_JWT: successfulJwt },
       relayStderr: false
     }, [
       'clinic', 'upload',
@@ -174,7 +174,7 @@ test('clinic upload bad-folder', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {
     cli({
-      env: { CLINIC_ASK_JWT: successfulJwt },
+      env: { CLINIC_JWT: successfulJwt },
       relayStderr: false
     }, [
       'clinic', 'upload',

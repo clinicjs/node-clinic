@@ -43,6 +43,24 @@ if ('NO_INSIGHT' in process.env) {
 checkForUpdates()
 
 const result = commist()
+  .register('login', function (argv) {
+    const args = minimist(argv, {
+      alias: {
+        help: 'h'
+      },
+      string: [
+        'upload-url'
+      ],
+      default: {
+        'upload-url': DEFAULT_UPLOAD_URL
+      }
+    })
+
+    authenticate(args['upload-url']).then((authToken) => {
+      const header = jwt.decode(authToken)
+      console.log('Logged in as', header.name)
+    })
+  })
   .register('upload', function (argv) {
     const args = minimist(argv, {
       alias: {

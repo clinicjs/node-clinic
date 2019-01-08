@@ -61,6 +61,23 @@ const result = commist()
       console.log('Logged in as', header.name)
     })
   })
+  .register('logout', function (argv) {
+    const args = minimist(argv, {
+      alias: {
+        help: 'h'
+      },
+      string: [
+        'upload-url'
+      ],
+      default: {
+        'upload-url': DEFAULT_UPLOAD_URL
+      }
+    })
+
+    authenticate.logout(args['upload-url']).then(() => {
+      console.log('Logged out from ', args['upload-url'])
+    })
+  })
   .register('upload', function (argv) {
     const args = minimist(argv, {
       alias: {

@@ -136,7 +136,7 @@ const result = commist()
         console.log('Logged out from all servers')
       })
     } else {
-      authenticate.logout(url).then(() => {
+      authenticate.logout(args['upload-url']).then(() => {
         console.log('Logged out from ', args['upload-url'])
       })
     }

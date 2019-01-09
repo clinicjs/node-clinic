@@ -87,6 +87,9 @@ const result = commist()
           printUser(users[url])
           console.log('')
         })
+      }).catch((err) => {
+        console.error('Could not list sessions:', err.message)
+        process.exit(1)
       })
     }
   })
@@ -144,10 +147,16 @@ const result = commist()
     if (args.all) {
       authenticate.removeSessions().then(() => {
         console.log('Signed out from all servers')
+      }).catch((err) => {
+        console.error('Could not sign out:', err.message)
+        process.exit(1)
       })
     } else {
       authenticate.logout(args.server).then(() => {
         console.log('Signed out from ', args.server)
+      }).catch((err) => {
+        console.error('Could not sign out:', err.message)
+        process.exit(1)
       })
     }
   })

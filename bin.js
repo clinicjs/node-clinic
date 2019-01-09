@@ -49,7 +49,7 @@ const result = commist()
         help: 'h'
       },
       string: [
-        'upload-url'
+        'server'
       ]
     })
 
@@ -70,8 +70,8 @@ const result = commist()
       }
     }
 
-    if (args['upload-url']) {
-      authenticate.getSession(args['upload-url']).then((user) => {
+    if (args.server) {
+      authenticate.getSession(args.server).then((user) => {
         if (!user) throw new Error('Expired')
         printUser(user)
       }).catch(() => {
@@ -96,10 +96,10 @@ const result = commist()
         help: 'h'
       },
       string: [
-        'upload-url'
+        'server'
       ],
       default: {
-        'upload-url': DEFAULT_UPLOAD_URL
+        'server': DEFAULT_UPLOAD_URL
       }
     })
 
@@ -108,7 +108,7 @@ const result = commist()
       process.exit(0)
     }
 
-    authenticate(args['upload-url']).then((authToken) => {
+    authenticate(args.server).then((authToken) => {
       const header = jwt.decode(authToken)
       if (header.name) {
         console.log(`Signed in as ${header.name} (${header.email}).`)
@@ -126,13 +126,13 @@ const result = commist()
         help: 'h'
       },
       string: [
-        'upload-url'
+        'server'
       ],
       boolean: [
         'all'
       ],
       default: {
-        'upload-url': DEFAULT_UPLOAD_URL
+        'server': DEFAULT_UPLOAD_URL
       }
     })
 
@@ -146,8 +146,8 @@ const result = commist()
         console.log('Signed out from all servers')
       })
     } else {
-      authenticate.logout(args['upload-url']).then(() => {
-        console.log('Signed out from ', args['upload-url'])
+      authenticate.logout(args.server).then(() => {
+        console.log('Signed out from ', args.server)
       })
     }
   })
@@ -157,14 +157,14 @@ const result = commist()
         help: 'h'
       },
       string: [
-        'upload-url'
+        'server'
       ],
       boolean: [
         'help',
         'private'
       ],
       default: {
-        'upload-url': DEFAULT_UPLOAD_URL
+        'server': DEFAULT_UPLOAD_URL
       }
     })
 
@@ -196,13 +196,13 @@ const result = commist()
         help: 'h'
       },
       string: [
-        'upload-url'
+        'server'
       ],
       boolean: [
         'help'
       ],
       default: {
-        'upload-url': DEFAULT_UPLOAD_URL
+        'server': DEFAULT_UPLOAD_URL
       }
     })
 
@@ -610,10 +610,10 @@ async function ask () {
 
 async function processUpload (args, opts = { private: false, ask: false }) {
   try {
-    const authToken = await authenticate(args['upload-url'])
+    const authToken = await authenticate(args.server)
     const { email } = jwt.decode(authToken)
     console.log(`Signed in as ${email}.`)
-    const uploadURL = args['upload-url']
+    const uploadURL = args.server
 
     const results = []
     for (let i = 0; i < args._.length; i++) {
@@ -644,8 +644,8 @@ async function processUpload (args, opts = { private: false, ask: false }) {
     }
   } catch (err) {
     if (err.code === 'ECONNREFUSED') {
-      console.error(`Connection refused to the Upload Server at ${args['upload-url']}.`)
-      if (/localhost/.test(args['upload-url'])) {
+      console.error(`Connection refused to the Upload Server at ${args.server}.`)
+      if (/localhost/.test(args.server)) {
         console.error('Make sure the data server is running.')
       }
     } else {

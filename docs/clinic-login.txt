@@ -5,7 +5,7 @@
 
   <h1>Flags</h1>
   -h | --help                Display Help
-  --upload-url               Specify a custom URL to a Clinic Upload server.
+  --server                   Specify a custom URL to a Clinic Upload server.
 
   <h1>Environment Variables</h1>
   CLINIC_JWT                 Token for authentication with the Clinic Upload server.

@@ -5,6 +5,6 @@
 
   <h1>Flags</h1>
   -h | --help                Display Help
-  --upload-url               Specify a custom URL to a Clinic Upload server.
+  --server                   Specify a custom URL to a Clinic Upload server.
   --all                      Log out of all Clinic Upload servers.
 

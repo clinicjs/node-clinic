@@ -35,7 +35,7 @@ test('clinic login', function (t) {
     }
   }, [
     'clinic', 'login',
-    '--upload-url', server.uploadUrl
+    '--server', server.uploadUrl
   ], function (err, stdout) {
     t.plan(2)
     t.ifError(err)
@@ -72,7 +72,7 @@ test('clinic user lists all authed users', function (t) {
     }
   }, [
     'clinic', 'login',
-    '--upload-url', server.uploadUrl
+    '--server', server.uploadUrl
   ], next)
 
   cli({
@@ -82,7 +82,7 @@ test('clinic user lists all authed users', function (t) {
     }
   }, [
     'clinic', 'login',
-    '--upload-url', server2.uploadUrl
+    '--server', server2.uploadUrl
   ], next)
 
   function next (err) {
@@ -113,7 +113,7 @@ test('clinic user lists all authed users', function (t) {
   }
 })
 
-test('clinic user --upload-url lists single user', function (t) {
+test('clinic user --server lists single user', function (t) {
   t.plan(3)
 
   cli({
@@ -123,7 +123,7 @@ test('clinic user --upload-url lists single user', function (t) {
     }
   }, [
     'clinic', 'login',
-    '--upload-url', server.uploadUrl
+    '--server', server.uploadUrl
   ], function (err) {
     t.ifError(err)
 
@@ -163,7 +163,7 @@ test('clinic logout', function (t) {
         CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout'),
         CLINIC_JWT: successfulJwt
       }
-    }, [ 'clinic', 'login', '--upload-url', server.uploadUrl ], cb)
+    }, [ 'clinic', 'login', '--server', server.uploadUrl ], cb)
   }
 
   function checkLogin (cb) {
@@ -171,7 +171,7 @@ test('clinic logout', function (t) {
       env: {
         CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout')
       }
-    }, [ 'clinic', 'user', '--upload-url', server.uploadUrl ], cb)
+    }, [ 'clinic', 'user', '--server', server.uploadUrl ], cb)
   }
 
   function logout (cb) {
@@ -179,7 +179,7 @@ test('clinic logout', function (t) {
       env: {
         CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout')
       }
-    }, [ 'clinic', 'logout', '--upload-url', server.uploadUrl ], cb)
+    }, [ 'clinic', 'logout', '--server', server.uploadUrl ], cb)
   }
 })
 
@@ -210,7 +210,7 @@ test('clinic logout --all logs out of all servers', function (t) {
         CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout-all'),
         CLINIC_JWT: token
       }
-    }, [ 'clinic', 'login', '--upload-url', url ], cb)
+    }, [ 'clinic', 'login', '--server', url ], cb)
   }
 
   function checkLogin (url, cb) {
@@ -218,7 +218,7 @@ test('clinic logout --all logs out of all servers', function (t) {
       env: {
         CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout-all')
       }
-    }, [ 'clinic', 'user', '--upload-url', url ], cb)
+    }, [ 'clinic', 'user', '--server', url ], cb)
   }
 
   function logoutAll (cb) {

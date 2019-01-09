@@ -29,7 +29,7 @@ test('clinic ask 10000.clinic-doctor with custom upload url', function (t) {
     env: { CLINIC_JWT: successfulJwt }
   }, [
     'clinic', 'ask',
-    '--upload-url', server.uploadUrl,
+    '--server', server.uploadUrl,
     doctorADirectory
   ], function (err, stdout) {
     t.plan(3)
@@ -79,7 +79,7 @@ test('clinic ask 10000.clinic-doctor auth failure', function (t) {
     env: { CLINIC_MOCK_AUTH_FAIL: 'true' }
   }, [
     'clinic', 'ask',
-    '--upload-url', server.uploadUrl,
+    '--server', server.uploadUrl,
     doctorADirectory
   ], function (err, stdout, stderr) {
     t.plan(2)

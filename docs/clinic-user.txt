@@ -3,10 +3,10 @@
 
   Show information for the currently logged-in user.
 
-  Provide <code>--upload-url</code> to show information for a specific Clinic Upload server.
+  Provide <code>--server</code> to show information for a specific Clinic Upload server.
   If not provided, the information for all servers is listed.
 
   <h1>Flags</h1>
   -h | --help                Display Help
-  --upload-url               Display the user info for this Clinic Upload server only.
+  --server                   Display the user info for this Clinic Upload server only.
 

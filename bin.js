@@ -118,6 +118,9 @@ const result = commist()
       string: [
         'upload-url'
       ],
+      boolean: [
+        'all'
+      ],
       default: {
         'upload-url': DEFAULT_UPLOAD_URL
       }
@@ -128,9 +131,15 @@ const result = commist()
       process.exit(0)
     }
 
-    authenticate.logout(args['upload-url']).then(() => {
-      console.log('Logged out from ', args['upload-url'])
-    })
+    if (args.all) {
+      authenticate.removeSessions().then(() => {
+        console.log('Logged out from all servers')
+      })
+    } else {
+      authenticate.logout(url).then(() => {
+        console.log('Logged out from ', args['upload-url'])
+      })
+    }
   })
   .register('upload', function (argv) {
     const args = minimist(argv, {

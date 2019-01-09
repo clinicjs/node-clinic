@@ -98,17 +98,10 @@ test('clinic user lists all authed users', function (t) {
       'clinic', 'user'
     ], function (err, stdout) {
       t.ifError(err)
-      const userInfos = stdout.split('\n\n')
-        .filter((el) => el !== '')
-        .sort((a, b) => {
-          if (a.includes('test@test')) return -1
-          if (a.includes('other@email')) return 1
-          return 0
-        })
-      t.ok(userInfos[0].includes(server.uploadUrl))
-      t.ok(userInfos[0].includes('Authenticated as test@test.com.'))
-      t.ok(userInfos[1].includes(server2.uploadUrl))
-      t.ok(userInfos[1].includes('Authenticated as other@email.com.'))
+      t.ok(stdout.includes(server.uploadUrl))
+      t.ok(stdout.includes('Authenticated as test@test.com.'))
+      t.ok(stdout.includes(server2.uploadUrl))
+      t.ok(stdout.includes('Authenticated as other@email.com.'))
     })
   }
 })

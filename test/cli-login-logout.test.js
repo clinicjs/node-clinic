@@ -195,10 +195,10 @@ test('clinic logout --all logs out of all servers', function (t) {
         checkLogin(server.uploadUrl, (err, stdout) => {
           t.ok(err)
           t.ok(/Not authenticated/.test(stdout))
-        })
-        checkLogin(server2.uploadUrl, (err, stdout) => {
-          t.ok(err)
-          t.ok(/Not authenticated/.test(stdout))
+          checkLogin(server2.uploadUrl, (err, stdout) => {
+            t.ok(err)
+            t.ok(/Not authenticated/.test(stdout))
+          })
         })
       })
     })

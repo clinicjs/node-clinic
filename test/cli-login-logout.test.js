@@ -167,7 +167,7 @@ test('clinic logout', function (t) {
   function checkLogin (cb) {
     cli({
       env: {
-        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout'),
+        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout')
       }
     }, [ 'clinic', 'user', '--upload-url', server.uploadUrl ], cb)
   }
@@ -214,7 +214,7 @@ test('clinic logout --all logs out of all servers', function (t) {
   function checkLogin (url, cb) {
     cli({
       env: {
-        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout-all'),
+        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout-all')
       }
     }, [ 'clinic', 'user', '--upload-url', url ], cb)
   }

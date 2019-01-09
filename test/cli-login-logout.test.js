@@ -138,6 +138,96 @@ test('clinic user --upload-url lists single user', function (t) {
   })
 })
 
+test('clinic logout', function (t) {
+  t.plan(5)
+
+  login((err) => {
+    t.ifError(err)
+    checkLogin((err) => {
+      t.ifError(err)
+      logout((err) => {
+        t.ifError(err)
+        checkLogin((err, stdout) => {
+          t.ok(err)
+          t.ok(/Not authenticated/.test(stdout))
+        })
+      })
+    })
+  })
+
+  function login (cb) {
+    cli({
+      env: {
+        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout'),
+        CLINIC_JWT: successfulJwt
+      }
+    }, [ 'clinic', 'login', '--upload-url', server.uploadUrl ], cb)
+  }
+
+  function checkLogin (cb) {
+    cli({
+      env: {
+        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout'),
+      }
+    }, [ 'clinic', 'user', '--upload-url', server.uploadUrl ], cb)
+  }
+
+  function logout (cb) {
+    cli({
+      env: {
+        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout')
+      }
+    }, [ 'clinic', 'logout', '--upload-url', server.uploadUrl ], cb)
+  }
+})
+
+test('clinic logout --all logs out of all servers', function (t) {
+  t.plan(7)
+
+  login(successfulJwt, server.uploadUrl, (err) => {
+    t.ifError(err)
+    login(successfulJwt2, server2.uploadUrl, (err) => {
+      t.ifError(err)
+      logoutAll((err) => {
+        t.ifError(err)
+        checkLogin(server.uploadUrl, (err, stdout) => {
+          t.ok(err)
+          t.ok(/Not authenticated/.test(stdout))
+        })
+        checkLogin(server2.uploadUrl, (err, stdout) => {
+          t.ok(err)
+          t.ok(/Not authenticated/.test(stdout))
+        })
+      })
+    })
+  })
+
+  function login (token, url, cb) {
+    cli({
+      env: {
+        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout-all'),
+        CLINIC_JWT: token
+      }
+    }, [ 'clinic', 'login', '--upload-url', url ], cb)
+  }
+
+  function checkLogin (url, cb) {
+    cli({
+      env: {
+        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout-all'),
+      }
+    }, [ 'clinic', 'user', '--upload-url', url ], cb)
+  }
+
+  function logoutAll (cb) {
+    cli({
+      env: {
+        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout-all')
+      }
+    }, [ 'clinic', 'logout', '--all' ], cb)
+  }
+})
+
 test('After all', function (t) {
   t.plan(0)
   server.close()

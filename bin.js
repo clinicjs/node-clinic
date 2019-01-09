@@ -43,6 +43,47 @@ if ('NO_INSIGHT' in process.env) {
 checkForUpdates()
 
 const result = commist()
+  .register('user', function (argv) {
+    const args = minimist(argv, {
+      alias: {
+        help: 'h'
+      },
+      string: [
+        'upload-url'
+      ]
+    })
+
+    if (args.h) {
+      printHelp('clinic-user')
+      process.exit(0)
+    }
+
+    function printUser (user) {
+      if (user) {
+        console.log('Authenticated as ', user.name, `(${user.email})`)
+      } else {
+        console.log('Not authenticated')
+      }
+    }
+
+    if (args['upload-url']) {
+      authenticate.getSession().then((user) => {
+        if (!user) throw new Error('Expired')
+        printUser(user)
+      }).catch(() => {
+        printUser(null)
+        process.exit(1)
+      })
+    } else {
+      authenticate.getSessions().then((users) => {
+        Object.keys(users).forEach((url) => {
+          console.log(helpFormatter(`<link>${url}</link>`))
+          printUser(users[url])
+          console.log('')
+        })
+      })
+    }
+  })
   .register('login', function (argv) {
     const args = minimist(argv, {
       alias: {
@@ -56,9 +97,17 @@ const result = commist()
       }
     })
 
+    if (args.h) {
+      printHelp('clinic-login')
+      process.exit(0)
+    }
+
     authenticate(args['upload-url']).then((authToken) => {
       const header = jwt.decode(authToken)
-      console.log('Logged in as', header.name)
+      console.log('Logged in as', header.name, `(${header.email})`)
+    }).catch((err) => {
+      console.error('Authentication failure:', err.message)
+      process.exit(1)
     })
   })
   .register('logout', function (argv) {
@@ -73,6 +122,11 @@ const result = commist()
         'upload-url': DEFAULT_UPLOAD_URL
       }
     })
+
+    if (args.h) {
+      printHelp('clinic-logout')
+      process.exit(0)
+    }
 
     authenticate.logout(args['upload-url']).then(() => {
       console.log('Logged out from ', args['upload-url'])

@@ -60,14 +60,18 @@ const result = commist()
 
     function printUser (user) {
       if (user) {
-        console.log('Authenticated as ', user.name, `(${user.email})`)
+        if (user.name) {
+          console.log(`Authenticated as ${user.name} (${user.email}).`)
+        } else {
+          console.log(`Authenticated as ${user.email}.`)
+        }
       } else {
         console.log('Not authenticated')
       }
     }
 
     if (args['upload-url']) {
-      authenticate.getSession().then((user) => {
+      authenticate.getSession(args['upload-url']).then((user) => {
         if (!user) throw new Error('Expired')
         printUser(user)
       }).catch(() => {
@@ -76,7 +80,9 @@ const result = commist()
       })
     } else {
       authenticate.getSessions().then((users) => {
-        Object.keys(users).forEach((url) => {
+        const urls = Object.keys(users)
+        if (urls.length === 0) process.exit(1)
+        urls.forEach((url) => {
           console.log(helpFormatter(`<link>${url}</link>`))
           printUser(users[url])
           console.log('')
@@ -104,7 +110,11 @@ const result = commist()
 
     authenticate(args['upload-url']).then((authToken) => {
       const header = jwt.decode(authToken)
-      console.log('Logged in as', header.name, `(${header.email})`)
+      if (header.name) {
+        console.log(`Signed in as ${header.name} (${header.email}).`)
+      } else {
+        console.log(`Signed in as ${header.email}.`)
+      }
     }).catch((err) => {
       console.error('Authentication failure:', err.message)
       process.exit(1)
@@ -133,11 +143,11 @@ const result = commist()
 
     if (args.all) {
       authenticate.removeSessions().then(() => {
-        console.log('Logged out from all servers')
+        console.log('Signed out from all servers')
       })
     } else {
       authenticate.logout(args['upload-url']).then(() => {
-        console.log('Logged out from ', args['upload-url'])
+        console.log('Signed out from ', args['upload-url'])
       })
     }
   })

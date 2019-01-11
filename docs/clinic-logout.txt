@@ -1,0 +1,10 @@
+
+  <title>Clinic Logout</title>
+
+  Log out of the Clinic Upload server.
+
+  <h1>Flags</h1>
+  -h | --help                Display Help
+  --server                   Specify a custom URL to a Clinic Upload server.
+  --all                      Log out of all Clinic Upload servers.
+

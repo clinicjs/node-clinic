@@ -657,6 +657,10 @@ async function processUpload (args, opts = { private: false, ask: false }) {
       if (/localhost/.test(args.server)) {
         console.error('Make sure the data server is running.')
       }
+    } else if (err.reply && err.reply.statusCode === 401 && !opts.retried) {
+      console.error('Authentication failure, your token might be expired. Retrying...')
+      await authenticate.logout(args.server)
+      return processUpload(args, Object.assign({}, opts, { retried: true }))
     } else {
       console.error('Unexpected Error:', err.stack)
     }

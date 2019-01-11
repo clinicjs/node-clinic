@@ -111,7 +111,7 @@ const result = commist()
       process.exit(0)
     }
 
-    authenticate(args.server).then((authToken) => {
+    authenticate(args.server, { useCached: false }).then((authToken) => {
       const header = jwt.decode(authToken)
       if (header.name) {
         console.log(`Signed in as ${header.name} (${header.email}).`)

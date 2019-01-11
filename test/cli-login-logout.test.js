@@ -63,46 +63,35 @@ test('clinic user exits with 1 if not authenticated', function (t) {
 test('clinic user lists all authed users', function (t) {
   t.plan(7)
 
-  let after = 2
-
-  cli({
-    env: {
-      CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-user-all'),
-      CLINIC_JWT: successfulJwt
-    }
-  }, [
-    'clinic', 'login',
-    '--server', server.uploadUrl
-  ], next)
-
-  cli({
-    env: {
-      CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-user-all'),
-      CLINIC_JWT: successfulJwt2
-    }
-  }, [
-    'clinic', 'login',
-    '--server', server2.uploadUrl
-  ], next)
-
-  function next (err) {
+  login(server.uploadUrl, successfulJwt, (err) => {
     t.ifError(err)
-    after -= 1
-    if (after > 0) return
+    login(server2.uploadUrl, successfulJwt2, (err) => {
+      t.ifError(err)
+      listUsers((err, stdout) => {
+        t.ifError(err)
+        t.ok(stdout.includes(server.uploadUrl))
+        t.ok(stdout.includes('Authenticated as test@test.com.'))
+        t.ok(stdout.includes(server2.uploadUrl))
+        t.ok(stdout.includes('Authenticated as other@email.com.'))
+      })
+    })
+  })
 
+  function login (url, token, cb) {
+    cli({
+      env: {
+        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-user-all'),
+        CLINIC_JWT: token
+      }
+    }, [ 'clinic', 'login', '--server', url ], cb)
+  }
+
+  function listUsers (cb) {
     cli({
       env: {
         CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-user-all')
       }
-    }, [
-      'clinic', 'user'
-    ], function (err, stdout) {
-      t.ifError(err)
-      t.ok(stdout.includes(server.uploadUrl))
-      t.ok(stdout.includes('Authenticated as test@test.com.'))
-      t.ok(stdout.includes(server2.uploadUrl))
-      t.ok(stdout.includes('Authenticated as other@email.com.'))
-    })
+    }, [ 'clinic', 'user' ], cb)
   }
 })
 

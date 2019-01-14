@@ -4,6 +4,6 @@ version: v1.13.3
 ignore:
   SNYK-JS-CHOWNR-73502:
     - tar-fs > chownr:
-        reason: vulnerability is in a feature we don't use (tar-fs "own" option), is only a problem on a system that is already compromised, and is considered unfixable (inherent to that type of operation) https://github.com/isaacs/chownr/issues/14#issuecomment-451543037
+        reason: vulnerability is in a feature we don't use (tar-fs's `extract` - we only use `pack`), is only a problem on a system that is already compromised (so anyone with this problem has bigger problems), and is considered inherent to the type of operation, therefore unfixable: https://github.com/isaacs/chownr/issues/14#issuecomment-451543037
         expires: '2019-05-01T22:22:22.123Z'
 patch: {}

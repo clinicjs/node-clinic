@@ -59,6 +59,7 @@ const result = commist()
       printHelp('clinic-upload')
     } else if (args._.length > 0) {
       checkMetricsPermission(() => {
+        insight.track('upload', 'public')
         insight.trackEvent({
           category: 'upload',
           action: 'public'
@@ -271,6 +272,7 @@ function trackTool (toolName, args, toolVersion, cb) {
   }
 
   checkMetricsPermission(() => {
+    insight.track(toolName, action)
     insight.trackEvent({
       category: toolName,
       action,

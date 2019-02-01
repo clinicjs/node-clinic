@@ -45,6 +45,22 @@ test('authenticate', async function (t) {
   t.strictEqual(jwtToken, 'jwtToken')
 })
 
+test('authenticate using ask', async function (t) {
+  let openedUrl = ''
+  const opnStub = url => {
+    openedUrl = url
+  }
+
+  const authenticate = proxyquire('../lib/authenticate', { 'opn': opnStub }) // mocking the browser opening
+
+  const jwtToken = await authenticate(`http://127.0.0.1:${server.address().port}`, true)
+  const [tokenQuery, askQuery] = openedUrl.split('?')[1].split('&').map(item => item.split('='))
+  t.plan(3)
+  t.strictEqual(tokenQuery[1], cliToken)
+  t.strictEqual(askQuery[1], '1')
+  t.strictEqual(jwtToken, 'jwtToken')
+})
+
 test('authenticate timeout', async function (t) {
   const opnStub = url => url
 

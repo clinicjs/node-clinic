@@ -41,7 +41,23 @@ test('authenticate', async function (t) {
 
   const jwtToken = await authenticate(`http://127.0.0.1:${server.address().port}`)
   t.plan(2)
-  t.strictEqual(openedUrl.split('token=')[1], cliToken)
+  t.strictEqual(openedUrl.split('/auth/token/')[1].replace('/', ''), cliToken)
+  t.strictEqual(jwtToken, 'jwtToken')
+})
+
+test('authenticate using ask', async function (t) {
+  let openedUrl = ''
+  const opnStub = url => {
+    openedUrl = url
+  }
+
+  const authenticate = proxyquire('../lib/authenticate', { 'opn': opnStub }) // mocking the browser opening
+
+  const jwtToken = await authenticate(`http://127.0.0.1:${server.address().port}`, true)
+  const [token, askQuery] = openedUrl.split('/auth/token/')[1].split('?')
+  t.plan(3)
+  t.strictEqual(token.replace('/', ''), cliToken)
+  t.strictEqual(askQuery, 'ask=1')
   t.strictEqual(jwtToken, 'jwtToken')
 })
 

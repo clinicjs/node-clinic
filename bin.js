@@ -598,14 +598,13 @@ async function uploadData (uploadURL, authToken, filename, opts) {
   // filename may either be .clinic-doctor.html or the data directory
   // .clinic-doctor
   const filePrefix = path.join(filename).replace(/\.html$/, '')
-  const htmlFile = path.basename(filename) + '.html'
   const isPrivate = opts && opts.private
 
   console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
 
   const result = await tarAndUploadPromisified(path.resolve(filePrefix), uploadURL, authToken, { private: isPrivate })
 
-  result.url = `${uploadURL}/${result.html}`
+  result.url = `${uploadURL}${result.html}`
   return result
 }
 
@@ -631,29 +630,29 @@ async function processUpload (args, opts = { private: false, ask: false }) {
     const authToken = await authenticate(args.server)
     const { email } = jwt.decode(authToken)
     console.log(`Signed in as ${email}.`)
-    const uploadURL = args.server
+    const server = args.server
 
-    const results = []
+    const uploadedUrls = []
     for (let i = 0; i < args._.length; i++) {
       const filename = args._[i]
-      const result = await uploadData(uploadURL, authToken, filename, opts)
+      const result = await uploadData(server, authToken, filename, opts)
       if (opts.ask) {
-        await ask(uploadURL, result, authToken)
+        await ask(server, result, authToken)
       }
-      results.push(result)
+      uploadedUrls.push(`${server}/${isPrivate ? 'private' : 'public'}/${result.id}/${filename.replace('.html', '')}.html`)
     }
 
     if (opts && opts.private) {
       console.log('The data has been uploaded to your private area.')
-      results.forEach(result => console.log(result.url))
+      uploadedUrls.forEach(url => console.log(url))
     } else {
       console.log('The data has been uploaded.')
-      if (results.length > 1) {
+      if (uploadedUrls.length > 1) {
         console.log('Use these links to share the profiles:')
       } else {
         console.log('Use this link to share it:')
       }
-      results.forEach(result => console.log(result.url))
+      uploadedUrls.forEach(url => console.log(url))
     }
 
     if (opts.ask) {

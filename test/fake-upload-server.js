@@ -18,9 +18,13 @@ class FakeUploadServer {
         files: {}
       }
 
+      let filename
       req.pipe(zlib.createGunzip()).pipe(tar.extract())
         .on('entry', function (entry, stream, next) {
           if (entry.type === 'file') {
+            if (entry.name.endsWith('.html')) {
+              filename = entry.name
+            }
             collect(stream, function (_, data) {
               request.files[entry.name] = Buffer.concat(data).toString()
             })
@@ -29,7 +33,7 @@ class FakeUploadServer {
           next()
         })
         .on('finish', function () {
-          res.end('{"id": "some-id"}')
+          res.end(`{"id": "some-id", "html": "/public/some-id/${filename}"}`)
           self.requests.push(request)
         })
     })

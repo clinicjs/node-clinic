@@ -639,7 +639,7 @@ async function processUpload (args, opts = { private: false, ask: false }) {
       if (opts.ask) {
         await ask(server, result, authToken)
       }
-      uploadedUrls.push(`${server}/${isPrivate ? 'private' : 'public'}/${result.id}/${filename.replace('.html', '')}.html`)
+      uploadedUrls.push(`${server}/${opts.private ? 'private' : 'public'}/${result.id}/${filename.replace('.html', '')}.html`)
     }
 
     if (opts && opts.private) {

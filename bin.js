@@ -18,6 +18,7 @@ const jwt = require('jsonwebtoken')
 const Insight = require('insight')
 const updateNotifier = require('update-notifier')
 const { promisify } = require('util')
+const get = promisify(require('simple-get').concat)
 const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
@@ -597,24 +598,31 @@ async function uploadData (uploadURL, authToken, filename, opts) {
   // filename may either be .clinic-doctor.html or the data directory
   // .clinic-doctor
   const filePrefix = path.join(filename).replace(/\.html$/, '')
-  const htmlFile = path.basename(filename) + '.html'
   const isPrivate = opts && opts.private
 
   console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
 
   const result = await tarAndUploadPromisified(path.resolve(filePrefix), uploadURL, authToken, { private: isPrivate })
 
-  const url = isPrivate
-    ? `${uploadURL}/private/${result.id}/${htmlFile}`
-    : `${uploadURL}/public/${result.id}/${htmlFile}`
-  return {
-    id: result.id,
-    url: url
-  }
+  result.url = `${uploadURL}${result.html}`
+  return result
 }
 
-async function ask () {
-  // TODO hit /ask endpoint
+async function ask (server, upload, token) {
+  const result = await get({
+    method: 'POST',
+    url: `${server}/ask`,
+    headers: { Authorization: `Bearer ${token}` },
+    json: true,
+    body: {
+      upload,
+      message: 'Asked for help through the CLI [placeholder message]'
+    }
+  })
+
+  if (result.statusCode !== 200) {
+    throw new Error(`Something went wrong, please use the "Ask" button in the web interface at ${server}/profile instead.`)
+  }
 }
 
 async function processUpload (args, opts = { private: false, ask: false }) {
@@ -622,29 +630,30 @@ async function processUpload (args, opts = { private: false, ask: false }) {
     const authToken = await authenticate(args.server, opts.ask)
     const { email } = jwt.decode(authToken)
     console.log(`Signed in as ${email}.`)
-    const uploadURL = args.server
+    const server = args.server
 
-    const results = []
+    const uploadedUrls = []
     for (let i = 0; i < args._.length; i++) {
       const filename = args._[i]
-      const result = await uploadData(uploadURL, authToken, filename, opts)
+      const htmlFile = `${path.basename(filename).replace('.html', '')}.html`
+      const result = await uploadData(server, authToken, filename, opts)
       if (opts.ask) {
-        await ask(result.url)
+        await ask(server, result, authToken)
       }
-      results.push(result)
+      uploadedUrls.push(`${server}/${opts.private ? 'private' : 'public'}/${result.id}/${htmlFile}`)
     }
 
     if (opts && opts.private) {
       console.log('The data has been uploaded to your private area.')
-      results.forEach(result => console.log(result.url))
+      uploadedUrls.forEach(url => console.log(url))
     } else {
       console.log('The data has been uploaded.')
-      if (results.length > 1) {
+      if (uploadedUrls.length > 1) {
         console.log('Use these links to share the profiles:')
       } else {
         console.log('Use this link to share it:')
       }
-      results.forEach(result => console.log(result.url))
+      uploadedUrls.forEach(url => console.log(url))
     }
 
     if (opts.ask) {

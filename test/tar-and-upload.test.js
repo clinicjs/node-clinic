@@ -44,7 +44,12 @@ function testFixtureUpload (type, html) {
           if (html) expectedRequest.files[`10000.clinic-${type}.html`] = 'html'
 
           t.strictDeepEqual(server.requests, [expectedRequest])
-          t.strictDeepEqual(data, { id: 'some-id' })
+          t.strictDeepEqual(data, {
+            id: 'some-id',
+            html: html
+              ? `/public/some-id/10000.clinic-${type}.html`
+              : '/public/some-id/undefined' // just bc the test server doesn't support this
+          })
           server.close(() => t.end())
         }
       )

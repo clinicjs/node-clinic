@@ -18,6 +18,7 @@ const jwt = require('jsonwebtoken')
 const Insight = require('insight')
 const updateNotifier = require('update-notifier')
 const { promisify } = require('util')
+const get = promisify(require('simple-get').concat)
 const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
@@ -604,17 +605,25 @@ async function uploadData (uploadURL, authToken, filename, opts) {
 
   const result = await tarAndUploadPromisified(path.resolve(filePrefix), uploadURL, authToken, { private: isPrivate })
 
-  const url = isPrivate
-    ? `${uploadURL}/private/${result.id}/${htmlFile}`
-    : `${uploadURL}/public/${result.id}/${htmlFile}`
-  return {
-    id: result.id,
-    url: url
-  }
+  result.url = `${uploadURL}/${result.html}`
+  return result
 }
 
-async function ask () {
-  // TODO hit /ask endpoint
+async function ask (server, upload, token) {
+  const result = await get({
+    method: 'POST',
+    url: `${server}/ask`,
+    headers: { Authorization: `Bearer ${token}` },
+    json: true,
+    body: {
+      upload,
+      message: 'Asked for help through the CLI [placeholder message]'
+    }
+  })
+
+  if (result.statusCode !== 200) {
+    throw new Error(`Something went wrong, please use the "Ask" button in the web interface at ${server}/profile instead.`)
+  }
 }
 
 async function processUpload (args, opts = { private: false, ask: false }) {
@@ -629,7 +638,7 @@ async function processUpload (args, opts = { private: false, ask: false }) {
       const filename = args._[i]
       const result = await uploadData(uploadURL, authToken, filename, opts)
       if (opts.ask) {
-        await ask(result.url)
+        await ask(uploadURL, result, authToken)
       }
       results.push(result)
     }

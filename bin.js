@@ -635,11 +635,12 @@ async function processUpload (args, opts = { private: false, ask: false }) {
     const uploadedUrls = []
     for (let i = 0; i < args._.length; i++) {
       const filename = args._[i]
+      const htmlFile = `${path.basename(filename).replace('.html', '')}.html`
       const result = await uploadData(server, authToken, filename, opts)
       if (opts.ask) {
         await ask(server, result, authToken)
       }
-      uploadedUrls.push(`${server}/${opts.private ? 'private' : 'public'}/${result.id}/${filename.replace('.html', '')}.html`)
+      uploadedUrls.push(`${server}/${opts.private ? 'private' : 'public'}/${result.id}/${htmlFile}`)
     }
 
     if (opts && opts.private) {

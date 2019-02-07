@@ -14,7 +14,7 @@ class FakeUploadServer {
     this.server = http.createServer(function (req, res) {
       const request = {
         method: req.method,
-        url: req.url,
+        url: req.url
       }
 
       if (request.url === '/ask' && request.method === 'POST') {

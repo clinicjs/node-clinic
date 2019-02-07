@@ -17,9 +17,9 @@ const doctorADirectory = path.resolve(
 const successfulJwt = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1NDIyMjI5MzMsImV4cCI6MTg4OTM3ODEzMywiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSJ9.FO0v4OM2V23lAXIcv-qcfFo0snOrOmsrY82kmcYlrJI'
 
 test('Before all', function (t) {
+  t.plan(1)
   server = new FakeUploadServer()
   server.listen(function () {
-    t.plan(1)
     t.ok(server)
   })
 })
@@ -52,6 +52,9 @@ test('clinic ask 10000.clinic-doctor with custom upload url', function (t) {
         '10000.clinic-doctor/b.txt': 'b',
         '10000.clinic-doctor/c.txt': 'c'
       }
+    }, {
+      method: 'POST',
+      url: '/ask'
     }])
   })
 })
@@ -66,7 +69,6 @@ test('clinic ask 10000.clinic-doctor with default upload url', function (t) {
     t.plan(2)
     // error is expected because the actual server on upload.clinicjs.org will return 404
     t.ok(err)
-    console.log('stdout', stdout)
     t.strictDeepEqual(stdout.trim().split('\n'), [
       'Signed in as test@test.com.',
       `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`
@@ -90,5 +92,5 @@ test('clinic ask 10000.clinic-doctor auth failure', function (t) {
 
 test('After all', function (t) {
   t.plan(0)
-  server.close()
+  server.close(() => t.endAll())
 })

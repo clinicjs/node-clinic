@@ -15,9 +15,15 @@ class FakeUploadServer {
       const request = {
         method: req.method,
         url: req.url,
-        files: {}
       }
 
+      if (request.url === '/ask' && request.method === 'POST') {
+        self.requests.push(request)
+        res.end('{"message": "ok"}')
+        return
+      }
+
+      request.files = {}
       let filename
       req.pipe(zlib.createGunzip()).pipe(tar.extract())
         .on('entry', function (entry, stream, next) {

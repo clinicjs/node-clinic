@@ -38,7 +38,7 @@ test('clinic upload 10000.clinic-doctor', function (t) {
     }, [
       'clinic', 'upload',
       '--server', server.uploadUrl,
-      '--noOpen',
+      '--no-open',
       doctorADirectory
     ], function (err, stdout) {
       t.ifError(err)
@@ -75,7 +75,7 @@ test('clinic upload 10000.clinic-doctor privately', function (t) {
       'clinic', 'upload',
       '--private',
       '--server', server.uploadUrl,
-      '--noOpen',
+      '--no-open',
       doctorADirectory
     ], function (err, stdout) {
       t.ifError(err)
@@ -110,7 +110,7 @@ test('clinic upload 10000.clinic-doctor 10001.clinic-doctor', function (t) {
     }, [
       'clinic', 'upload',
       '--server', server.uploadUrl,
-      '--noOpen',
+      '--no-open',
       doctorADirectory, doctorBDirectory
     ], function (err, stdout) {
       t.ifError(err)
@@ -160,7 +160,7 @@ test('clinic upload - bad status code', function (t) {
     }, [
       'clinic', 'upload',
       '--server', `http://127.0.0.1:${server.address().port}`,
-      '--noOpen',
+      '--no-open',
       doctorADirectory
     ], function (err, stdout, stderr) {
       t.strictDeepEqual(err, new Error('process exited with exit code 1'))
@@ -183,7 +183,7 @@ test('clinic upload bad-folder', function (t) {
     }, [
       'clinic', 'upload',
       '--server', server.uploadUrl,
-      '--noOpen',
+      '--no-open',
       doctorBadDirectory
     ], function (err, stdout, stderr) {
       t.strictDeepEqual(err, new Error('process exited with exit code 1'))

@@ -9,7 +9,7 @@ const cli = require('../test/cli.js')
 test('clinic flame --name', function (t) {
   // collect data
   cli({ relayStderr: false }, [
-    'clinic', 'flame', '--noOpen', '--name', 'custom-name',
+    'clinic', 'flame', '--no-open', '--name', 'custom-name',
     '--', 'node', '-e', 'setTimeout(() => {}, 300)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
@@ -35,7 +35,7 @@ test('clinic flame --name', function (t) {
 test('clinic flame --output-html', function (t) {
   // collect data
   cli({ relayStderr: false }, [
-    'clinic', 'flame', '--noOpen', '--output-html', '{name}-{pid}-{timestamp}.html',
+    'clinic', 'flame', '--no-open', '--output-html', '{name}-{pid}-{timestamp}.html',
     '--', 'node', '-e', 'setTimeout(() => {}, 300)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
@@ -62,7 +62,7 @@ test('clinic flame --output-html', function (t) {
 test('clinic flame --output-dir', function (t) {
   // collect data
   cli({ relayStderr: false }, [
-    'clinic', 'flame', '--noOpen', '--output-dir', '{name}-{pid}',
+    'clinic', 'flame', '--no-open', '--output-dir', '{name}-{pid}',
     '--', 'node', '-e', 'setTimeout(() => {}, 300)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)

@@ -28,7 +28,7 @@
   -h | --help                Display Help
   --private                  Upload data privately to your account.
   --server                   Upload data to a different Clinic Upload server.
-  --noOpen                  Prevent Clinic from opening the upload in your browser.
+  --no-open                  Prevent Clinic from opening the upload in your browser.
 
   <h1>Environment Variables</h1>
   CLINIC_JWT                 Token for authentication with the Clinic Upload server.

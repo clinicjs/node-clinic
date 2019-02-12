@@ -9,7 +9,7 @@ const cli = require('./cli.js')
 test('clinic doctor -- node - no issues', function (t) {
   // collect data
   cli({}, [
-    'clinic', 'doctor', '--noOpen',
+    'clinic', 'doctor', '--no-open',
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
@@ -36,7 +36,7 @@ test('clinic doctor -- node - no issues', function (t) {
 test('clinic doctor -- node - bad status code', function (t) {
   // collect data
   cli({ relayStderr: false }, [
-    'clinic', 'doctor', '--noOpen',
+    'clinic', 'doctor', '--no-open',
     '--', 'node', '-e', 'setTimeout(() => { process.exit(1) }, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
@@ -64,7 +64,7 @@ test('clinic doctor - signal', {
   skip: process.platform === 'win32' ? 'SIGKILL cannot be identified on windows' : false
 }, function (t) {
   cli({ relayStderr: false }, [
-    'clinic', 'doctor', '--noOpen',
+    'clinic', 'doctor', '--no-open',
     '--', 'node', '-e', 'process.kill(process.pid, "SIGKILL")'
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited by signal SIGKILL'))
@@ -76,7 +76,7 @@ test('clinic doctor - signal', {
 test('clinic doctor -- node - visualization error', function (t) {
   // collect data
   cli({ relayStderr: false }, [
-    'clinic', 'doctor', '--noOpen',
+    'clinic', 'doctor', '--no-open',
     '--', 'node', '-e', `
       const fs = require('fs')
       const path = require('path')
@@ -98,7 +98,7 @@ test('clinic doctor -- node - visualization error', function (t) {
 
 test('clinic doctor --on-port', function (t) {
   cli({ relayStderr: false }, [
-    'clinic', 'doctor', '--noOpen',
+    'clinic', 'doctor', '--no-open',
     '--on-port', 'autocannon localhost:$PORT -d 1',
     '--', 'node', '-e', `
       const http = require('http')
@@ -115,7 +115,7 @@ test('clinic doctor --on-port', function (t) {
 
 test('clinic doctor --autocannon', function (t) {
   cli({ relayStderr: false }, [
-    'clinic', 'doctor', '--noOpen',
+    'clinic', 'doctor', '--no-open',
     '--autocannon', '[', '/', '-d', '1', ']',
     '--', 'node', '-e', `
       const http = require('http')
@@ -132,7 +132,7 @@ test('clinic doctor --autocannon', function (t) {
 
 test('clinic doctor -- node - configure output destination', function (t) {
   cli({ relayStderr: false }, [
-    'clinic', 'doctor', '--noOpen',
+    'clinic', 'doctor', '--no-open',
     '--dest', 'test-doctor-destination',
     '--', 'node', '-e', 'setTimeout(() => {}, 200)'
   ], function (err, stdout, stderr, tempdir) {

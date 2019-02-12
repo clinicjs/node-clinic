@@ -172,10 +172,11 @@ const result = commist()
       boolean: [
         'help',
         'private',
-        'noOpen'
+        'open'
       ],
       default: {
-        'server': DEFAULT_UPLOAD_URL
+        'server': DEFAULT_UPLOAD_URL,
+        'open': true
       }
     })
 
@@ -211,10 +212,11 @@ const result = commist()
       ],
       boolean: [
         'help',
-        'noOpen'
+        'open'
       ],
       default: {
-        'server': DEFAULT_UPLOAD_URL
+        'server': DEFAULT_UPLOAD_URL,
+        'open': true
       }
     })
 
@@ -664,7 +666,7 @@ async function processUpload (args, opts = { private: false, ask: false }) {
     }
 
     // Open first upload after pause to allow users to read output
-    if (!args.noOpen && uploadedUrls.length) {
+    if (args.open && uploadedUrls.length) {
       process.stdout.write('Opening browser...')
       setTimeout(() => {
         process.stdout.clearLine()

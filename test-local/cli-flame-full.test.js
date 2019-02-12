@@ -9,7 +9,7 @@ const cli = require('../test/cli.js')
 test('clinic flame -- node - no issues', function (t) {
   // collect data
   cli({ relayStderr: false }, [
-    'clinic', 'flame', '--no-open',
+    'clinic', 'flame', '--noOpen',
     '--', 'node', '-e', 'setTimeout(() => {}, 300)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
@@ -35,7 +35,7 @@ test('clinic flame -- node - no issues', function (t) {
 test('clinic flame -- node - bad status code', function (t) {
   // collect data
   cli({ relayStderr: false }, [
-    'clinic', 'flame', '--no-open',
+    'clinic', 'flame', '--noOpen',
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))

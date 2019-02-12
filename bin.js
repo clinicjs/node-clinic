@@ -171,7 +171,8 @@ const result = commist()
       ],
       boolean: [
         'help',
-        'private'
+        'private',
+        'noOpen'
       ],
       default: {
         'server': DEFAULT_UPLOAD_URL
@@ -209,7 +210,8 @@ const result = commist()
         'server'
       ],
       boolean: [
-        'help'
+        'help',
+        'noOpen'
       ],
       default: {
         'server': DEFAULT_UPLOAD_URL
@@ -659,6 +661,16 @@ async function processUpload (args, opts = { private: false, ask: false }) {
     if (opts.ask) {
       console.log('')
       console.log('Thanks for contacting NearForm, we will reply as soon as possible.')
+    }
+
+    // Open first upload after pause to allow users to read output
+    if (!args.noOpen && uploadedUrls.length) {
+      process.stdout.write('Opening browser...')
+      setTimeout(() => {
+        process.stdout.clearLine()
+        process.stdout.cursorTo(0)
+        opn(uploadedUrls[0], { wait: false })
+      }, 1500)
     }
   } catch (err) {
     if (err.code === 'ECONNREFUSED') {

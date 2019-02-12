@@ -9,7 +9,7 @@ const cli = require('./cli.js')
 test('clinic bubbleprof -- node - no issues', function (t) {
   // collect data
   cli({}, [
-    'clinic', 'bubbleprof', '--no-open',
+    'clinic', 'bubbleprof', '--noOpen',
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
@@ -36,7 +36,7 @@ test('clinic bubbleprof -- node - no issues', function (t) {
 test('clinic bubbleprof -- node - bad status code', function (t) {
   // collect data
   cli({ relayStderr: false }, [
-    'clinic', 'bubbleprof', '--no-open',
+    'clinic', 'bubbleprof', '--noOpen',
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
@@ -63,7 +63,7 @@ test('clinic bubbleprof -- node - bad status code', function (t) {
 test('clinic bubbleprof -- node - visualization error', function (t) {
   // collect data
   cli({ relayStderr: false }, [
-    'clinic', 'bubbleprof', '--no-open',
+    'clinic', 'bubbleprof', '--noOpen',
     '--', 'node', '-e', `
       const fs = require('fs')
       const path = require('path')
@@ -84,7 +84,7 @@ test('clinic bubbleprof -- node - visualization error', function (t) {
 
 test('clinic bubbleprof -- node - configure output destination', function (t) {
   cli({ relayStderr: false }, [
-    'clinic', 'bubbleprof', '--no-open',
+    'clinic', 'bubbleprof', '--noOpen',
     '--dest', 'test-bubbleprof-destination',
     '--', 'node', '-e', 'setTimeout(() => {}, 200)'
   ], function (err, stdout, stderr, tempdir) {

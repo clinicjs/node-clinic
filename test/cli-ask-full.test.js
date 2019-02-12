@@ -30,6 +30,7 @@ test('clinic ask 10000.clinic-doctor with custom upload url', function (t) {
   }, [
     'clinic', 'ask',
     '--server', server.uploadUrl,
+    '--noOpen',
     doctorADirectory
   ], function (err, stdout) {
     t.plan(3)
@@ -82,6 +83,7 @@ test('clinic ask 10000.clinic-doctor auth failure', function (t) {
   }, [
     'clinic', 'ask',
     '--server', server.uploadUrl,
+    '--noOpen',
     doctorADirectory
   ], function (err, stdout, stderr) {
     t.plan(2)

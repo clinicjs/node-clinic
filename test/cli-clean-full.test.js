@@ -8,7 +8,7 @@ const cli = require('./cli.js')
 test('clinic clean', function (t) {
   // collect data
   cli({}, [
-    'clinic', 'doctor', '--no-open',
+    'clinic', 'doctor', '--noOpen',
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)

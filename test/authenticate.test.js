@@ -45,6 +45,24 @@ test('authenticate', async function (t) {
   t.strictEqual(jwtToken, 'jwtToken')
 })
 
+test('authenticate for private upload', async function (t) {
+  let openedUrl = ''
+  const opnStub = url => {
+    openedUrl = url
+  }
+
+  const authenticate = proxyquire('../lib/authenticate', { 'opn': opnStub }) // mocking the browser opening
+
+  const jwtToken = await authenticate(`http://127.0.0.1:${server.address().port}`, {
+    private: true
+  })
+  const [token, askQuery] = openedUrl.split('/auth/token/')[1].split('?')
+  t.plan(3)
+  t.strictEqual(token.replace('/', ''), cliToken)
+  t.strictEqual(askQuery, 'private=1')
+  t.strictEqual(jwtToken, 'jwtToken')
+})
+
 test('authenticate using ask', async function (t) {
   let openedUrl = ''
   const opnStub = url => {
@@ -53,11 +71,13 @@ test('authenticate using ask', async function (t) {
 
   const authenticate = proxyquire('../lib/authenticate', { 'opn': opnStub }) // mocking the browser opening
 
-  const jwtToken = await authenticate(`http://127.0.0.1:${server.address().port}`, true)
+  const jwtToken = await authenticate(`http://127.0.0.1:${server.address().port}`, {
+    ask: true
+  })
   const [token, askQuery] = openedUrl.split('/auth/token/')[1].split('?')
   t.plan(3)
   t.strictEqual(token.replace('/', ''), cliToken)
-  t.strictEqual(askQuery, 'ask=1')
+  t.strictEqual(askQuery, 'ask=1&private=1')
   t.strictEqual(jwtToken, 'jwtToken')
 })
 

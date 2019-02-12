@@ -627,7 +627,7 @@ async function ask (server, upload, token) {
 
 async function processUpload (args, opts = { private: false, ask: false }) {
   try {
-    const authToken = await authenticate(args.server, opts.ask)
+    const authToken = await authenticate(args.server, opts)
     const { email } = jwt.decode(authToken)
     console.log(`Signed in as ${email}.`)
     const server = args.server

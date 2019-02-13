@@ -60,23 +60,6 @@ test('clinic ask 10000.clinic-doctor with custom upload url', function (t) {
   })
 })
 
-test('clinic ask 10000.clinic-doctor with default upload url', function (t) {
-  cli({
-    env: { CLINIC_JWT: successfulJwt }
-  }, [
-    'clinic', 'ask',
-    doctorADirectory
-  ], function (err, stdout) {
-    t.plan(2)
-    // error is expected because the actual server on upload.clinicjs.org will return 404
-    t.ok(err)
-    t.strictDeepEqual(stdout.trim().split('\n'), [
-      'Signed in as test@test.com.',
-      `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`
-    ])
-  })
-})
-
 test('clinic ask 10000.clinic-doctor auth failure', function (t) {
   cli({
     env: { CLINIC_MOCK_AUTH_FAIL: 'true' }

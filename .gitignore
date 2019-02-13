@@ -64,3 +64,5 @@ typings/
 
 # Visual studio code
 .vscode
+# IntelliJ Idea
+.idea

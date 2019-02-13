@@ -103,6 +103,7 @@ clinic doctor --help
 clinic bubbleprof --help
 clinic flame --help
 clinic upload --help
+clinic ask --help
 ```
 
 - The Doctor functionality is provided by the [clinic-doctor](https://github.com/nearform/node-clinic-doctor) module.

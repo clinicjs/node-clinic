@@ -5,6 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const opn = require('opn')
 const ora = require('ora')
+const async = require('async')
 const shellEscape = require('any-shell-escape')
 const commist = require('commist')
 const minimist = require('minimist')
@@ -17,6 +18,7 @@ const crypto = require('crypto')
 const Insight = require('insight')
 const updateNotifier = require('update-notifier')
 const pkg = require('./package.json')
+const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
 const clean = require('./lib/clean')
 
@@ -63,12 +65,27 @@ const result = commist()
           action: 'public'
         })
 
-        console.log('This version of clinic is incompatible with the Upload Server.')
-        console.log('Please update clinic using')
-        console.log(helpFormatter('  <code>npm install -g clinic@latest</code>'))
-        console.log('and try again.')
+        async.eachSeries(args._, function (filename, done) {
+          // filename may either be .clinic-doctor.html or the data directory
+          // .clinic-doctor
+          const filePrefix = path.join(filename).replace(/\.html$/, '')
+          const htmlFile = path.basename(filename) + '.html'
 
-        process.exit(1)
+          console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
+          tarAndUpload(
+            path.resolve(filePrefix),
+            args['upload-url'],
+            function (err, reply) {
+              if (err) return done(err)
+              console.log('The data has been uploaded')
+              console.log('Use this link to share it:')
+              console.log(`${args['upload-url']}/public/${reply.id}/${htmlFile}`)
+              done(null)
+            }
+          )
+        }, function (err) {
+          if (err) throw err
+        })
       })
     } else {
       printHelp('clinic-upload')

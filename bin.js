@@ -65,27 +65,12 @@ const result = commist()
           action: 'public'
         })
 
-        async.eachSeries(args._, function (filename, done) {
-          // filename may either be .clinic-doctor.html or the data directory
-          // .clinic-doctor
-          const filePrefix = path.join(filename).replace(/\.html$/, '')
-          const htmlFile = path.basename(filename) + '.html'
+        console.log('This version of clinic is incompatible with the Upload Server.')
+        console.log('Please update clinic using')
+        console.log(helpFormatter('  <code>npm install -g clinic@latest</code>'))
+        console.log('and try again.')
 
-          console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
-          tarAndUpload(
-            path.resolve(filePrefix),
-            args['upload-url'],
-            function (err, reply) {
-              if (err) return done(err)
-              console.log('The data has been uploaded')
-              console.log('Use this link to share it:')
-              console.log(`${args['upload-url']}/public/${reply.id}/${htmlFile}`)
-              done(null)
-            }
-          )
-        }, function (err) {
-          if (err) throw err
-        })
+        process.exit(1)
       })
     } else {
       printHelp('clinic-upload')

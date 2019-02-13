@@ -18,5 +18,5 @@
   <h1>Flags</h1>
   -h | --help                Display Help
   -v | --version             Display Version
-  --collect-only             Do not process data on terminiation
+  --collect-only             Do not process data on termination
   --visualize-only datapath  Build or rebuild visualization from data

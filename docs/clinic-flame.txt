@@ -1,7 +1,7 @@
 
   <title>Clinic Flame</title> - v{{version}}
 
-  <code>clinic flame</code> helps you find synchronous bottlenecks 
+  <code>clinic flame</code> helps you find synchronous bottlenecks
   by creating a flamegraph visualization that assists in identifying
   function calls that may be blocking the event loop.
 
@@ -22,5 +22,5 @@
   <h1>Flags</h1>
   -h | --help                Display Help
   -v | --version             Display Version
-  --collect-only             Do not process data on terminiation
+  --collect-only             Do not process data on termination
   --visualize-only datapath  Build or rebuild visualization from data

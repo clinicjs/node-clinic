@@ -425,6 +425,7 @@ function trackTool (toolName, args, toolVersion, cb) {
   }
 
   checkMetricsPermission(() => {
+    insight.track(toolName, action)
     insight.trackEvent({
       category: toolName,
       action,

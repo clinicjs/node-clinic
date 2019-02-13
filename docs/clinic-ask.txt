@@ -17,3 +17,5 @@
 
   <h1>Flags</h1>
   -h | --help                Display Help
+  --server                   Upload data to a different Clinic Upload server.
+  --no-open                  Prevent Clinic from opening the upload in your browser.

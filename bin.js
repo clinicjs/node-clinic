@@ -171,10 +171,12 @@ const result = commist()
       ],
       boolean: [
         'help',
-        'private'
+        'private',
+        'open'
       ],
       default: {
-        'server': DEFAULT_UPLOAD_URL
+        'server': DEFAULT_UPLOAD_URL,
+        'open': true
       }
     })
 
@@ -209,10 +211,12 @@ const result = commist()
         'server'
       ],
       boolean: [
-        'help'
+        'help',
+        'open'
       ],
       default: {
-        'server': DEFAULT_UPLOAD_URL
+        'server': DEFAULT_UPLOAD_URL,
+        'open': true
       }
     })
 
@@ -627,7 +631,7 @@ async function ask (server, upload, token) {
 
 async function processUpload (args, opts = { private: false, ask: false }) {
   try {
-    const authToken = await authenticate(args.server, opts.ask)
+    const authToken = await authenticate(args.server, opts)
     const { email } = jwt.decode(authToken)
     console.log(`Signed in as ${email}.`)
     const server = args.server
@@ -659,6 +663,16 @@ async function processUpload (args, opts = { private: false, ask: false }) {
     if (opts.ask) {
       console.log('')
       console.log('Thanks for contacting NearForm, we will reply as soon as possible.')
+    }
+
+    // Open first upload after pause to allow users to read output
+    if (args.open && uploadedUrls.length) {
+      process.stdout.write('Opening browser...')
+      setTimeout(() => {
+        process.stdout.clearLine()
+        process.stdout.cursorTo(0)
+        opn(uploadedUrls[0], { wait: false })
+      }, 1500)
     }
   } catch (err) {
     if (err.code === 'ECONNREFUSED') {

@@ -633,6 +633,10 @@ async function ask (server, filename, upload, token) {
   }
 }
 
+function getError (err) {
+  return ['dev', 'development'].includes(process.env.NODE_ENV) ? err.stack : err.message
+}
+
 async function processUpload (args, opts = { private: false, ask: false }) {
   try {
     const authToken = await authenticate(args.server, opts)
@@ -691,7 +695,7 @@ async function processUpload (args, opts = { private: false, ask: false }) {
       await authenticate.logout(args.server)
       return processUpload(args, Object.assign({}, opts, { retried: true }))
     } else {
-      console.error('Unexpected Error:', err.stack)
+      console.error('Unexpected Error:', getError(err))
     }
     throw err
   }

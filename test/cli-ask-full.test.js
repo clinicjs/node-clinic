@@ -26,7 +26,10 @@ test('Before all', function (t) {
 
 test('clinic ask 10000.clinic-doctor with custom upload url', function (t) {
   cli({
-    env: { CLINIC_JWT: successfulJwt }
+    env: {
+      CLINIC_JWT: successfulJwt,
+      CLINIC_MOCK_ASK_MESSAGE: 'Test message'
+    }
   }, [
     'clinic', 'ask',
     '--server', server.uploadUrl,

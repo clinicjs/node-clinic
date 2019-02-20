@@ -19,6 +19,9 @@ const Insight = require('insight')
 const updateNotifier = require('update-notifier')
 const { promisify } = require('util')
 const get = promisify(require('simple-get').concat)
+const dedent = require('dedent')
+const tmp = require('tmp')
+const editor = require('editor')
 const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
@@ -613,17 +616,85 @@ async function uploadData (uploadURL, authToken, filename, opts) {
   return result
 }
 
-async function ask (server, upload, token) {
+async function getAskMessage (dirname) {
+  const access = promisify(fs.access)
+  const writeFile = promisify(fs.writeFile)
+  const readFile = promisify(fs.readFile)
+
+  const basename = path.basename(dirname)
+  const header = dedent`
+    # Asking for help with: ${basename}
+    # Please enter your question below. There is no specific formatting, but
+    # feel free to use Markdown if you need to.
+    # ---- type below ----
+  `
+  const defaultMessage = dedent`
+    ${header}
+
+  `
+
+  const messageFileAttempts = [
+    path.join(dirname, 'ASK_MESSAGE'),
+    // in case the above is not writable or doesn't exist
+    tmp.tmpNameSync({ name: `${basename}-ASK_MESSAGE` })
+  ]
+  let messageFile
+  for (const attempt of messageFileAttempts) {
+    try {
+      // If a previous message still exists, probably something crashed
+      // down the line, we can just restore it
+      await access(attempt)
+      messageFile = attempt
+      break
+    } catch (err) {
+      try {
+        await writeFile(attempt, defaultMessage)
+        messageFile = attempt
+        break
+      } catch (err) {
+        // try next
+      }
+    }
+  }
+
+  if (process.stdout.isTTY && !process.env.CI) {
+    await new Promise((resolve, reject) => {
+      editor(messageFile, (code, sig) => {
+        if (code === 0) resolve()
+        else reject(new Error('Could not start editor'))
+      })
+    })
+  } else if (process.env.CLINIC_MOCK_ASK_MESSAGE) {
+    await writeFile(messageFile, process.env.CLINIC_MOCK_ASK_MESSAGE)
+  } else {
+    throw new Error('Could not start editor')
+  }
+
+  const message = await readFile(messageFile, 'utf8')
+
+  return {
+    message: message.replace(header, ''),
+    messageFile
+  }
+}
+
+async function ask (server, filename, upload, token) {
+  const dirname = filename.replace(/\.html$/, '')
+  const { message, messageFile } = await getAskMessage(dirname)
+
   const result = await get({
     method: 'POST',
     url: `${server}/ask`,
     headers: { Authorization: `Bearer ${token}` },
     json: true,
-    body: {
-      upload,
-      message: 'Asked for help through the CLI [placeholder message]'
-    }
+    body: { upload, message }
   })
+
+  const unlink = promisify(fs.unlink)
+  try {
+    await unlink(messageFile)
+  } catch (err) {
+  }
 
   if (result.statusCode !== 200) {
     throw new Error(`Something went wrong, please use the "Ask" button in the web interface at ${server}/profile instead.`)
@@ -643,7 +714,7 @@ async function processUpload (args, opts = { private: false, ask: false }) {
       const htmlFile = `${path.basename(filename).replace('.html', '')}.html`
       const result = await uploadData(server, authToken, filename, opts)
       if (opts.ask) {
-        await ask(server, result, authToken)
+        await ask(server, filename, result, authToken)
       }
       uploadedUrls.push(`${server}/${opts.private ? 'private' : 'public'}/${result.id}/${htmlFile}`)
     }

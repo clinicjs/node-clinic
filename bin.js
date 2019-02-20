@@ -670,10 +670,17 @@ async function getAskMessage (dirname) {
     throw new Error('Could not start editor')
   }
 
-  const message = await readFile(messageFile, 'utf8')
+  let message = await readFile(messageFile, 'utf8')
+  message = message.replace(header, '')
+
+  if (message.trim() === '') {
+    const err = new Error('Empty message--aborting Ask.')
+    err.code = 'NoMessage'
+    throw err
+  }
 
   return {
-    message: message.replace(header, ''),
+    message,
     messageFile
   }
 }
@@ -752,6 +759,8 @@ async function processUpload (args, opts = { private: false, ask: false }) {
       if (/localhost/.test(args.server)) {
         console.error('Make sure the data server is running.')
       }
+    } else if (err.code === 'NoMessage') {
+      console.error('Empty message--aborting Ask.')
     } else if (err.reply && err.reply.statusCode === 401 && !opts.retried) {
       console.error('Authentication failure, your token might be expired. Retrying...')
       await authenticate.logout(args.server)

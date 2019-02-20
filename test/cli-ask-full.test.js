@@ -63,6 +63,42 @@ test('clinic ask 10000.clinic-doctor with custom upload url', function (t) {
   })
 })
 
+test('clinic ask 10000.clinic-doctor, empty message', function (t) {
+  server.requests = []
+  cli({
+    env: {
+      CLINIC_JWT: successfulJwt,
+      CLINIC_MOCK_ASK_MESSAGE: '\n'
+    }
+  }, [
+    'clinic', 'ask',
+    '--server', server.uploadUrl,
+    '--no-open',
+    doctorADirectory
+  ], function (err, stdout, stderr) {
+    t.plan(4)
+    t.ok(err)
+
+    t.strictDeepEqual(stdout.trim().split('\n'), [
+      'Signed in as test@test.com.',
+      `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`
+    ])
+    t.strictDeepEqual(stderr.trim().split('\n'), [
+      'Empty message--aborting Ask.'
+    ])
+
+    t.strictDeepEqual(server.requests, [{
+      method: 'POST',
+      url: '/protected/data',
+      files: {
+        '10000.clinic-doctor/a.txt': 'a',
+        '10000.clinic-doctor/b.txt': 'b',
+        '10000.clinic-doctor/c.txt': 'c'
+      }
+    }], 'did not receive ask request')
+  })
+})
+
 test('clinic ask 10000.clinic-doctor auth failure', function (t) {
   cli({
     env: { CLINIC_MOCK_AUTH_FAIL: 'true' }

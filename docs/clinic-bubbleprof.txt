@@ -25,7 +25,7 @@
 
     <code>clinic doctor --autocannon [ -m POST 'http://localhost:$PORT/?\$page=1' ] -- node server.js</code>
 
-  Note that dollar signs ($) appearing in the URL must be escaped, else they
+  Note that dollar signs (`$`) appearing in the URL must be escaped (`\$`), else they
   will be treated as environment variables as well.
 
   <h1>Flags</h1>

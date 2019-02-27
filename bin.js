@@ -626,12 +626,15 @@ async function getAskMessage (dirname) {
     # Asking for help with: ${basename}
     # Please enter your question below. There is no specific formatting, but
     # feel free to use Markdown if you need to.
+    #
+    # You may have been dropped into vim. If you're unfamiliar with it, do:
+    # - press 'i' to enter insert mode
+    # - type your message
+    # - press Escape to exit insert mode
+    # - type ':wq' to save and exit
     # ---- type below ----
   `
-  const defaultMessage = dedent`
-    ${header}
-
-  `
+  const defaultMessage = `${header}\n\n\n`
 
   const messageFileAttempts = [
     path.join(dirname, 'ASK_MESSAGE'),

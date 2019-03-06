@@ -19,14 +19,12 @@ const Insight = require('insight')
 const updateNotifier = require('update-notifier')
 const { promisify } = require('util')
 const get = promisify(require('simple-get').concat)
-const dedent = require('dedent')
-const tmp = require('tmp')
-const editor = require('editor')
 const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
-const clean = require('./lib/clean')
+const clean = require('./lib/clean.js')
 const authenticate = require('./lib/authenticate.js')
+const getAskMessage = require('./lib/get-ask-message.js')
 const tarAndUploadPromisified = promisify(tarAndUpload)
 
 const GA_TRACKING_CODE = 'UA-29381785-8'
@@ -616,81 +614,9 @@ async function uploadData (uploadURL, authToken, filename, opts) {
   return result
 }
 
-async function getAskMessage (dirname) {
-  const access = promisify(fs.access)
-  const writeFile = promisify(fs.writeFile)
-  const readFile = promisify(fs.readFile)
-
-  const basename = path.basename(dirname)
-  const header = dedent`
-    # Asking for help with: ${basename}
-    # Please enter your question below. There is no specific formatting, but
-    # feel free to use Markdown if you need to.
-    #
-    # You may have been dropped into vim. If you're unfamiliar with it, do:
-    # - press 'i' to enter insert mode
-    # - type your message
-    # - press Escape to exit insert mode
-    # - type ':wq' to save and exit
-    # ---- type below ----
-  `
-  const defaultMessage = `${header}\n\n\n`
-
-  const messageFileAttempts = [
-    path.join(dirname, 'ASK_MESSAGE'),
-    // in case the above is not writable or doesn't exist
-    tmp.tmpNameSync({ name: `${basename}-ASK_MESSAGE` })
-  ]
-  let messageFile
-  for (const attempt of messageFileAttempts) {
-    try {
-      // If a previous message still exists, probably something crashed
-      // down the line, we can just restore it
-      await access(attempt)
-      messageFile = attempt
-      break
-    } catch (err) {
-      try {
-        await writeFile(attempt, defaultMessage)
-        messageFile = attempt
-        break
-      } catch (err) {
-        // try next
-      }
-    }
-  }
-
-  if (process.stdout.isTTY && !process.env.CI) {
-    await new Promise((resolve, reject) => {
-      editor(messageFile, (code, sig) => {
-        if (code === 0) resolve()
-        else reject(new Error('Could not start editor'))
-      })
-    })
-  } else if (process.env.CLINIC_MOCK_ASK_MESSAGE) {
-    await writeFile(messageFile, process.env.CLINIC_MOCK_ASK_MESSAGE)
-  } else {
-    throw new Error('Could not start editor')
-  }
-
-  let message = await readFile(messageFile, 'utf8')
-  message = message.replace(header, '')
-
-  if (message.trim() === '') {
-    const err = new Error('Empty message--aborting Ask.')
-    err.code = 'NoMessage'
-    throw err
-  }
-
-  return {
-    message,
-    messageFile
-  }
-}
-
 async function ask (server, filename, upload, token) {
   const dirname = filename.replace(/\.html$/, '')
-  const { message, messageFile } = await getAskMessage(dirname)
+  const { message, cleanup } = await getAskMessage(dirname)
 
   const result = await get({
     method: 'POST',
@@ -700,11 +626,7 @@ async function ask (server, filename, upload, token) {
     body: { upload, message }
   })
 
-  const unlink = promisify(fs.unlink)
-  try {
-    await unlink(messageFile)
-  } catch (err) {
-  }
+  await cleanup()
 
   if (result.statusCode !== 200) {
     throw new Error(`Something went wrong, please use the "Ask" button in the web interface at ${server}/profile instead.`)

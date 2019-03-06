@@ -115,7 +115,11 @@ clinic ask --help
 ```
 -h | --help                Display Help
 -v | --version             Display Version
---debug                    Do not minify generated files
+--collect-only             Do not process data on termination
+--visualize-only datapath  Build or rebuild visualization from data
+--on-port                  Run a script when the server starts listening on a port.
+--autocannon               Run the autocannon benchmarking tool when the server starts listening on a port.
+--dest                     Destination for the collect data (default .).
 ```
 
 ## Programmable Interfaces

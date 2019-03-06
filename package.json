@@ -56,7 +56,7 @@
     "standard": "^12.0.0",
     "tap": "^12.1.0",
     "tap-junit": "^2.1.0",
-    "tar-stream": "^1.6.2"
+    "tar-stream": "^2.0.1"
   },
   "keywords": [
     "performance",

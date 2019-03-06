@@ -2,7 +2,7 @@
   "name": "clinic",
   "description": "Clinic diagnoses your performance issues",
   "repository": "nearform/node-clinic",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "engines": {
     "node": "^11.0.0 || ^10.0.0 || ^8.11.1"
   },
@@ -27,8 +27,10 @@
     "commist": "^1.0.0",
     "cross-argv": "^1.0.0",
     "dargs": "^6.0.0",
+    "dedent": "^0.7.0",
     "env-string": "^1.0.0",
     "execspawn": "^1.0.1",
+    "inquirer": "^6.2.2",
     "insight": "^0.10.1",
     "jsonwebtoken": "^8.3.0",
     "minimist": "^1.2.0",
@@ -44,6 +46,7 @@
     "stream-collector": "^1.0.1",
     "subarg": "^1.0.0",
     "tar-fs": "^1.16.0",
+    "tmp": "0.0.33",
     "update-notifier": "^2.5.0",
     "websocket-stream": "^5.1.2"
   },
@@ -53,8 +56,7 @@
     "standard": "^12.0.0",
     "tap": "^12.1.0",
     "tap-junit": "^2.1.0",
-    "tar-stream": "^2.0.1",
-    "tmp": "0.0.33"
+    "tar-stream": "^2.0.1"
   },
   "keywords": [
     "performance",

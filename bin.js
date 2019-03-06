@@ -22,8 +22,9 @@ const get = promisify(require('simple-get').concat)
 const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
-const clean = require('./lib/clean')
+const clean = require('./lib/clean.js')
 const authenticate = require('./lib/authenticate.js')
+const getAskMessage = require('./lib/get-ask-message.js')
 const tarAndUploadPromisified = promisify(tarAndUpload)
 
 const GA_TRACKING_CODE = 'UA-29381785-8'
@@ -613,17 +614,19 @@ async function uploadData (uploadURL, authToken, filename, opts) {
   return result
 }
 
-async function ask (server, upload, token) {
+async function ask (server, filename, upload, token) {
+  const dirname = filename.replace(/\.html$/, '')
+  const { message, cleanup } = await getAskMessage(dirname)
+
   const result = await get({
     method: 'POST',
     url: `${server}/ask`,
     headers: { Authorization: `Bearer ${token}` },
     json: true,
-    body: {
-      upload,
-      message: 'Asked for help through the CLI [placeholder message]'
-    }
+    body: { upload, message }
   })
+
+  await cleanup()
 
   if (result.statusCode !== 200) {
     throw new Error(`Something went wrong, please use the "Ask" button in the web interface at ${server}/profile instead.`)
@@ -643,7 +646,7 @@ async function processUpload (args, opts = { private: false, ask: false }) {
       const htmlFile = `${path.basename(filename).replace('.html', '')}.html`
       const result = await uploadData(server, authToken, filename, opts)
       if (opts.ask) {
-        await ask(server, result, authToken)
+        await ask(server, filename, result, authToken)
       }
       uploadedUrls.push(`${server}/${opts.private ? 'private' : 'public'}/${result.id}/${htmlFile}`)
     }
@@ -681,6 +684,8 @@ async function processUpload (args, opts = { private: false, ask: false }) {
       if (/localhost/.test(args.server)) {
         console.error('Make sure the data server is running.')
       }
+    } else if (err.code === 'NoMessage') {
+      console.error('Empty message--aborting Ask.')
     } else if (err.reply && err.reply.statusCode === 401 && !opts.retried) {
       console.error('Authentication failure, your token might be expired. Retrying...')
       await authenticate.logout(args.server)

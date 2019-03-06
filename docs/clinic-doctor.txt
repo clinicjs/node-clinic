@@ -17,6 +17,19 @@
 
     <code>clinic doctor --visualize-only PID.clinic-doctor-sample</code>
 
+  You can use the --autocannon flag to simulate load on your server.
+  --autocannon accepts configuration for autocannon using "subarg" syntax:
+
+    <code>clinic doctor --autocannon [ -m POST /api/example ] -- node server.js</code>
+
+  When configuring --autocannon, the $PORT environment variable contains the
+  port your server is listening on:
+
+    <code>clinic doctor --autocannon [ -m POST 'http://localhost:$PORT/?\$page=1' ] -- node server.js</code>
+
+  Note that dollar signs ($) appearing in the URL must be escaped, else they
+  will be treated as environment variables as well.
+
   <h1>Flags</h1>
   -h | --help                Display Help
   -v | --version             Display Version
@@ -24,4 +37,5 @@
   --visualize-only datapath  Build or rebuild visualization from data
   --sample-interval interval Sample interval in milliseconds
   --on-port                  Run a script when the server starts listening on a port.
+  --autocannon               Run the autocannon benchmarking tool when the server starts listening on a port.
   --dest                     Destination for the collect data (default .).

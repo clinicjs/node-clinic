@@ -1,6 +1,4 @@
-![banner](logo.png)
-
-# node-clinic
+# Clinic.js
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/nearform/node-clinic.svg)](https://greenkeeper.io/)
 [![npm version][npm-version]][npm-url] [![Stability Stable][stability-stable]][stability-docs] [![Azure build status][azure-status]][azure-url]
@@ -15,14 +13,17 @@ Demo and detailed documentation: https://clinicjs.org/
 ```
 npm install -g clinic
 ```
+<br />
+
+![Screenshots](tools.gif)
 
 ## Getting started
 
-As a first step, run the <code>clinic doctor</code>:
+As a first step, run the `clinic doctor`:
 
-<code>clinic doctor -- node server.js</code>
+`clinic doctor -- node server.js`
 
-Then benchmark your server with <code>wrk</code> or <code>autocannon</code>:
+Then benchmark your server with `wrk` or `autocannon`:
 
 ```
 wrk http://localhost:3000
@@ -44,17 +45,17 @@ clinic doctor --on-port 'wrk http://localhost:$PORT' -- node server.js
 ```
 
 Finally shut down your server (Ctrl+C). Once the server process has shutdown
-<code>clinic doctor</code> will analyse the collected data and detect what type of issue
+`clinic doctor` will analyse the collected data and detect what type of issue
 you are having. Based on the issue type, it will provide a recommendation for
 you.
 
-For example, to debug I/O issues, use <code>clinic bubbleprof</code>:
+For example, to debug I/O issues, use `clinic bubbleprof`:
 
 ```
 clinic bubbleprof -- node server.js
 ```
 
-Then benchmark your server again, just like you did with <code>clinic doctor</code>.
+Then benchmark your server again, just like you did with `clinic doctor`.
 
 Note that when looking at the CPU graph you might notice that it doesn't
 necessarily go from 0-100 but might go from 0-200 or higher. This is because the
@@ -67,7 +68,7 @@ these factors together.
 
 ## Supported Node.js versions
 
-Clinic relies heavily on Node.js core instrumentation available in later versions.
+Clinic.js relies heavily on Node.js core instrumentation available in later versions.
 Currently the supported Node.js versions are `^10.0.0` and `^8.9.4`.
 
 ## Examples and Demos
@@ -86,7 +87,7 @@ https://github.com/nearform/node-clinic/issues
 ```
 
 When creating an issue, it will be a huge help for us if you upload your
-data to the clinic cloud. To do this, use <code>clinic upload</code>:
+data to [Clinic.js Upload](https://upload.clinicjs.org). To do this, use `clinic upload`:
 
 ```
 clinic upload 1000.clinic-doctor
@@ -96,7 +97,7 @@ and include the URL that it returns.
 
 ## More information
 
-For more information use the <code>--help</code> option:
+For more information use the `--help` option:
 
 ```
 clinic doctor --help
@@ -106,9 +107,9 @@ clinic upload --help
 clinic ask --help
 ```
 
-- The Doctor functionality is provided by the [clinic-doctor](https://github.com/nearform/node-clinic-doctor) module.
-- The Bubbleprof functionality is provided by [clinic-bubbleprof](https://github.com/nearform/node-clinic-bubbleprof).
-- The Flame functionality is provided by [clinic-flame](https://github.com/nearform/node-clinic-flame).
+- The `doctor` functionality is provided by [Clinic.js Doctor](https://github.com/nearform/node-clinic-doctor).
+- The `bubbleprof` functionality is provided by [Clinic.js Bubbleprof](https://github.com/nearform/node-clinic-bubbleprof).
+- The `flame` functionality is provided by [Clinic.js Flame](https://github.com/nearform/node-clinic-flame).
 
 ## Flags
 
@@ -126,9 +127,9 @@ clinic ask --help
 
 Each of the tools has a programmable interface which you can read about in their repos.
 
-- [Node Clinic Doctor](https://github.com/nearform/node-clinic-doctor)
-- [Node Clinic Bubbleprof](https://github.com/nearform/node-clinic-bubbleprof)
-- [Node Clinic Flame](https://github.com/nearform/node-clinic-flame)
+- [Clinic.js Doctor](https://github.com/nearform/node-clinic-doctor)
+- [Clinic.js Bubbleprof](https://github.com/nearform/node-clinic-bubbleprof)
+- [Clinic.js Flame](https://github.com/nearform/node-clinic-flame)
 
 ## License
 

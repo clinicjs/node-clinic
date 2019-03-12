@@ -10,6 +10,7 @@ Demo and detailed documentation: https://clinicjs.org/
 
 ## Install
 
+
 ```
 npm install -g clinic
 ```

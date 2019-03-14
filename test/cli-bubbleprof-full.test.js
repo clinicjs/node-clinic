@@ -13,7 +13,7 @@ test('clinic bubbleprof -- node - no issues', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    const dirname = stdout.match(/(\d+.clinic-bubbleprof)/)[1]
+    const dirname = stdout.match(/(\.clinic\/\d+.clinic-bubbleprof)/)[1]
 
     t.strictEqual(stdout.split('\n')[1], 'Analysing data')
     t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${dirname}.html`)
@@ -40,7 +40,7 @@ test('clinic bubbleprof -- node - bad status code', function (t) {
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    const dirname = stdout.match(/(\d+.clinic-bubbleprof)/)[1]
+    const dirname = stdout.match(/(\.clinic\/\d+.clinic-bubbleprof)/)[1]
 
     t.strictEqual(stdout.split('\n')[1], 'Analysing data')
     t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${dirname}.html`)
@@ -70,6 +70,7 @@ test('clinic bubbleprof -- node - visualization error', function (t) {
 
       // Delete the systeminfo file, such that the visualizer fails.
       fs.unlinkSync(path.join(
+        '.clinic',
         process.pid + '.clinic-bubbleprof',
         process.pid + '.clinic-bubbleprof-systeminfo'
       ))

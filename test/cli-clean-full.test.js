@@ -15,7 +15,7 @@ test('clinic clean', function (t) {
 
     fs.readdir(tempdir, function (err, files) {
       t.ifError(err)
-      t.equal(files.length, 2) // the folder and html file
+      t.same(files, ['.clinic'])
       fs.writeFileSync(path.join(tempdir, 'some-other-file'), 'sup')
 
       cli({ cwd: tempdir }, ['clinic', 'clean'], function (err) {

@@ -13,7 +13,7 @@ test('clinic flame -- node - no issues', function (t) {
     '--', 'node', '-e', 'require("util").inspect(process)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    const dirname = stdout.match(/(\d+.clinic-flame)/)[1]
+    const dirname = stdout.match(/(\.clinic\/\d+.clinic-flame)/)[1]
 
     t.strictEqual(stdout.split('\n')[1], 'Analysing data')
     t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${dirname}.html`)
@@ -40,7 +40,7 @@ test('clinic flame -- node - bad status code', function (t) {
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    const dirname = stdout.match(/(\d+.clinic-flame)/)[1]
+    const dirname = stdout.match(/(\.clinic\/\d+.clinic-flame)/)[1]
 
     t.strictEqual(stdout.split('\n')[1], 'Analysing data')
     t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${dirname}.html`)

@@ -409,7 +409,7 @@ function checkMetricsPermission (cb) {
   /* istanbul ignore if: tracking intentionally disabled when running tests */
   if (insight.optOut === undefined) {
     insight.askPermission(
-      'May Clinic report anonymous usage statistics to improve the tool over time?',
+      'May Clinic.js report anonymous usage statistics to improve the tool over time?',
       cb
     )
   } else {

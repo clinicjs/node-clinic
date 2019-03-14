@@ -1,13 +1,13 @@
 
-  <title>Clinic Login</title>
+  <title>Clinic.js Login</title>
 
-  Log in to the Clinic Upload server.
+  Log in to the Clinic.js Upload server.
 
   <h1>Flags</h1>
   -h | --help                Display Help
-  --server                   Specify a custom URL to a Clinic Upload server.
+  --server                   Specify a custom URL to a Clinic.js Upload server.
 
   <h1>Environment Variables</h1>
-  CLINIC_JWT                 Token for authentication with the Clinic Upload server.
+  CLINIC_JWT                 Token for authentication with the Clinic.js Upload server.
                              Obtained from <link>https://upload.clinicjs.org/profile</link>.
 

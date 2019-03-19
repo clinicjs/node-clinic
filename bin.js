@@ -163,7 +163,7 @@ const result = commist()
       })
     }
   })
-  .register('upload', function (argv) {
+  .register('upload', catchify(async function (argv) {
     const args = minimist(argv, {
       alias: {
         help: 'h'
@@ -185,26 +185,24 @@ const result = commist()
     if (args.help) {
       printHelp('clinic-upload')
     } else if (args._.length > 0) {
-      checkMetricsPermission(async () => {
-        // checkMP does not handle Promise rejections, so we try-catch this entire thing
-        try {
-          insight.trackEvent({
-            category: 'upload',
-            action: 'public'
-          })
-
-          await processUpload(args, { private: args.private })
-        } catch (err) {
-          // message already printed in processUpload
-          process.exit(1)
-        }
+      await checkMetricsPermission()
+      insight.trackEvent({
+        category: 'upload',
+        action: 'public'
       })
+
+      try {
+        await processUpload(args, { private: args.private })
+      } catch (err) {
+        // message already printed in processUpload
+        process.exit(1)
+      }
     } else {
       printHelp('clinic-upload')
       process.exit(1)
     }
-  })
-  .register('ask', function (argv) {
+  }))
+  .register('ask', catchify(async function (argv) {
     const args = minimist(argv, {
       alias: {
         help: 'h'
@@ -225,28 +223,26 @@ const result = commist()
     if (args.help) {
       printHelp('clinic-ask')
     } else if (args._.length > 0) {
-      checkMetricsPermission(async () => {
-        // checkMP does not handle Promise rejections, so we try-catch this entire thing
-        try {
-          insight.trackEvent({
-            category: 'upload',
-            action: 'ask'
-          })
-
-          await processUpload(args, {
-            private: true,
-            ask: true
-          })
-        } catch (err) {
-          // message already printed in processUpload
-          process.exit(1)
-        }
+      await checkMetricsPermission()
+      insight.trackEvent({
+        category: 'upload',
+        action: 'ask'
       })
+
+      try {
+        await processUpload(args, {
+          private: true,
+          ask: true
+        })
+      } catch (err) {
+        // message already printed in processUpload
+        process.exit(1)
+      }
     } else {
       printHelp('clinic-ask')
       process.exit(1)
     }
-  })
+  }))
   .register('clean', function (argv) {
     const args = minimist(argv, {
       alias: {
@@ -263,7 +259,7 @@ const result = commist()
       })
     }
   })
-  .register('doctor', function (argv) {
+  .register('doctor', catchify(async function (argv) {
     const version = require('@nearform/doctor/package.json').version
     const args = subarg(argv, {
       alias: {
@@ -297,15 +293,14 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-doctor', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      trackTool('doctor', args, version, () => {
-        runTool(args, require('@nearform/doctor'), version, { color: 'green' })
-      })
+      await trackTool('doctor', args, version)
+      await runTool(args, require('@nearform/doctor'), version, { color: 'green' })
     } else {
       printHelp('clinic-doctor', version)
       process.exit(1)
     }
-  })
-  .register('bubbleprof', function (argv) {
+  }))
+  .register('bubbleprof', catchify(async function (argv) {
     const version = require('@nearform/bubbleprof/package.json').version
     const args = subarg(argv, {
       alias: {
@@ -336,15 +331,14 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-bubbleprof', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      trackTool('bubbleprof', args, version, () => {
-        runTool(args, require('@nearform/bubbleprof'), version, { color: 'blue' })
-      })
+      await trackTool('bubbleprof', args, version)
+      await runTool(args, require('@nearform/bubbleprof'), version, { color: 'blue' })
     } else {
       printHelp('clinic-bubbleprof', version)
       process.exit(1)
     }
-  })
-  .register('flame', function (argv) {
+  }))
+  .register('flame', catchify(async function (argv) {
     const version = require('@nearform/flame/version')
     const args = subarg(argv, {
       alias: {
@@ -375,14 +369,13 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-flame', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      trackTool('flame', args, version, () => {
-        runTool(args, require('@nearform/flame'), version, { color: 'yellow' })
-      })
+      await trackTool('flame', args, version)
+      await runTool(args, require('@nearform/flame'), version, { color: 'yellow' })
     } else {
       printHelp('clinic-flame', version)
       process.exit(1)
     }
-  })
+  }))
   .parse(xargv(process.argv.slice(2)))
 
 // not `clinic doctor`, `clinic flame`, and not `clinic bubbleprof`
@@ -409,19 +402,27 @@ if (result !== null) {
   }
 }
 
-function checkMetricsPermission (cb) {
-  /* istanbul ignore if: tracking intentionally disabled when running tests */
-  if (insight.optOut === undefined) {
-    insight.askPermission(
-      'May Clinic.js report anonymous usage statistics to improve the tool over time?',
-      cb
-    )
-  } else {
-    cb()
+function catchify (asyncFn) {
+  return function (...args) {
+    asyncFn(...args).catch((err) => {
+      console.error(err.stack)
+      process.exit(1)
+    })
   }
 }
 
-function trackTool (toolName, args, toolVersion, cb) {
+function checkMetricsPermission (cb) {
+  /* istanbul ignore if: tracking intentionally disabled when running tests */
+  if (insight.optOut === undefined) {
+    return promisify(insight.askPermission).call(
+      insight,
+      'May Clinic.js report anonymous usage statistics to improve the tool over time?'
+    )
+  }
+  return Promise.resolve()
+}
+
+async function trackTool (toolName, args, toolVersion) {
   let action = 'run'
   if (args['visualize-only']) {
     action = 'visualize-only'
@@ -429,15 +430,12 @@ function trackTool (toolName, args, toolVersion, cb) {
     action = 'collect-only'
   }
 
-  checkMetricsPermission(() => {
-    insight.track(toolName, action)
-    insight.trackEvent({
-      category: toolName,
-      action,
-      label: toolVersion
-    })
-
-    cb()
+  await checkMetricsPermission()
+  insight.track(toolName, action)
+  insight.trackEvent({
+    category: toolName,
+    action,
+    label: toolVersion
   })
 }
 
@@ -511,32 +509,39 @@ function runTool (args, Tool, version, uiOptions) {
     if (!spinner.isSpinning) spinner.start()
   }
 
+  let defer
+  const promise = new Promise((resolve, reject) => {
+    defer = { resolve, reject }
+  })
+
   if (args['collect-only']) {
     process.once('SIGINT', onsigint)
     tool.collect(args['--'], function (err, filename) {
-      if (err) throw err
+      if (err) return defer.reject(err)
       if (spinner.isEnabled) {
         spinner.stop()
         spinner.stream.write(`${spinner.text}\n`)
       }
       console.log(`Output file is ${filename}`)
+      defer.resolve()
     })
   } else if (args['visualize-only']) {
     const dataPath = args['visualize-only'].replace(/[\\/]$/, '')
     viz(dataPath, function (err) {
-      if (err) throw err
+      if (err) return defer.reject(err)
 
       console.log(`Generated HTML file is ${dataPath}.html`)
       console.log('You can use this command to upload it:')
       console.log(`clinic upload ${dataPath}`)
+      defer.resolve()
     })
   } else {
     process.once('SIGINT', onsigint)
     tool.collect(args['--'], function (err, filename) {
-      if (err) throw err
+      if (err) return defer.reject(err)
 
       viz(filename, function (err) {
-        if (err) throw err
+        if (err) return defer.reject(err)
         if (spinner.isEnabled) {
           spinner.stop()
           spinner.stream.write(`${spinner.text}\n`)
@@ -549,9 +554,12 @@ function runTool (args, Tool, version, uiOptions) {
         // open HTML file in default browser
         /* istanbul ignore if: we don't want to open a browser in `npm test` */
         if (args.open) opn('file://' + path.resolve(filename + '.html'), { wait: false })
+        defer.resolve()
       })
     })
   }
+
+  return promise
 
   function viz (filename, cb) {
     if (!/\d+\.clinic-.+$/.test(filename)) {

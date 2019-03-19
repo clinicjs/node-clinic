@@ -10,7 +10,7 @@ test('clinic doctor -- node - no issues', function (t) {
   // collect data
   cli({}, [
     'clinic', 'doctor', '--no-open',
-    '--', 'node', '-e', 'setTimeout(() => {}, 100)'
+    '--', 'node', '-e', 'setTimeout(() => {}, 400)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
     const dirname = stdout.match(/(\d+.clinic-doctor)/)[1]
@@ -37,7 +37,7 @@ test('clinic doctor -- node - bad status code', function (t) {
   // collect data
   cli({ relayStderr: false }, [
     'clinic', 'doctor', '--no-open',
-    '--', 'node', '-e', 'setTimeout(() => { process.exit(1) }, 100)'
+    '--', 'node', '-e', 'setTimeout(() => { process.exit(1) }, 400)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
     const dirname = stdout.match(/(\d+.clinic-doctor)/)[1]
@@ -134,7 +134,7 @@ test('clinic doctor -- node - configure output destination', function (t) {
   cli({ relayStderr: false }, [
     'clinic', 'doctor', '--no-open',
     '--dest', 'test-doctor-destination',
-    '--', 'node', '-e', 'setTimeout(() => {}, 200)'
+    '--', 'node', '-e', 'setTimeout(() => {}, 400)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
     const basename = stdout.match(/(\d+.clinic-doctor)/)[1]

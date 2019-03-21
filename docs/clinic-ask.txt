@@ -1,5 +1,5 @@
 
-  <title>Clinic Ask</title>
+  <title>Clinic.js Ask</title>
 
   To upload the data generated to the upload server private area, run <code>clinic ask</code>
 
@@ -17,5 +17,5 @@
 
   <h1>Flags</h1>
   -h | --help                Display Help
-  --server                   Upload data to a different Clinic Upload server.
-  --no-open                  Prevent Clinic from opening the upload in your browser.
+  --server                   Upload data to a different Clinic.js Upload server.
+  --no-open                  Prevent Clinic.js from opening the upload in your browser.

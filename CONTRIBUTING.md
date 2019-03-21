@@ -1,4 +1,4 @@
-# Welcome to Clinic!
+# Welcome to Clinic.js!
 
 Please take a second to read over this before opening an issue. Providing complete information upfront will help us address any issue (and ship new features!) faster.
 
@@ -6,7 +6,7 @@ We greatly appreciate bug fixes, documentation improvements and new features, ho
 
 ## Code of Conduct
 
-The Node Clinic project has a [Code of Conduct][CoC] that all contributors are
+The Clinic.js project has a [Code of Conduct][CoC] that all contributors are
 expected to follow.
 
 ## Bug Reports
@@ -14,12 +14,12 @@ expected to follow.
 A perfect bug report would have the following:
 
 1. Summary of the issue you are experiencing.
-2. Details on what versions of node and clinic you have (`node -v` and `clinic -v`).
+2. Details on what versions of node and Clinic.js you have (`node -v` and `clinic -v`).
 3. A simple repeatable test case for us to run. Please try to run through it 2-3 times to ensure it is completely repeatable.
 
 We would like to avoid issues that require a follow up questions to identify the bug. These follow ups are difficult to do unless we have a repeatable test case.
 
-In addition, it is helpful if you upload your clinic data to help us diagnose your issues.
+In addition, it is helpful if you upload your Clinic.js data to help us diagnose your issues.
 Use the `clinic upload` tool to do this:
 
 ```
@@ -59,12 +59,12 @@ Release process:
 
 ## Licensing and Certification
 
-While the Node Clinic project as a whole is distributed under the GPL 3.0
-license, all contributions to the Node Clinic project are submitted *to* the
+While the Clinic.js project as a whole is distributed under the GPL 3.0
+license, all contributions to the Clinic.js project are submitted *to* the
 project under the MIT license. This gives the project maintainers flexibility
 while ensuring that your rights to your contributions do not change.
 
-The Node Clinic project uses a Contribution Certification that is derived from
+The Clinic.js project uses a Contribution Certification that is derived from
 the [Developer Certificate of Origin][DCO]. It is important to note that the
 Contribution Certification *is not the same as the standard DCO* and we do not
 use the term "DCO" or "Developer Certificate of Origin" to describe it to avoid

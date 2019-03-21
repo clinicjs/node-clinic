@@ -1,11 +1,11 @@
 
-  <title>Clinic Clean</title>
+  <title>Clinic.js Clean</title>
 
   A cleanup tool that looks in your current working directory
   for files and folders that match <code>{pid}.clinic-{command}</code> and
   removes them.
 
-  Useful if you have been using clinic a bunch and wants to cleanup the data.
+  Useful if you have been using Clinic.js a bunch and want to cleanup the data.
 
   <h1>Flags</h1>
   -h | --help                Display Help

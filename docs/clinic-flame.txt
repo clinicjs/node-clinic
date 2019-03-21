@@ -1,5 +1,5 @@
 
-  <title>Clinic Flame</title> - v{{version}}
+  <title>Clinic.js Flame</title> - v{{version}}
 
   <code>clinic flame</code> helps you find synchronous bottlenecks
   by creating a flamegraph visualization that assists in identifying

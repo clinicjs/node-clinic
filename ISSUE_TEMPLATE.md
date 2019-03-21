@@ -18,17 +18,17 @@
 
 ## Environment
 <!--- Check with `clinic -v` and `clinic doctor -v` -->
-<!--- e.g. Clinic v0.8.1 Doctor v2.4.1 -->
-* Clinic version: 
+<!--- e.g. Clinic.js v0.8.1 Doctor v2.4.1 -->
+* Clinic.js version:
 
 <!--- Check with `node -v` and `npm -v` -->
 <!--- e.g. Node v10.2.1 npm v6.0.1 -->
-* Node version: 
+* Node.js version:
 
 <!--- See https://whatbrowser.org/ -->
 <!--- e.g. Chrome 67 -->
-* Browser name and version: 
+* Browser name and version:
 
 <!--- See http://whatsmyos.com/ -->
 <!--- e.g. OSX 10.11.5 -->
-* Operating system and version: 
+* Operating system and version:

@@ -1,5 +1,5 @@
 
-  <title>Clinic Doctor</title> - v{{version}}
+  <title>Clinic.js Doctor</title> - v{{version}}
 
   <code>clinic doctor</code> is the first step in profiling your application.
   It will show you what kind of problem you are having and recommend the path

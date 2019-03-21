@@ -1,5 +1,5 @@
 
-  <title>Clinic BubbleProf</title> - v{{version}}
+  <title>Clinic.js BubbleProf</title> - v{{version}}
 
   <code>clinic bubbleprof</code> helps you find asynchronous bottlenecks and debug event loop blocking.
 

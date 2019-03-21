@@ -326,7 +326,7 @@ const result = commist()
       default: {
         open: true,
         debug: false,
-        'dest': DEFAULT_DEST
+        dest: DEFAULT_DEST
       },
       '--': true
     })
@@ -365,7 +365,7 @@ const result = commist()
       default: {
         open: true,
         debug: false,
-        'dest': DEFAULT_DEST
+        dest: DEFAULT_DEST
       },
       '--': true
     })

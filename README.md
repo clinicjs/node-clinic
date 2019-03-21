@@ -90,7 +90,7 @@ When creating an issue, it will be a huge help for us if you upload your
 data to [Clinic.js Upload](https://upload.clinicjs.org). To do this, use `clinic upload`:
 
 ```
-clinic upload 1000.clinic-doctor
+clinic upload .clinic/1000.clinic-doctor
 ```
 
 and include the URL that it returns.

@@ -1,6 +1,5 @@
 # clinic specific
-*.clinic-doctor
-*.clinic-doctor.html
+.clinic
 *.tmp
 !test/fixtures/**/*.clinic-*
 

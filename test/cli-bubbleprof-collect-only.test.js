@@ -11,9 +11,9 @@ test('clinic bubbleprof --collect-only - no issues', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    t.ok(/Output file is (\d+).clinic-bubbleprof/.test(stdout))
+    t.ok(/Output file is \.clinic[/\\](\d+).clinic-bubbleprof/.test(stdout))
 
-    const dirname = stdout.match(/(\d+.clinic-bubbleprof)/)[1]
+    const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-bubbleprof)/)[1]
     fs.access(path.resolve(tempdir, dirname), function (err) {
       t.ifError(err)
 
@@ -31,9 +31,9 @@ test('clinic bubbleprof --collect-only - bad status code', function (t) {
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    t.ok(/Output file is (\d+).clinic-bubbleprof/.test(stdout))
+    t.ok(/Output file is \.clinic[/\\](\d+).clinic-bubbleprof/.test(stdout))
 
-    const dirname = stdout.match(/(\d+.clinic-bubbleprof)/)[1]
+    const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-bubbleprof)/)[1]
     fs.access(path.resolve(tempdir, dirname), function (err) {
       t.ifError(err)
 

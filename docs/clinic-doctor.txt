@@ -38,4 +38,4 @@
   --sample-interval interval Sample interval in milliseconds
   --on-port                  Run a script when the server starts listening on a port.
   --autocannon               Run the autocannon benchmarking tool when the server starts listening on a port.
-  --dest                     Destination for the collect data (default .).
+  --dest                     Destination for the collected data (default <code>.clinic/</code>).

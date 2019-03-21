@@ -29,6 +29,7 @@ const tarAndUploadPromisified = promisify(tarAndUpload)
 
 const GA_TRACKING_CODE = 'UA-29381785-8'
 const DEFAULT_UPLOAD_URL = 'https://upload.clinicjs.org'
+const DEFAULT_DEST = '.clinic'
 
 const insight = new Insight({
   trackingCode: GA_TRACKING_CODE,
@@ -285,7 +286,8 @@ const result = commist()
       default: {
         'sample-interval': '10',
         'open': true,
-        'debug': false
+        'debug': false,
+        'dest': DEFAULT_DEST
       },
       '--': true
     })
@@ -323,7 +325,8 @@ const result = commist()
       ],
       default: {
         open: true,
-        debug: false
+        debug: false,
+        dest: DEFAULT_DEST
       },
       '--': true
     })
@@ -361,7 +364,8 @@ const result = commist()
       ],
       default: {
         open: true,
-        debug: false
+        debug: false,
+        dest: DEFAULT_DEST
       },
       '--': true
     })

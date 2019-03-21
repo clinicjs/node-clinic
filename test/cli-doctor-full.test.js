@@ -13,7 +13,7 @@ test('clinic doctor -- node - no issues', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    const dirname = stdout.match(/(\d+.clinic-doctor)/)[1]
+    const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-doctor)/)[1]
 
     t.strictEqual(stdout.split('\n')[1], 'Analysing data')
     t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${dirname}.html`)
@@ -40,7 +40,7 @@ test('clinic doctor -- node - bad status code', function (t) {
     '--', 'node', '-e', 'setTimeout(() => { process.exit(1) }, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    const dirname = stdout.match(/(\d+.clinic-doctor)/)[1]
+    const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-doctor)/)[1]
 
     t.strictEqual(stdout.split('\n')[1], 'Analysing data')
     t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${dirname}.html`)
@@ -83,6 +83,7 @@ test('clinic doctor -- node - visualization error', function (t) {
 
       // Delete the systeminfo file, such that the visualizer fails.
       fs.unlinkSync(path.join(
+        '.clinic',
         process.pid + '.clinic-doctor',
         process.pid + '.clinic-doctor-systeminfo'
       ))

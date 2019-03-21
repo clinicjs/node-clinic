@@ -12,8 +12,8 @@ test('clinic bubbleprof --collect-only - no issues', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    t.ok(/Output file is \.clinic\/(\d+).clinic-bubbleprof/.test(stdout))
-    const dirname = stdout.match(/(\.clinic\/\d+.clinic-bubbleprof)/)[1]
+    t.ok(/Output file is \.clinic[/\\](\d+).clinic-bubbleprof/.test(stdout))
+    const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-bubbleprof)/)[1]
     const dirpath = path.resolve(tempdir, dirname)
 
     // visualize data
@@ -56,8 +56,8 @@ test('clinic bubbleprof --visualize-only - with trailing /', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    t.ok(/Output file is \.clinic\/(\d+).clinic-bubbleprof/.test(stdout))
-    const dirname = stdout.match(/(\.clinic\/\d+.clinic-bubbleprof)/)[1]
+    t.ok(/Output file is \.clinic[/\\](\d+).clinic-bubbleprof/.test(stdout))
+    const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-bubbleprof)/)[1]
     const dirpath = path.resolve(tempdir, dirname)
 
     // visualize data

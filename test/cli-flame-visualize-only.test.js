@@ -12,8 +12,8 @@ test('clinic flame --visualize-only - no issues', function (t) {
     '--', 'node', '-e', 'require("util").inspect(process)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    t.ok(/Output file is \.clinic\/(\d+).clinic-flame/.test(stdout))
-    const dirname = stdout.match(/(\.clinic\/\d+.clinic-flame)/)[1]
+    t.ok(/Output file is \.clinic[/\\](\d+).clinic-flame/.test(stdout))
+    const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-flame)/)[1]
     const dirpath = path.resolve(tempdir, dirname)
 
     // visualize data
@@ -56,8 +56,8 @@ test('clinic flame --visualize-only - supports trailing slash', function (t) {
     '--', 'node', '-e', 'require("util").inspect(process)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
-    t.ok(/Output file is \.clinic\/(\d+).clinic-flame/.test(stdout))
-    const dirname = stdout.match(/(\.clinic\/\d+.clinic-flame)/)[1]
+    t.ok(/Output file is \.clinic[/\\](\d+).clinic-flame/.test(stdout))
+    const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-flame)/)[1]
     const dirpath = path.resolve(tempdir, dirname)
 
     // visualize data

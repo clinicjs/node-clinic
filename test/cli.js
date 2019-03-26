@@ -72,12 +72,6 @@ function cli (settings, args, callback) {
         })
       }
     }, function (err, result) {
-      // TODO(mcollina): useful for debugging, remove?
-      if (err) {
-        console.log(result.stdout)
-        console.log(result.stderr)
-      }
-
       callback(err,
         result ? result.stdout : null,
         result ? result.stderr : null,

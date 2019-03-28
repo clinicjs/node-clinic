@@ -117,7 +117,7 @@ test('clinic doctor --on-port', function (t) {
 test('clinic doctor --autocannon', function (t) {
   cli({ relayStderr: false }, [
     'clinic', 'doctor', '--no-open',
-    '--autocannon', '[', '/', '-d', '1', ']',
+    '--autocannon', '[', '/', '-d', '2', ']',
     '--', 'node', '-e', `
       const http = require('http')
 
@@ -125,7 +125,7 @@ test('clinic doctor --autocannon', function (t) {
     `
   ], function (err, stdout, stderr) {
     t.ifError(err)
-    t.ok(stderr.indexOf('Running 1s test @ http://localhost:') > -1)
+    t.ok(stderr.indexOf('Running 2s test @ http://localhost:') > -1)
     t.strictEqual(stdout.split('\n')[0], 'Analysing data')
     t.end()
   })

@@ -36,7 +36,6 @@ test('clinic --autocannon with escaped $', function (t) {
       }).listen(0)
     `
   ], function (err, stdout, stderr) {
-    console.log(stdout)
     t.ifError(err)
     t.ok(stderr.indexOf('Running 1s test @ http://localhost:') > -1)
     t.strictEqual(stdout.split('\n')[0], '/$PORT?$page=10')
@@ -55,7 +54,6 @@ test('clinic --autocannon with /path', function (t) {
       http.createServer((req, res) => res.end(req.url)).listen(0)
     `
   ], function (err, stdout, stderr) {
-    console.log(stdout)
     t.ifError(err)
     t.ok(stderr.indexOf('Running 1s test @ http://localhost:') > -1)
     t.strictEqual(stdout.split('\n')[0], 'Analysing data')

@@ -30,7 +30,7 @@ test('Before all', function (t) {
 test('clinic login', function (t) {
   cli({
     env: {
-      CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-login'),
+      CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-login'),
       CLINIC_JWT: successfulJwt
     }
   }, [
@@ -49,7 +49,7 @@ test('clinic login', function (t) {
 test('clinic user exits with 1 if not authenticated', function (t) {
   cli({
     env: {
-      CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-user')
+      CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-user')
     }
   }, [
     'clinic', 'user'
@@ -80,7 +80,7 @@ test('clinic user lists all authed users', function (t) {
   function login (url, token, cb) {
     cli({
       env: {
-        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-user-all'),
+        CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-user-all'),
         CLINIC_JWT: token
       }
     }, [ 'clinic', 'login', '--server', url ], cb)
@@ -89,7 +89,7 @@ test('clinic user lists all authed users', function (t) {
   function listUsers (cb) {
     cli({
       env: {
-        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-user-all')
+        CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-user-all')
       }
     }, [ 'clinic', 'user' ], cb)
   }
@@ -100,7 +100,7 @@ test('clinic user --server lists single user', function (t) {
 
   cli({
     env: {
-      CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-user-one'),
+      CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-user-one'),
       CLINIC_JWT: successfulJwt
     }
   }, [
@@ -111,7 +111,7 @@ test('clinic user --server lists single user', function (t) {
 
     cli({
       env: {
-        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-user-one')
+        CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-user-one')
       }
     }, [
       'clinic', 'user'
@@ -142,7 +142,7 @@ test('clinic logout', function (t) {
   function login (cb) {
     cli({
       env: {
-        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout'),
+        CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-logout'),
         CLINIC_JWT: successfulJwt
       }
     }, [ 'clinic', 'login', '--server', server.uploadUrl ], cb)
@@ -151,7 +151,7 @@ test('clinic logout', function (t) {
   function checkLogin (cb) {
     cli({
       env: {
-        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout')
+        CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-logout')
       }
     }, [ 'clinic', 'user', '--server', server.uploadUrl ], cb)
   }
@@ -159,7 +159,7 @@ test('clinic logout', function (t) {
   function logout (cb) {
     cli({
       env: {
-        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout')
+        CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-logout')
       }
     }, [ 'clinic', 'logout', '--server', server.uploadUrl ], cb)
   }
@@ -189,7 +189,7 @@ test('clinic logout --all logs out of all servers', function (t) {
   function login (token, url, cb) {
     cli({
       env: {
-        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout-all'),
+        CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-logout-all'),
         CLINIC_JWT: token
       }
     }, [ 'clinic', 'login', '--server', url ], cb)
@@ -198,7 +198,7 @@ test('clinic logout --all logs out of all servers', function (t) {
   function checkLogin (url, cb) {
     cli({
       env: {
-        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout-all')
+        CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-logout-all')
       }
     }, [ 'clinic', 'user', '--server', url ], cb)
   }
@@ -206,7 +206,7 @@ test('clinic logout --all logs out of all servers', function (t) {
   function logoutAll (cb) {
     cli({
       env: {
-        CLINIC_CREDENTIALS: path.join(tempCredentials.name, '.clinic-logout-all')
+        CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-logout-all')
       }
     }, [ 'clinic', 'logout', '--all' ], cb)
   }

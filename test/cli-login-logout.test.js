@@ -2,7 +2,7 @@
 
 const test = require('tap').test
 const path = require('path')
-const tmp = require('tmp')
+const tempy = require('tempy')
 const cli = require('./cli.js')
 const FakeUploadServer = require('./fake-upload-server.js')
 let server
@@ -16,7 +16,7 @@ const successfulJwt2 = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmU
 
 test('Before all', function (t) {
   t.plan(2)
-  tempCredentials = tmp.dirSync()
+  tempCredentials = tempy.directory()
   server = new FakeUploadServer()
   server.listen(function () {
     t.ok(server)

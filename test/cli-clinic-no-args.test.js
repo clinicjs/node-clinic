@@ -5,7 +5,7 @@ const cli = require('./cli.js')
 
 test('clinic', function (t) {
   cli({}, ['clinic'], function (err, stdout) {
-    t.strictDeepEqual(err, new Error('process exited with exit code 1'))
+    t.strictDeepEqual(err, new Error('clinic exited with exit code 1'))
     t.ok(/Clinic[^\w ]/.test(stdout.split('\n')[1]))
     t.end()
   })

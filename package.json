@@ -39,7 +39,7 @@
     "pump": "^3.0.0",
     "pumpify": "^1.4.0",
     "rand-token": "^0.4.0",
-    "rimraf": "^2.6.2",
+    "rimraf": "^2.6.3",
     "simple-get": "^3.0.3",
     "split2": "^3.0.0",
     "stream-buffers": "^3.0.2",

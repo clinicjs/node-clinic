@@ -65,9 +65,9 @@ function cli (settings, args, callback) {
           if (code === 0 && signal === null) {
             done(null)
           } else if (signal !== null) {
-            done(new Error(`clinic exited by signal ${signal}`))
+            done(new Error(`process exited by signal ${signal}`))
           } else if (code !== 0) {
-            done(new Error(`clinic exited with exit code ${code}`))
+            done(new Error(`process exited with exit code ${code}`))
           }
         })
       }

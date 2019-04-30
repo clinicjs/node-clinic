@@ -16,7 +16,7 @@ jobs:
     inputs:
       versionSpec: $(node_version)
     displayName: Install Node.js
-  - bash: npm i
+  - bash: 'npm install && npm ls'
     displayName: Install dependencies
   - bash: npm run ci-lint
     displayName: Check linting

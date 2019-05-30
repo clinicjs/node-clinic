@@ -121,6 +121,34 @@ test('upload - bad status code', function (t) {
   })
 })
 
+test('upload - error message from server', function (t) {
+  const dataDirectory = path.resolve(
+    __dirname,
+    'fixtures',
+    'only-folder',
+    `10000.clinic-doctor`
+  )
+
+  const server = http.createServer(function (req, res) {
+    res.statusCode = 400
+    res.end('{"statusCode": 400, "error": "Bad Request", "message": "This is the message"}')
+  })
+
+  server.listen(0, '127.0.0.1', function () {
+    const uploadUrl = `http://localhost:${server.address().port}`
+    tarAndUpload(dataDirectory, uploadUrl, null, {}, function (err) {
+      t.strictDeepEqual(err, Object.assign(new Error('This is the message'), {
+        reply: {
+          statusCode: 400,
+          error: 'Bad Request',
+          message: 'This is the message'
+        }
+      }))
+      server.close(() => t.end())
+    })
+  })
+})
+
 test('upload fixtures/empty-directory.tmp/10000.clinic-doctor', function (t) {
   const emptyDataDirectory = path.resolve(
     __dirname,

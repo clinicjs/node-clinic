@@ -5,6 +5,7 @@ const os = require('os')
 const async = require('async')
 const path = require('path')
 const { spawn } = require('child_process')
+const rimraf = require('rimraf')
 const collect = require('stream-collector')
 
 const BIN_PATH = path.resolve(__dirname, '..', 'bin.js')
@@ -28,7 +29,7 @@ function cli (settings, args, callback) {
   }
 
   if (settings.cwd) ondir(null, settings.cwd)
-  else fs.mkdtemp(path.resolve(os.tmpdir(), 'foo-'), ondir)
+  else fs.mkdtemp(path.resolve(os.tmpdir(), 'clinic-test-'), ondir)
 
   function ondir (err, tempdir) {
     if (err) return callback(err)
@@ -72,6 +73,10 @@ function cli (settings, args, callback) {
         })
       }
     }, function (err, result) {
+      process.once('exit', () => {
+        rimraf.sync(tempdir)
+      })
+
       callback(err,
         result ? result.stdout : null,
         result ? result.stderr : null,

@@ -52,7 +52,10 @@ test('clinic doctor --collect-only - signal', {
     'clinic', 'doctor', '--collect-only',
     '--', 'node', '-e', 'process.kill(process.pid, "SIGKILL")'
   ], function (err, stdout, stderr) {
-    t.strictDeepEqual(err, new Error('process exited by signal SIGKILL'))
+    // check exit code of `clinic doctor` itself
+    t.strictDeepEqual(err, new Error('process exited with exit code 1'))
+    // check exit output for the child process
+    t.includes(stderr, 'Error: process exited by signal SIGKILL')
     t.strictEqual(stdout, 'To stop data collection press: Ctrl + C\n')
     t.end()
   })

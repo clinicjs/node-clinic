@@ -15,7 +15,9 @@
     "ci-lint": "standard | snazzy",
     "ci-test-no-cov": "tap -j1 --timeout 0 --no-cov test/*.test.js",
     "ci-test-cov": "tap -j1 --timeout 0 test/*.test.js",
-    "lint": "standard --fix | snazzy"
+    "lint": "standard --fix | snazzy",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
     "@nearform/bubbleprof": "^2.0.0",
@@ -48,7 +50,8 @@
     "tar-fs": "^1.16.0",
     "tempy": "^0.3.0",
     "update-notifier": "^3.0.0",
-    "websocket-stream": "^5.1.2"
+    "websocket-stream": "^5.1.2",
+    "snyk": "^1.189.0"
   },
   "devDependencies": {
     "proxyquire": "^2.1.0",
@@ -68,5 +71,6 @@
     "flame",
     "bubble"
   ],
-  "license": "GPL-3.0-or-later"
+  "license": "GPL-3.0-or-later",
+  "snyk": true
 }

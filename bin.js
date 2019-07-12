@@ -105,7 +105,7 @@ const result = commist()
         'server'
       ],
       default: {
-        'server': DEFAULT_UPLOAD_URL
+        server: DEFAULT_UPLOAD_URL
       }
     })
 
@@ -138,7 +138,7 @@ const result = commist()
         'all'
       ],
       default: {
-        'server': DEFAULT_UPLOAD_URL
+        server: DEFAULT_UPLOAD_URL
       }
     })
 
@@ -177,8 +177,8 @@ const result = commist()
         'open'
       ],
       default: {
-        'server': DEFAULT_UPLOAD_URL,
-        'open': true
+        server: DEFAULT_UPLOAD_URL,
+        open: true
       }
     })
 
@@ -217,8 +217,8 @@ const result = commist()
         'open'
       ],
       default: {
-        'server': DEFAULT_UPLOAD_URL,
-        'open': true
+        server: DEFAULT_UPLOAD_URL,
+        open: true
       }
     })
 
@@ -285,9 +285,9 @@ const result = commist()
       ],
       default: {
         'sample-interval': '10',
-        'open': true,
-        'debug': false,
-        'dest': DEFAULT_DEST
+        open: true,
+        debug: false,
+        dest: DEFAULT_DEST
       },
       '--': true
     })

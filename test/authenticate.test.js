@@ -37,7 +37,7 @@ test('authenticate', async function (t) {
     openedUrl = url
   }
 
-  const authenticate = proxyquire('../lib/authenticate', { 'open': openStub }) // mocking the browser opening
+  const authenticate = proxyquire('../lib/authenticate', { open: openStub }) // mocking the browser opening
 
   const jwtToken = await authenticate(`http://127.0.0.1:${server.address().port}`)
   t.plan(2)
@@ -51,7 +51,7 @@ test('authenticate for private upload', async function (t) {
     openedUrl = url
   }
 
-  const authenticate = proxyquire('../lib/authenticate', { 'open': openStub }) // mocking the browser opening
+  const authenticate = proxyquire('../lib/authenticate', { open: openStub }) // mocking the browser opening
 
   const jwtToken = await authenticate(`http://127.0.0.1:${server.address().port}`, {
     private: true
@@ -69,7 +69,7 @@ test('authenticate using ask', async function (t) {
     openedUrl = url
   }
 
-  const authenticate = proxyquire('../lib/authenticate', { 'open': openStub }) // mocking the browser opening
+  const authenticate = proxyquire('../lib/authenticate', { open: openStub }) // mocking the browser opening
 
   const jwtToken = await authenticate(`http://127.0.0.1:${server.address().port}`, {
     ask: true
@@ -84,7 +84,7 @@ test('authenticate using ask', async function (t) {
 test('authenticate timeout', async function (t) {
   const openStub = url => url
 
-  const authenticate = proxyquire('../lib/authenticate', { 'open': openStub }) // mocking the browser opening
+  const authenticate = proxyquire('../lib/authenticate', { open: openStub }) // mocking the browser opening
 
   simulateTimeout = true
 
@@ -101,7 +101,7 @@ test('authenticate timeout', async function (t) {
 })
 
 test('authenticate no auth token', async function (t) {
-  const authenticate = proxyquire('../lib/authenticate', { 'open': url => url }) // mocking the browser opening
+  const authenticate = proxyquire('../lib/authenticate', { open: url => url }) // mocking the browser opening
 
   simulateNoToken = true
   try {
@@ -120,8 +120,8 @@ test('authenticate failure', async function (t) {
   const authenticate = proxyquire(
     '../lib/authenticate',
     {
-      'open': url => url,
-      'split2': () => ({ on: () => [] })
+      open: url => url,
+      split2: () => ({ on: () => [] })
     })
 
   try {

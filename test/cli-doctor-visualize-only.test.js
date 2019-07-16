@@ -9,7 +9,7 @@ test('clinic doctor --visualize-only - no issues', function (t) {
   // collect data
   cli({}, [
     'clinic', 'doctor', '--collect-only',
-    '--', 'node', '-e', 'setTimeout(() => {}, 100)'
+    '--', 'node', '-e', 'setTimeout(() => {}, 500)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
     t.ok(/Output file is \.clinic[/\\](\d+).clinic-doctor/.test(stdout))
@@ -53,7 +53,7 @@ test('clinic doctor --visualize-only - supports trailing slash', function (t) {
   // collect data
   cli({}, [
     'clinic', 'doctor', '--collect-only',
-    '--', 'node', '-e', 'setTimeout(() => {}, 100)'
+    '--', 'node', '-e', 'setTimeout(() => {}, 500)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
     t.ok(/Output file is \.clinic[/\\](\d+).clinic-doctor/.test(stdout))

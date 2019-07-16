@@ -9,7 +9,7 @@ test('clinic clean', function (t) {
   // collect data
   cli({}, [
     'clinic', 'doctor', '--no-open',
-    '--', 'node', '-e', 'setTimeout(() => {}, 100)'
+    '--', 'node', '-e', 'setTimeout(() => {}, 500)'
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
 

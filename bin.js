@@ -3,7 +3,7 @@
 
 const fs = require('fs')
 const path = require('path')
-const opn = require('opn')
+const open = require('open')
 const ora = require('ora')
 const shellEscape = require('any-shell-escape')
 const commist = require('commist')
@@ -548,7 +548,7 @@ function runTool (args, Tool, version, uiOptions) {
 
         // open HTML file in default browser
         /* istanbul ignore if: we don't want to open a browser in `npm test` */
-        if (args.open) opn('file://' + path.resolve(filename + '.html'), { wait: false })
+        if (args.open) open('file://' + path.resolve(filename + '.html'), { wait: false })
       })
     })
   }
@@ -683,7 +683,7 @@ async function processUpload (args, opts = { private: false, ask: false }) {
       setTimeout(() => {
         process.stdout.clearLine()
         process.stdout.cursorTo(0)
-        opn(uploadedUrls[0], { wait: false })
+        open(uploadedUrls[0], { wait: false })
       }, 1500)
     }
   } catch (err) {

@@ -90,22 +90,37 @@ test('authenticate using ask', async function (t) {
   t.strictEqual(jwtToken, 'jwtToken')
 })
 
+test('authenticate does not try to open browser in SSH session', async function (t) {
+  const openStub = url => t.fail('should not try to open browser')
+
+  const origEnv = process.env
+  process.env = { ...origEnv, SSH_CLIENT: '127.0.0.1 1234 22' } // IP PID port
+  t.on('end', () => { process.env = origEnv })
+  const authenticate = proxyquire('../lib/authenticate', { open: openStub })
+
+  const jwtToken = await authenticate(`http://127.0.0.1:${server.address().port}`, {
+    ask: true
+  })
+  t.ok(jwtToken)
+})
+
 test('authenticate timeout', async function (t) {
   const openStub = url => openSuccess()
 
   const authenticate = proxyquire('../lib/authenticate', { open: openStub }) // mocking the browser opening
 
   simulateTimeout = true
+  t.on('end', () => {
+    simulateTimeout = false
+  })
 
   try {
     await authenticate(`http://127.0.0.1:${server.address().port}`)
-    simulateTimeout = false
     t.fail('it should reject')
   } catch (err) {
     t.plan(2)
     t.ok(err)
     t.ok(err.message.includes('Authentication timed out'))
-    simulateTimeout = false
   }
 })
 
@@ -115,15 +130,16 @@ test('authenticate no auth token', async function (t) {
   const authenticate = proxyquire('../lib/authenticate', { open: openStub }) // mocking the browser opening
 
   simulateNoToken = true
+  t.on('end', () => {
+    simulateNoToken = false
+  })
   try {
     await authenticate(`http://127.0.0.1:${server.address().port}`)
-    simulateNoToken = false
     t.fail('it should reject')
   } catch (err) {
     t.plan(2)
     t.ok(err)
     t.ok(err.message.includes('Authentication failed. No token obtained'))
-    simulateNoToken = false
   }
 })
 

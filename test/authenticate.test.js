@@ -8,6 +8,12 @@ let server, cliToken
 let simulateTimeout = false
 let simulateNoToken = false
 
+function openSuccess () {
+  return Promise.resolve({
+    on: (event, fn) => fn(0)
+  })
+}
+
 test('Before all', function (t) {
   server = http.createServer(() => {})
 
@@ -35,6 +41,7 @@ test('authenticate', async function (t) {
   let openedUrl = ''
   const openStub = url => {
     openedUrl = url
+    return openSuccess()
   }
 
   const authenticate = proxyquire('../lib/authenticate', { open: openStub }) // mocking the browser opening
@@ -49,6 +56,7 @@ test('authenticate for private upload', async function (t) {
   let openedUrl = ''
   const openStub = url => {
     openedUrl = url
+    return openSuccess()
   }
 
   const authenticate = proxyquire('../lib/authenticate', { open: openStub }) // mocking the browser opening
@@ -67,6 +75,7 @@ test('authenticate using ask', async function (t) {
   let openedUrl = ''
   const openStub = url => {
     openedUrl = url
+    return openSuccess()
   }
 
   const authenticate = proxyquire('../lib/authenticate', { open: openStub }) // mocking the browser opening
@@ -82,7 +91,7 @@ test('authenticate using ask', async function (t) {
 })
 
 test('authenticate timeout', async function (t) {
-  const openStub = url => url
+  const openStub = url => openSuccess()
 
   const authenticate = proxyquire('../lib/authenticate', { open: openStub }) // mocking the browser opening
 
@@ -101,7 +110,9 @@ test('authenticate timeout', async function (t) {
 })
 
 test('authenticate no auth token', async function (t) {
-  const authenticate = proxyquire('../lib/authenticate', { open: url => url }) // mocking the browser opening
+  const openStub = url => openSuccess()
+
+  const authenticate = proxyquire('../lib/authenticate', { open: openStub }) // mocking the browser opening
 
   simulateNoToken = true
   try {
@@ -117,10 +128,12 @@ test('authenticate no auth token', async function (t) {
 })
 
 test('authenticate failure', async function (t) {
+  const openStub = url => openSuccess()
+
   const authenticate = proxyquire(
     '../lib/authenticate',
     {
-      open: url => url,
+      open: openStub,
       split2: () => ({ on: () => [] })
     })
 

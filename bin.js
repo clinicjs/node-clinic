@@ -267,6 +267,7 @@ const result = commist()
         version: 'v'
       },
       boolean: [
+        'upload',
         'help',
         'version',
         'collect-only',
@@ -274,12 +275,14 @@ const result = commist()
         'debug'
       ],
       string: [
+        'server',
         'visualize-only',
         'sample-interval',
         'on-port',
         'dest'
       ],
       default: {
+        server: DEFAULT_UPLOAD_URL,
         'sample-interval': '10',
         open: true,
         debug: false,
@@ -308,6 +311,7 @@ const result = commist()
         version: 'v'
       },
       boolean: [
+        'upload',
         'help',
         'version',
         'collect-only',
@@ -315,10 +319,12 @@ const result = commist()
         'debug'
       ],
       string: [
+        'server',
         'visualize-only',
         'dest'
       ],
       default: {
+        server: DEFAULT_UPLOAD_URL,
         open: true,
         debug: false,
         dest: DEFAULT_DEST
@@ -346,6 +352,7 @@ const result = commist()
         version: 'v'
       },
       boolean: [
+        'upload',
         'help',
         'version',
         'collect-only',
@@ -353,10 +360,12 @@ const result = commist()
         'debug'
       ],
       string: [
+        'server',
         'visualize-only',
         'dest'
       ],
       default: {
+        server: DEFAULT_UPLOAD_URL,
         open: true,
         debug: false,
         dest: DEFAULT_DEST
@@ -439,7 +448,7 @@ async function trackTool (toolName, args, toolVersion) {
   })
 }
 
-function runTool (args, Tool, version, uiOptions) {
+async function runTool (args, Tool, version, uiOptions) {
   const autocannonOpts = typeof args['autocannon'] === 'string'
     // --autocannon /url
     ? { _: [args['autocannon']] }
@@ -458,6 +467,8 @@ function runTool (args, Tool, version, uiOptions) {
       console.log('To generate the report press: Ctrl + C')
     }
   }
+
+  const openLocalFile = args.open && !args.upload
 
   const tool = new Tool({
     sampleInterval: parseInt(args['sample-interval'], 10),
@@ -523,7 +534,7 @@ function runTool (args, Tool, version, uiOptions) {
         spinner.stream.write(`${spinner.text}\n`)
       }
       console.log(`Output file is ${filename}`)
-      defer.resolve()
+      defer.resolve({ data: filename })
     })
   } else if (args['visualize-only']) {
     const dataPath = args['visualize-only'].replace(/[\\/]$/, '')
@@ -533,7 +544,7 @@ function runTool (args, Tool, version, uiOptions) {
       console.log(`Generated HTML file is ${dataPath}.html`)
       console.log('You can use this command to upload it:')
       console.log(`clinic upload ${dataPath}`)
-      defer.resolve()
+      defer.resolve({ data: dataPath, visualizer: `${dataPath}.html` })
     })
   } else {
     process.once('SIGINT', onsigint)
@@ -553,13 +564,22 @@ function runTool (args, Tool, version, uiOptions) {
 
         // open HTML file in default browser
         /* istanbul ignore if: we don't want to open a browser in `npm test` */
-        if (args.open) open('file://' + path.resolve(filename + '.html'), { wait: false })
-        defer.resolve()
+        if (openLocalFile) {
+          open('file://' + path.resolve(filename + '.html'), { wait: false })
+        }
+
+        defer.resolve({ data: filename, visualizer: `${filename}.html` })
       })
     })
   }
 
-  return promise
+  const outputs = await promise
+  if (args.upload) {
+    await processUpload({
+      ...args,
+      _: [outputs.data]
+    }, { private: true })
+  }
 
   function viz (filename, cb) {
     if (!/\d+\.clinic-.+$/.test(filename)) {

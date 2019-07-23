@@ -19,6 +19,7 @@ const Insight = require('insight')
 const updateNotifier = require('update-notifier')
 const { promisify } = require('util')
 const get = promisify(require('simple-get').concat)
+const rimraf = require('rimraf')
 const pkg = require('./package.json')
 const tarAndUpload = require('./lib/tar-and-upload.js')
 const helpFormatter = require('./lib/help-formatter.js')
@@ -533,7 +534,7 @@ async function runTool (args, Tool, version, uiOptions) {
         spinner.stop()
         spinner.stream.write(`${spinner.text}\n`)
       }
-      console.log(`Output file is ${filename}`)
+
       defer.resolve({ data: filename })
     })
   } else if (args['visualize-only']) {
@@ -541,9 +542,6 @@ async function runTool (args, Tool, version, uiOptions) {
     viz(dataPath, function (err) {
       if (err) return defer.reject(err)
 
-      console.log(`Generated HTML file is ${dataPath}.html`)
-      console.log('You can use this command to upload it:')
-      console.log(`clinic upload ${dataPath}`)
       defer.resolve({ data: dataPath, visualizer: `${dataPath}.html` })
     })
   } else {
@@ -558,10 +556,6 @@ async function runTool (args, Tool, version, uiOptions) {
           spinner.stream.write(`${spinner.text}\n`)
         }
 
-        console.log(`Generated HTML file is ${filename}.html`)
-        console.log('You can use this command to upload it:')
-        console.log(`clinic upload ${filename}`)
-
         // open HTML file in default browser
         /* istanbul ignore if: we don't want to open a browser in `npm test` */
         if (openLocalFile) {
@@ -574,12 +568,27 @@ async function runTool (args, Tool, version, uiOptions) {
   }
 
   const outputs = await promise
+
   if (args.upload) {
-    await processUpload({
-      ...args,
-      _: [outputs.data]
-    }, { private: true })
+    console.log(`Uploading result ${outputs.visualizer}...`)
+    try {
+      await processUpload({
+        ...args,
+        _: [outputs.data]
+      }, { private: true })
+    } finally {
+      rimraf.sync(outputs.data)
+      rimraf.sync(outputs.visualizer)
+    }
+  } else if (outputs.visualizer) {
+    console.log(`Output file is ${outputs.visualizer}`)
+    console.log('You can use this command to upload it:')
+    console.log(`  clinic upload ${outputs.data}`)
+  } else {
+    console.log(`Generated file is ${outputs.data}`)
   }
+
+  return // rest is util functions
 
   function viz (filename, cb) {
     if (!/\d+\.clinic-.+$/.test(filename)) {

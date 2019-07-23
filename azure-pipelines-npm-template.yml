@@ -4,6 +4,8 @@ jobs:
     vmImage: ${{ parameters.vmImage }}
   strategy:
     matrix:
+      node_12_x:
+        node_version: 12.x
       node_11_x:
         node_version: 11.x
       node_10_x:
@@ -16,9 +18,13 @@ jobs:
     inputs:
       versionSpec: $(node_version)
     displayName: Install Node.js
-  - bash: npm i
+  - bash: 'npm install && npm ls'
     displayName: Install dependencies
   - bash: npm run ci-lint
     displayName: Check linting
-  - bash: npm run ci-test
-    displayName: Run tests
+  - bash: npm run ci-test-cov
+    displayName: Run tests with code coverage
+    condition: ne(variables['node_version'], '8.x')
+  - bash: npm run ci-test-no-cov
+    displayName: Run tests without code coverage
+    condition: eq(variables['node_version'], '8.x')

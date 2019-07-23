@@ -83,7 +83,7 @@ test('clinic user lists all authed users', function (t) {
         CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-user-all'),
         CLINIC_JWT: token
       }
-    }, [ 'clinic', 'login', '--server', url ], cb)
+    }, ['clinic', 'login', '--server', url], cb)
   }
 
   function listUsers (cb) {
@@ -91,7 +91,7 @@ test('clinic user lists all authed users', function (t) {
       env: {
         CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-user-all')
       }
-    }, [ 'clinic', 'user' ], cb)
+    }, ['clinic', 'user'], cb)
   }
 })
 
@@ -145,7 +145,7 @@ test('clinic logout', function (t) {
         CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-logout'),
         CLINIC_JWT: successfulJwt
       }
-    }, [ 'clinic', 'login', '--server', server.uploadUrl ], cb)
+    }, ['clinic', 'login', '--server', server.uploadUrl], cb)
   }
 
   function checkLogin (cb) {
@@ -153,7 +153,7 @@ test('clinic logout', function (t) {
       env: {
         CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-logout')
       }
-    }, [ 'clinic', 'user', '--server', server.uploadUrl ], cb)
+    }, ['clinic', 'user', '--server', server.uploadUrl], cb)
   }
 
   function logout (cb) {
@@ -161,7 +161,7 @@ test('clinic logout', function (t) {
       env: {
         CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-logout')
       }
-    }, [ 'clinic', 'logout', '--server', server.uploadUrl ], cb)
+    }, ['clinic', 'logout', '--server', server.uploadUrl], cb)
   }
 })
 
@@ -192,7 +192,7 @@ test('clinic logout --all logs out of all servers', function (t) {
         CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-logout-all'),
         CLINIC_JWT: token
       }
-    }, [ 'clinic', 'login', '--server', url ], cb)
+    }, ['clinic', 'login', '--server', url], cb)
   }
 
   function checkLogin (url, cb) {
@@ -200,7 +200,7 @@ test('clinic logout --all logs out of all servers', function (t) {
       env: {
         CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-logout-all')
       }
-    }, [ 'clinic', 'user', '--server', url ], cb)
+    }, ['clinic', 'user', '--server', url], cb)
   }
 
   function logoutAll (cb) {
@@ -208,7 +208,7 @@ test('clinic logout --all logs out of all servers', function (t) {
       env: {
         CLINIC_CREDENTIALS: path.join(tempCredentials, '.clinic-logout-all')
       }
-    }, [ 'clinic', 'logout', '--all' ], cb)
+    }, ['clinic', 'logout', '--all'], cb)
   }
 })
 

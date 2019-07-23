@@ -3,7 +3,7 @@
 
 const fs = require('fs')
 const path = require('path')
-const opn = require('opn')
+const open = require('open')
 const ora = require('ora')
 const shellEscape = require('any-shell-escape')
 const commist = require('commist')
@@ -105,7 +105,7 @@ const result = commist()
         'server'
       ],
       default: {
-        'server': DEFAULT_UPLOAD_URL
+        server: DEFAULT_UPLOAD_URL
       }
     })
 
@@ -138,7 +138,7 @@ const result = commist()
         'all'
       ],
       default: {
-        'server': DEFAULT_UPLOAD_URL
+        server: DEFAULT_UPLOAD_URL
       }
     })
 
@@ -177,8 +177,8 @@ const result = commist()
         'open'
       ],
       default: {
-        'server': DEFAULT_UPLOAD_URL,
-        'open': true
+        server: DEFAULT_UPLOAD_URL,
+        open: true
       }
     })
 
@@ -215,8 +215,8 @@ const result = commist()
         'open'
       ],
       default: {
-        'server': DEFAULT_UPLOAD_URL,
-        'open': true
+        server: DEFAULT_UPLOAD_URL,
+        open: true
       }
     })
 
@@ -281,9 +281,9 @@ const result = commist()
       ],
       default: {
         'sample-interval': '10',
-        'open': true,
-        'debug': false,
-        'dest': DEFAULT_DEST
+        open: true,
+        debug: false,
+        dest: DEFAULT_DEST
       },
       '--': true
     })
@@ -553,7 +553,7 @@ function runTool (args, Tool, version, uiOptions) {
 
         // open HTML file in default browser
         /* istanbul ignore if: we don't want to open a browser in `npm test` */
-        if (args.open) opn('file://' + path.resolve(filename + '.html'), { wait: false })
+        if (args.open) open('file://' + path.resolve(filename + '.html'), { wait: false })
         defer.resolve()
       })
     })
@@ -691,7 +691,7 @@ async function processUpload (args, opts = { private: false, ask: false }) {
       setTimeout(() => {
         process.stdout.clearLine()
         process.stdout.cursorTo(0)
-        opn(uploadedUrls[0], { wait: false })
+        open(uploadedUrls[0], { wait: false })
       }, 1500)
     }
   } catch (err) {

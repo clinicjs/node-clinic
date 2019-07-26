@@ -588,7 +588,7 @@ async function runTool (args, Tool, version, uiOptions) {
     console.log(`Output file is ${outputs.data}`)
   }
 
-  return // rest is util functions
+  // rest is util functions
 
   function viz (filename, cb) {
     if (!/\d+\.clinic-.+$/.test(filename)) {

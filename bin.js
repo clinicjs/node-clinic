@@ -581,11 +581,11 @@ async function runTool (args, Tool, version, uiOptions) {
       rimraf.sync(outputs.visualizer)
     }
   } else if (outputs.visualizer) {
-    console.log(`Output file is ${outputs.visualizer}`)
+    console.log(`Generated HTML file is ${outputs.visualizer}`)
     console.log('You can use this command to upload it:')
-    console.log(`  clinic upload ${outputs.data}`)
+    console.log(`clinic upload ${outputs.data}`)
   } else {
-    console.log(`Generated file is ${outputs.data}`)
+    console.log(`Output file is ${outputs.data}`)
   }
 
   return // rest is util functions

@@ -5,6 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const open = require('open')
 const ora = require('ora')
+const pump = require('pump')
 const shellEscape = require('any-shell-escape')
 const commist = require('commist')
 const minimist = require('minimist')
@@ -278,6 +279,7 @@ const result = commist()
         'debug'
       ],
       string: [
+        'check',
         'visualize-only',
         'sample-interval',
         'on-port',
@@ -285,6 +287,7 @@ const result = commist()
       ],
       default: {
         'sample-interval': '10',
+        check: false,
         open: true,
         debug: false,
         dest: DEFAULT_DEST
@@ -292,11 +295,13 @@ const result = commist()
       '--': true
     })
 
+    if (args.check === '') args.check = true
+
     if (args.version) {
       printVersion(version)
     } else if (args.help) {
       printHelp('clinic-doctor', version)
-    } else if (args['visualize-only'] || args['--'].length > 1) {
+    } else if (args['visualize-only'] || typeof args.check === 'string' || args['--'].length > 1) {
       trackTool('doctor', args, version, () => {
         runTool(args, require('@nearform/doctor'), version, { color: 'green' })
       })
@@ -456,7 +461,7 @@ function runTool (args, Tool, version, uiOptions) {
   if (!onPort && !args['visualize-only']) {
     if (args['collect-only']) {
       console.log('To stop data collection press: Ctrl + C')
-    } else {
+    } else if (typeof args.check !== 'string') {
       console.log('To generate the report press: Ctrl + C')
     }
   }
@@ -530,6 +535,9 @@ function runTool (args, Tool, version, uiOptions) {
       console.log('You can use this command to upload it:')
       console.log(`clinic upload ${dataPath}`)
     })
+  } else if (typeof args.check === 'string') { // check an existing profile
+    const dataPath = args.check.replace(/[\\/]$/, '')
+    check(dataPath)
   } else {
     process.once('SIGINT', onsigint)
     tool.collect(args['--'], function (err, filename) {
@@ -546,10 +554,25 @@ function runTool (args, Tool, version, uiOptions) {
         console.log('You can use this command to upload it:')
         console.log(`clinic upload ${filename}`)
 
+        if (args.check) {
+          check(filename)
+        }
+
         // open HTML file in default browser
         /* istanbul ignore if: we don't want to open a browser in `npm test` */
         if (args.open) open('file://' + path.resolve(filename + '.html'), { wait: false })
       })
+    })
+  }
+
+  function check (filename) {
+    tool.check(filename, function (err, result) {
+      if (err) throw err
+      console.log('Found', result.recommendation.title)
+      console.log(fs.readFileSync(result.recommendation.summary, 'utf8'))
+      if (result.recommendation.issue) {
+        process.exit(1)
+      }
     })
   }
 

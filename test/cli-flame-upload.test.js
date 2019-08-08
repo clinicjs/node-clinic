@@ -2,7 +2,6 @@
 
 const fs = require('fs')
 const path = require('path')
-const async = require('async')
 const { afterEach, beforeEach, test } = require('tap')
 const FakeUploadServer = require('./fake-upload-server.js')
 const cli = require('./cli.js')
@@ -44,7 +43,7 @@ test('clinic flame --upload -- node - no issues', function (t) {
       `${basename}.html`,
       `${basename}/${basename}-inlinedfunctions`,
       `${basename}/${basename}-samples`,
-      `${basename}/${basename}-systeminfo`,
+      `${basename}/${basename}-systeminfo`
     ])
 
     t.throws(() => fs.accessSync(dirname), 'directory is removed')
@@ -80,7 +79,7 @@ test('clinic flame --upload --autocannon', function (t) {
       `${basename}.html`,
       `${basename}/${basename}-inlinedfunctions`,
       `${basename}/${basename}-samples`,
-      `${basename}/${basename}-systeminfo`,
+      `${basename}/${basename}-systeminfo`
     ])
 
     t.throws(() => fs.accessSync(dirname), 'directory is removed')

@@ -30,7 +30,7 @@
     "dedent": "^0.7.0",
     "env-string": "^1.0.0",
     "execspawn": "^1.0.1",
-    "inquirer": "^6.2.2",
+    "inquirer": "^7.0.0",
     "insight": "^0.10.1",
     "jsonwebtoken": "^8.3.0",
     "minimist": "^1.2.0",

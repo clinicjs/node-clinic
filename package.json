@@ -28,7 +28,7 @@
     "cross-argv": "^1.0.0",
     "dargs": "^7.0.0",
     "dedent": "^0.7.0",
-    "env-string": "^1.0.0",
+    "env-string": "^1.0.1",
     "execspawn": "^1.0.1",
     "inquirer": "^7.0.0",
     "insight": "^0.10.1",

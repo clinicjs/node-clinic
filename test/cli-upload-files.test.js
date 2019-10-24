@@ -46,8 +46,8 @@ test('clinic upload 10000.clinic-doctor', function (t) {
       t.strictDeepEqual(stdout.trim().split('\n'), [
         'Signed in as test@test.com.',
         `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`,
-        `The data has been uploaded.`,
-        `Use this link to share it:`,
+        'The data has been uploaded.',
+        'Use this link to share it:',
         `http://127.0.0.1:${server.server.address().port}/public/some-id/${path.basename(doctorADirectory)}.html`
       ])
 
@@ -83,7 +83,7 @@ test('clinic upload 10000.clinic-doctor privately', function (t) {
       t.strictDeepEqual(stdout.trim().split('\n'), [
         'Signed in as test@test.com.',
         `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`,
-        `The data has been uploaded to your private area.`,
+        'The data has been uploaded to your private area.',
         `http://127.0.0.1:${server.server.address().port}/private/some-id/${path.basename(doctorADirectory)}.html`
       ])
 
@@ -119,8 +119,8 @@ test('clinic upload 10000.clinic-doctor 10001.clinic-doctor', function (t) {
         'Signed in as test@test.com.',
         `Uploading data for ${doctorADirectory} and ${doctorADirectory}.html`,
         `Uploading data for ${doctorBDirectory} and ${doctorBDirectory}.html`,
-        `The data has been uploaded.`,
-        `Use these links to share the profiles:`,
+        'The data has been uploaded.',
+        'Use these links to share the profiles:',
         `http://127.0.0.1:${server.server.address().port}/public/some-id/${path.basename(doctorADirectory)}.html`,
         `http://127.0.0.1:${server.server.address().port}/public/some-id/${path.basename(doctorBDirectory)}.html`
       ])

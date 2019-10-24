@@ -450,11 +450,11 @@ async function trackTool (toolName, args, toolVersion) {
 }
 
 async function runTool (args, Tool, version, uiOptions) {
-  const autocannonOpts = typeof args['autocannon'] === 'string'
+  const autocannonOpts = typeof args.autocannon === 'string'
     // --autocannon /url
-    ? { _: [args['autocannon']] }
+    ? { _: [args.autocannon] }
     // --autocannon [ /url -m POST --flags... ]
-    : args['autocannon']
+    : args.autocannon
   const autocannonPath = require.resolve('autocannon')
 
   const onPort = autocannonOpts

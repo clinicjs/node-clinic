@@ -32,9 +32,9 @@ test('clinic flame --upload -- node - no issues', function (t) {
 
     t.strictEqual(stdout.split('\n')[1], 'Analysing data')
     t.strictEqual(stdout.split('\n')[2], `Uploading result ${dirname}.html...`)
-    t.strictEqual(stdout.split('\n')[3], `Signed in as test@test.com.`)
+    t.strictEqual(stdout.split('\n')[3], 'Signed in as test@test.com.')
     t.strictEqual(stdout.split('\n')[4], `Uploading data for ${dirname} and ${dirname}.html`)
-    t.strictEqual(stdout.split('\n')[5], `The data has been uploaded to your private area.`)
+    t.strictEqual(stdout.split('\n')[5], 'The data has been uploaded to your private area.')
 
     t.strictEqual(server.requests[0].method, 'POST')
     t.strictEqual(server.requests[0].url, '/protected/data', 'upload is private')
@@ -68,9 +68,9 @@ test('clinic flame --upload --autocannon', function (t) {
     t.ok(stderr.indexOf('Running 2s test @ http://localhost:') > -1)
     t.strictEqual(stdout.split('\n')[0], 'Analysing data')
     t.strictEqual(stdout.split('\n')[1], `Uploading result ${dirname}.html...`)
-    t.strictEqual(stdout.split('\n')[2], `Signed in as test@test.com.`)
+    t.strictEqual(stdout.split('\n')[2], 'Signed in as test@test.com.')
     t.strictEqual(stdout.split('\n')[3], `Uploading data for ${dirname} and ${dirname}.html`)
-    t.strictEqual(stdout.split('\n')[4], `The data has been uploaded to your private area.`)
+    t.strictEqual(stdout.split('\n')[4], 'The data has been uploaded to your private area.')
 
     t.strictEqual(server.requests[0].method, 'POST')
     t.strictEqual(server.requests[0].url, '/protected/data', 'upload is private')

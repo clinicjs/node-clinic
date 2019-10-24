@@ -62,7 +62,7 @@ test('upload - bad response', function (t) {
     __dirname,
     'fixtures',
     'only-folder',
-    `10000.clinic-doctor`
+    '10000.clinic-doctor'
   )
 
   const server = http.createServer(function (req, res) {
@@ -83,7 +83,7 @@ test('upload - bad body encoding', function (t) {
     __dirname,
     'fixtures',
     'only-folder',
-    `10000.clinic-doctor`
+    '10000.clinic-doctor'
   )
 
   const server = http.createServer(function (req, res) {
@@ -104,7 +104,7 @@ test('upload - bad status code', function (t) {
     __dirname,
     'fixtures',
     'only-folder',
-    `10000.clinic-doctor`
+    '10000.clinic-doctor'
   )
 
   const server = http.createServer(function (req, res) {
@@ -126,7 +126,7 @@ test('upload - error message from server', function (t) {
     __dirname,
     'fixtures',
     'only-folder',
-    `10000.clinic-doctor`
+    '10000.clinic-doctor'
   )
 
   const server = http.createServer(function (req, res) {

@@ -27,7 +27,7 @@
   <h1>Flags</h1>
   -h | --help                Display Help
   --private                  Upload data privately to your account.
-  --server                   Upload data to a different Clinic.js Upload server.
+  --server URL               Upload data to a different Clinic.js Upload server.
   --no-open                  Prevent Clinic.js from opening the upload in your browser.
 
   <h1>Environment Variables</h1>

@@ -9,6 +9,10 @@
 
     <code>clinic doctor -- node server.js</code>
 
+  Once you exit (Ctrl-C) the process, your report will open in a browser window. You can disable this behavior:
+
+    <code>clinic doctor --open=false -- node server.js</code>
+
   If profiling on a server, it can be useful to only do data collection:
 
     <code>clinic doctor --collect-only -- node server.js</code>
@@ -38,6 +42,7 @@
   --sample-interval interval Sample interval in milliseconds
   --on-port                  Run a script when the server starts listening on a port.
   --autocannon               Run the autocannon benchmarking tool when the server starts listening on a port.
+  --open                     Boolean to enable or disable your report opening in your web browser.
   --dest                     Destination for the collected data (default <code>.clinic/</code>).
   --upload                   Upload the visualization using <code>clinic upload</code> instead of saving it locally.
   --server URL               Use a different Clinic Upload server than the default (<link>https://upload.clinicjs.org/</link>).

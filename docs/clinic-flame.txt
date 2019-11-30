@@ -13,7 +13,7 @@
 
   Once you exit (Ctrl-C) the process, your report will open in a browser window. You can disable this behavior:
 
-    <code>clinic doctor --open=false -- node server.js</code>
+    <code>clinic flame --open=false -- node server.js</code>
 
   If profiling on a server, it can be useful to only do data collection:
 

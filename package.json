@@ -45,7 +45,7 @@
     "stream-buffers": "^3.0.2",
     "stream-collector": "^1.0.1",
     "subarg": "^1.0.0",
-    "tar-fs": "^1.16.0",
+    "tar-fs": "^2.0.0",
     "tempy": "^0.3.0",
     "update-notifier": "^3.0.0",
     "websocket-stream": "^5.1.2"

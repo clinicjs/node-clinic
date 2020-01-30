@@ -262,6 +262,10 @@ const result = commist()
   })
   .register('doctor', catchify(async function (argv) {
     const version = require('@nearform/doctor/package.json').version
+    if(argv[0]==='--' && argv[1]==='npm' && argv[2]==='start') {
+      printHelp('clinic-doctor', version)
+      process.exit(1)
+    }
     const args = subarg(argv, {
       alias: {
         help: 'h',

@@ -702,6 +702,15 @@ async function processUpload (args, opts = { private: false, ask: false }) {
     for (let i = 0; i < args._.length; i++) {
       const filename = args._[i]
       const htmlFile = `${path.basename(filename).replace('.html', '')}.html`
+
+      // Check if path exists before uploading
+      try {
+        fs.readFileSync(filename)
+      } catch (err) {
+        console.error('Unexpected Error:', getError(err))
+        process.exit(1)
+      }
+
       const result = await uploadData(server, authToken, filename, opts)
       if (opts.ask) {
         await ask(server, filename, result, authToken)

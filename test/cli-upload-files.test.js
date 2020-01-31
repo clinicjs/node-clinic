@@ -213,7 +213,7 @@ test('clinic upload bad-path', function (t) {
       doctorBadFilePath
     ], function (err, stdout, stderr) {
       t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-      t.ok(stderr.includes('No data to upload'))
+      t.ok(stderr.includes('ENOENT: no such file or directory'))
       server.close(() => t.end())
     })
   })

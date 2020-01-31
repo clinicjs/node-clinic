@@ -427,7 +427,7 @@ function catchify (asyncFn) {
   }
 }
 
-function checkArgs (args,help,version) {
+function checkArgs(args, help, version) {
   if(args[0]==='--' && args[1]!=='node') {
     printHelp(help, version)
     process.exit(1)

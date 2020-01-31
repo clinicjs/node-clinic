@@ -30,6 +30,13 @@ const doctorBadDirectory = path.resolve(
   'bad-folder'
 )
 
+const doctorBadFilePath = path.resolve(
+  __dirname,
+  'fixtures',
+  'html-and-folder',
+  '10000.clinic-doctor-incorrectpath'
+)
+
 test('clinic upload 10000.clinic-doctor', function (t) {
   const server = new FakeUploadServer()
   server.listen(function () {
@@ -185,6 +192,25 @@ test('clinic upload bad-folder', function (t) {
       '--server', server.uploadUrl,
       '--no-open',
       doctorBadDirectory
+    ], function (err, stdout, stderr) {
+      t.strictDeepEqual(err, new Error('process exited with exit code 1'))
+      t.ok(stderr.includes('No data to upload'))
+      server.close(() => t.end())
+    })
+  })
+})
+
+test('clinic upload bad-path', function (t) {
+  const server = new FakeUploadServer()
+  server.listen(function () {
+    cli({
+      env: { CLINIC_JWT: successfulJwt },
+      relayStderr: false
+    }, [
+      'clinic', 'upload',
+      '--server', server.uploadUrl,
+      '--no-open',
+      doctorBadFilePath
     ], function (err, stdout, stderr) {
       t.strictDeepEqual(err, new Error('process exited with exit code 1'))
       t.ok(stderr.includes('No data to upload'))

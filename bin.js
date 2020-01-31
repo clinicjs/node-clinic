@@ -262,8 +262,8 @@ const result = commist()
   })
   .register('doctor', catchify(async function (argv) {
     const version = require('@nearform/doctor/package.json').version
-    checkArgs(argv, 'clinic-doctor', version);
-    
+    checkArgs(argv, 'clinic-doctor', version)
+
     const args = subarg(argv, {
       alias: {
         help: 'h',
@@ -308,8 +308,8 @@ const result = commist()
   }))
   .register('bubbleprof', catchify(async function (argv) {
     const version = require('@nearform/bubbleprof/package.json').version
-    checkArgs(argv, 'clinic-bubbleprof', version);
-    
+    checkArgs(argv, 'clinic-bubbleprof', version)
+
     const args = subarg(argv, {
       alias: {
         help: 'h',
@@ -351,7 +351,7 @@ const result = commist()
   }))
   .register('flame', catchify(async function (argv) {
     const version = require('@nearform/flame/version')
-    checkArgs(argv, 'clinic-bubbleprof', version);
+    checkArgs(argv, 'clinic-bubbleprof', version)
 
     const args = subarg(argv, {
       alias: {
@@ -427,8 +427,8 @@ function catchify (asyncFn) {
   }
 }
 
-function checkArgs(args, help, version) {
-  if(args[0]==='--' && args[1]!=='node') {
+function checkArgs (args, help, version) {
+  if (args[0] === '--' && args[1] !== 'node') {
     printHelp(help, version)
     process.exit(1)
   }

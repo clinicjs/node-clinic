@@ -437,12 +437,16 @@ function checkArgs (args, help, version) {
     printHelp(help, version)
     process.exit(1)
   }
-  // Check for timeout and set the timeout delay
-  const timeout = args.filter(a => a.includes('timeout'))
-  const delay = timeout.toString().split('=')[1]
+  // Check for timeout usage and set the timeout delay
+  const delayused = args.toString().includes('timeout')
 
-  const now = process.hrtime()
-  while (deltams(now) < delay) { }
+  if (delayused) {
+    const timeout = args.filter(a => a.includes('timeout'))
+    const delay = timeout.toString().split('=')[1]
+
+    const now = process.hrtime()
+    while (deltams(now) < delay) { }
+  }
 }
 
 function checkMetricsPermission (cb) {

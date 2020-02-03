@@ -262,6 +262,8 @@ const result = commist()
   })
   .register('doctor', catchify(async function (argv) {
     const version = require('@nearform/doctor/package.json').version
+    checkArgs(argv, 'clinic-doctor', version)
+
     const args = subarg(argv, {
       alias: {
         help: 'h',
@@ -306,6 +308,8 @@ const result = commist()
   }))
   .register('bubbleprof', catchify(async function (argv) {
     const version = require('@nearform/bubbleprof/package.json').version
+    checkArgs(argv, 'clinic-bubbleprof', version)
+
     const args = subarg(argv, {
       alias: {
         help: 'h',
@@ -347,6 +351,8 @@ const result = commist()
   }))
   .register('flame', catchify(async function (argv) {
     const version = require('@nearform/flame/version')
+    checkArgs(argv, 'clinic-bubbleprof', version)
+
     const args = subarg(argv, {
       alias: {
         help: 'h',
@@ -419,6 +425,16 @@ function catchify (asyncFn) {
       process.exit(1)
     })
   }
+}
+
+function checkArgs (args, help, version) {
+  if (args[0] === '--' && args[1] !== 'node') {
+    printHelp(help, version)
+    process.exit(1)
+  }
+  // Check for timeout and set the timeout delay
+  const timeout = args.filter(a => a.includes('timeout'))
+  const delay = timeout.toString().split('=')[1]
 }
 
 function checkMetricsPermission (cb) {

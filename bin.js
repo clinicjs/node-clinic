@@ -427,6 +427,11 @@ function catchify (asyncFn) {
   }
 }
 
+function deltams (now) {
+  const delta = process.hrtime(now)
+  return delta[0] * 1e3 + delta[1] * 1e-6
+}
+
 function checkArgs (args, help, version) {
   if (args[0] === '--' && args[1] !== 'node') {
     printHelp(help, version)
@@ -435,6 +440,9 @@ function checkArgs (args, help, version) {
   // Check for timeout and set the timeout delay
   const timeout = args.filter(a => a.includes('timeout'))
   const delay = timeout.toString().split('=')[1]
+
+  const now = process.hrtime()
+  while (deltams(now) < delay) { }
 }
 
 function checkMetricsPermission (cb) {

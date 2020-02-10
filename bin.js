@@ -662,12 +662,6 @@ async function uploadData (uploadURL, authToken, filename, opts) {
 
   console.log(`Uploading data for ${filePrefix} and ${filePrefix}.html`)
 
-  // Check if path exists before uploading
-  if(!fs.existsSync(path.resolve(filePrefix))) {
-    console.error('File '+path.resolve(filePrefix)+' does not exist')
-    process.exit(1)
-  }
-
   const result = await tarAndUploadPromisified(path.resolve(filePrefix), uploadURL, authToken, { private: isPrivate })
 
   result.url = `${uploadURL}${result.html}`

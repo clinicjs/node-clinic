@@ -351,7 +351,7 @@ const result = commist()
   }))
   .register('flame', catchify(async function (argv) {
     const version = require('@nearform/flame/version')
-    checkArgs(argv, 'clinic-bubbleprof', version)
+    checkArgs(argv, 'clinic-flame', version)
 
     const args = subarg(argv, {
       alias: {
@@ -485,7 +485,7 @@ async function runTool (args, Tool, version, uiOptions) {
   const openLocalFile = args.open && !args.upload
 
   const tool = new Tool({
-    timeoutDelay: parseInt(args['on-timeout'], 10),
+    collectDelay: parseInt(args['on-timeout'], 10),
     sampleInterval: parseInt(args['sample-interval'], 10),
     detectPort: !!onPort,
     dest: args.dest,

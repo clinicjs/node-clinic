@@ -1,5 +1,6 @@
 'use strict'
 
+const url = require('url')
 const fs = require('fs')
 const path = require('path')
 const test = require('tap').test
@@ -23,7 +24,7 @@ test('clinic doctor --visualize-only - no issues', function (t) {
       t.ifError(err)
       t.strictEqual(
         stdout,
-        `Generated HTML file is ${dirpath}.html
+        `Generated HTML file is ${url.pathToFileURL(dirpath)}.html
 You can use this command to upload it:
 clinic upload ${dirpath}
 `)
@@ -62,7 +63,7 @@ test('clinic doctor --visualize-only - supports trailing slash', function (t) {
 
     // visualize data
     cli({}, [
-      'clinic', 'doctor', '--visualize-only', `${dirpath}${path.sep}`
+      'clinic', 'doctor', '--visualize-only', `${url.pathToFileURL(dirpath)}${path.sep}`
     ], function (err, stdout) {
       t.ifError(err)
       t.strictEqual(

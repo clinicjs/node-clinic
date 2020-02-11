@@ -1,5 +1,6 @@
 'use strict'
 
+const url = require('url')
 const fs = require('fs')
 const path = require('path')
 const async = require('async')
@@ -14,9 +15,10 @@ test('clinic bubbleprof -- node - no issues', function (t) {
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
     const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-bubbleprof)/)[1]
+    const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
     t.strictEqual(stdout.split('\n')[1], 'Analysing data')
-    t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${dirname}.html`)
+    t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
 
     // check that files exists
     async.parallel({
@@ -41,9 +43,10 @@ test('clinic bubbleprof -- node - bad status code', function (t) {
   ], function (err, stdout, stderr, tempdir) {
     t.ifError(err)
     const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-bubbleprof)/)[1]
+    const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
     t.strictEqual(stdout.split('\n')[1], 'Analysing data')
-    t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${dirname}.html`)
+    t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
 
     // check that files exists
     async.parallel({

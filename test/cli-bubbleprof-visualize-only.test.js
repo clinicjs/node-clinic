@@ -68,7 +68,7 @@ test('clinic bubbleprof --visualize-only - with trailing /', function (t) {
       t.ifError(err)
       t.strictEqual(
         stdout,
-        `Generated HTML file is ${dirpath}.html
+        `Generated HTML file is ${url.pathToFileURL(dirpath)}.html
 You can use this command to upload it:
 clinic upload ${dirpath}
 `)

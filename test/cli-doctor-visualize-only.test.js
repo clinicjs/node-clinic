@@ -63,12 +63,12 @@ test('clinic doctor --visualize-only - supports trailing slash', function (t) {
 
     // visualize data
     cli({}, [
-      'clinic', 'doctor', '--visualize-only', `${url.pathToFileURL(dirpath)}${path.sep}`
+      'clinic', 'doctor', '--visualize-only', `${dirpath}${path.sep}`
     ], function (err, stdout) {
       t.ifError(err)
       t.strictEqual(
         stdout,
-        `Generated HTML file is ${dirpath}.html
+        `Generated HTML file is ${url.pathToFileURL(dirpath)}.html
 You can use this command to upload it:
 clinic upload ${dirpath}
 `)

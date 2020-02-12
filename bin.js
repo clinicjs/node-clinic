@@ -481,6 +481,11 @@ async function runTool (args, Tool, version, uiOptions) {
       console.log('To generate the report press: Ctrl + C')
     }
   }
+  // Validate usage of on-port flag
+  if(args['on-port']>0 && onPort) {
+    console.log('You must provide on-port with the autocannon config')
+    process.exit(0)
+  }
 
   const openLocalFile = args.open && !args.upload
 

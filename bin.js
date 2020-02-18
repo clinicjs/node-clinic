@@ -491,7 +491,7 @@ async function runTool (args, Tool, version, uiOptions) {
   const openLocalFile = args.open && !args.upload
 
   const tool = new Tool({
-    collectDelay: parseInt(args['on-timeout'], 10),
+    collectDelay: parseInt(args['collect-delay'], 10),
     sampleInterval: parseInt(args['sample-interval'], 10),
     detectPort: !!onPort,
     dest: args.dest,

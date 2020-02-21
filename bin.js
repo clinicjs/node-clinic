@@ -352,7 +352,7 @@ const result = commist()
   }))
   .register('flame', catchify(async function (argv) {
     const version = require('@nearform/flame/version')
-    checkArgs(argv, 'clinic-bubbleprof', version)
+    checkArgs(argv, 'clinic-flame', version)
 
     const args = subarg(argv, {
       alias: {

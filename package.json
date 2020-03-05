@@ -20,7 +20,7 @@
   "dependencies": {
     "@nearform/bubbleprof": "^3.0.0",
     "@nearform/doctor": "nearform/node-clinic-doctor#transpiled_code_warning",
-    "@nearform/flame": "^5.0.0",
+    "@nearform/flame": "nearform/node-clinic-flame#transpiled_code_warning",
     "any-shell-escape": "^0.1.1",
     "async": "^3.0.1",
     "autocannon": "^4.0.0",

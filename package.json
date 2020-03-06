@@ -18,7 +18,7 @@
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {
-    "@nearform/bubbleprof": "^3.0.0",
+    "@nearform/bubbleprof": "nearform/node-clinic-bubbleprof#transpiled_code_warning",
     "@nearform/doctor": "nearform/node-clinic-doctor#transpiled_code_warning",
     "@nearform/flame": "nearform/node-clinic-flame#transpiled_code_warning",
     "any-shell-escape": "^0.1.1",

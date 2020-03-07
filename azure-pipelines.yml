@@ -12,4 +12,4 @@ jobs:
 - template: azure-pipelines-npm-template.yml
   parameters:
     name: Mac
-    vmImage: macOS-10.13
+    vmImage: macOS-10.14

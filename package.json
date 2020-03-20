@@ -18,7 +18,7 @@
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {
-    "@nearform/bubbleprof": "nearform/node-clinic-bubbleprof#collect_timeout_feature",
+    "@nearform/bubbleprof": "^3.0.0",
     "@nearform/doctor": "nearform/node-clinic-doctor#collect_timeout_feature",
     "@nearform/flame": "nearform/node-clinic-flame#collect_timeout_feature",
     "any-shell-escape": "^0.1.1",

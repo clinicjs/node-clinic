@@ -38,7 +38,7 @@
     "ora": "^4.0.0",
     "pump": "^3.0.0",
     "pumpify": "^2.0.0",
-    "rand-token": "^0.4.0",
+    "rand-token": "^1.0.1",
     "rimraf": "^3.0.0",
     "simple-get": "^3.0.3",
     "split2": "^3.0.0",

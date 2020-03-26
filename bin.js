@@ -486,6 +486,8 @@ async function runTool (args, Tool, version, uiOptions) {
   const openLocalFile = args.open && !args.upload
 
   const tool = new Tool({
+    relativePath: parseInt(args['relative-path'], 10),
+    sourceMaps: parseInt(args['source-maps'], 10),
     sampleInterval: parseInt(args['sample-interval'], 10),
     detectPort: !!onPort,
     dest: args.dest,

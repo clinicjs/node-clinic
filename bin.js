@@ -616,20 +616,17 @@ async function runTool (args, Tool, version, uiOptions) {
       if (iss !== 'none') {
         console.log(`Doctor detected a potential ${iss} issue.`)
       }
-
-      if (iss === 'garbage collection') {
-        console.log(`node --inspect ${proc}`)
-      } else if (iss === 'event-loop') {
+      if (iss === 'event-loop') {
+        console.log('To get started with diagnosing the issue run:') 
         console.log(`clinic flame --autocannon [ / ] -- node ${proc}`)
       } else if (iss === 'io') {
+        console.log('To get started with diagnosing the issue run:')
         console.log(`clinic bubbleprof --autocannon [ / ] -- node ${proc}`)
       } else if (iss === 'data') {
         console.log('Try running the benchmark for a longer time.')
-      } else if (iss === 'unknown') {
-
       }
     } catch (err) {
-
+      // The version of Doctor used does not have a getIssue() function  
     }
   }
 

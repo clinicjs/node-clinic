@@ -2,6 +2,7 @@
 .clinic
 *.tmp
 !test/fixtures/**/*.clinic-*
+test/fixtures/**/ASK_MESSAGE
 
 # Logs
 logs

@@ -263,7 +263,6 @@ const result = commist()
   })
   .register('doctor', catchify(async function (argv) {
     const version = require('@nearform/doctor/package.json').version
-    checkArgs(argv, 'clinic-doctor', version)
 
     const args = subarg(argv, {
       alias: {
@@ -300,6 +299,7 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-doctor', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
+      checkArgs(args, 'clinic-doctor', version)
       await trackTool('doctor', args, version)
       await runTool(args, require('@nearform/doctor'), version, { color: 'green' })
     } else {
@@ -309,7 +309,6 @@ const result = commist()
   }))
   .register('bubbleprof', catchify(async function (argv) {
     const version = require('@nearform/bubbleprof/package.json').version
-    checkArgs(argv, 'clinic-bubbleprof', version)
 
     const args = subarg(argv, {
       alias: {
@@ -343,6 +342,7 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-bubbleprof', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
+      checkArgs(args, 'clinic-bubbleprof', version)
       await trackTool('bubbleprof', args, version)
       await runTool(args, require('@nearform/bubbleprof'), version, { color: 'blue' })
     } else {
@@ -352,7 +352,6 @@ const result = commist()
   }))
   .register('flame', catchify(async function (argv) {
     const version = require('@nearform/flame/version')
-    checkArgs(argv, 'clinic-flame', version)
 
     const args = subarg(argv, {
       alias: {
@@ -386,6 +385,7 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-flame', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
+      checkArgs(args, 'clinic-flame', version)
       await trackTool('flame', args, version)
       await runTool(args, require('@nearform/flame'), version, { color: 'yellow' })
     } else {
@@ -429,7 +429,9 @@ function catchify (asyncFn) {
 }
 
 function checkArgs (args, help, version) {
-  if (args[0] === '--' && args[1] !== 'node') {
+  if (args['--'] && args['--'].length >= 1 && path.basename(args['--'][0]) !== 'node') {
+    console.error('Clinic.js must be called with a `node` command line: `clinic doctor -- node script.js`\n')
+
     printHelp(help, version)
     process.exit(1)
   }

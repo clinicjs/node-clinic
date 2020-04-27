@@ -609,7 +609,7 @@ async function runTool (args, Tool, version, uiOptions) {
     console.log(`Output file is ${outputs.data}`)
   }
 
-  if (Tool.name === 'ClinicDoctor') {
+  if (Tool.name === 'ClinicDoctor' && !args['collect-only']) {
     try {
       const iss = tool.getIssue()
       const proc = args['--'][args['--'].length - 1]

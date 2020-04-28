@@ -611,9 +611,9 @@ async function runTool (args, Tool, version, uiOptions) {
     console.log(`Output file is ${outputs.data}`)
   }
 
-  if (Tool.name === 'ClinicDoctor' && !args['collect-only']) {
+  if (Tool.name === 'ClinicDoctor' && !args['collect-only'] && !args['visualize-only']) {
     try {
-      const iss = tool.getIssue()
+      const iss = tool.issue
       const proc = args['--'][args['--'].length - 1]
       if (iss !== 'none') {
         console.log(`Doctor detected a potential ${iss} issue.`)
@@ -628,7 +628,7 @@ async function runTool (args, Tool, version, uiOptions) {
         console.log('Try running the benchmark for a longer time.')
       }
     } catch (err) {
-      // The version of Doctor used does not have a getIssue() function
+      // The version of Doctor used does not have the issue member
     }
   }
 

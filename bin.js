@@ -613,7 +613,7 @@ async function runTool (args, Tool, version, uiOptions) {
 
   if (Tool.name === 'ClinicDoctor' && !args['collect-only'] && !args['visualize-only']) {
     const iss = tool.issue
-    const proc = args['--'][args['--'].length - 1]
+    const proc = dargs(args['--'])
     if (iss !== 'none' && iss !== undefined) {
       console.log(`Doctor detected a potential ${iss} issue.`)
     }

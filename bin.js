@@ -429,7 +429,7 @@ function catchify (asyncFn) {
 }
 
 function checkArgs (args, help, version) {
-  if (args['--'] && args['--'].length >= 1 && !/^node(\.exe)$/.test(path.basename(args['--'][0]))) {
+  if (args['--'] && args['--'].length >= 1 && !/^node(\.exe)?$/.test(path.basename(args['--'][0]))) {
     console.error('Clinic.js must be called with a `node` command line: `clinic doctor -- node script.js`\n')
 
     printHelp(help, version)

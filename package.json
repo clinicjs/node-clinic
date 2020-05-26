@@ -40,7 +40,7 @@
     "pumpify": "^2.0.0",
     "rand-token": "^1.0.1",
     "rimraf": "^3.0.0",
-    "simple-get": "^3.0.3",
+    "simple-get": "^4.0.0",
     "split2": "^3.0.0",
     "stream-buffers": "^3.0.2",
     "stream-collector": "^1.0.1",

@@ -301,7 +301,7 @@ const result = commist()
     } else if (args['visualize-only'] || args['--'].length > 1) {
       checkArgs(args, 'clinic-doctor', version)
       await trackTool('doctor', args, version)
-      await runTool(args, require('@nearform/doctor'), version, { color: 'green' })
+      await runTool(args, require('../doctor'), version, { color: 'green' })
     } else {
       printHelp('clinic-doctor', version)
       process.exit(1)
@@ -614,8 +614,7 @@ async function runTool (args, Tool, version, uiOptions) {
   if (Tool.name === 'ClinicDoctor' && !args['collect-only'] && !args['visualize-only']) {
     const iss = tool.issue
 
-    const argsArr = args['--']
-    argsArr.shift()
+    const argsArr = args['--'].slice(1)
     const proc = argsArr.join(' ')
 
     if (iss !== 'none' && iss !== undefined) {

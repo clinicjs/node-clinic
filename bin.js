@@ -301,7 +301,7 @@ const result = commist()
     } else if (args['visualize-only'] || args['--'].length > 1) {
       checkArgs(args, 'clinic-doctor', version)
       await trackTool('doctor', args, version)
-      await runTool(args, require('../doctor'), version, { color: 'green' })
+      await runTool(args, require('@nearform/doctor'), version, { color: 'green' })
     } else {
       printHelp('clinic-doctor', version)
       process.exit(1)
@@ -429,7 +429,7 @@ function catchify (asyncFn) {
 }
 
 function checkArgs (args, help, version) {
-  if (args['--'] && args['--'].length >= 1 && !/^node(\.exe)?$/.test(path.basename(args['--'][0]))) {
+  if (args['--'] && args['--'].length >= 1 && path.basename(args['--'][0]) !== 'node') {
     console.error('Clinic.js must be called with a `node` command line: `clinic doctor -- node script.js`\n')
 
     printHelp(help, version)

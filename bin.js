@@ -604,27 +604,6 @@ async function runTool (args, Tool, version, uiOptions) {
     console.log(`Output file is ${outputs.data}`)
   }
 
-  if (Tool.name === 'ClinicDoctor' && !args['collect-only']) {
-    try {
-      const iss = tool.getIssue()
-      const proc = args['--'][args['--'].length - 1]
-      if (iss !== 'none') {
-        console.log(`Doctor detected a potential ${iss} issue.`)
-      }
-      if (iss === 'event-loop') {
-        console.log('To get started with diagnosing the issue run:')
-        console.log(`clinic flame --autocannon [ / ] -- node ${proc}`)
-      } else if (iss === 'io') {
-        console.log('To get started with diagnosing the issue run:')
-        console.log(`clinic bubbleprof --autocannon [ / ] -- node ${proc}`)
-      } else if (iss === 'data') {
-        console.log('Try running the benchmark for a longer time.')
-      }
-    } catch (err) {
-      // The version of Doctor used does not have a getIssue() function
-    }
-  }
-
   // rest is util functions
 
   function viz (filename, cb) {

@@ -18,7 +18,7 @@
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {
-    "@nearform/bubbleprof": "^3.0.0",
+    "@nearform/bubbleprof": "^4.0.0",
     "@nearform/doctor": "^4.1.2",
     "@nearform/flame": "^5.0.0",
     "any-shell-escape": "^0.1.1",

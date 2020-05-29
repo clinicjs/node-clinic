@@ -38,7 +38,6 @@
   -h | --help                Display Help
   -v | --version             Display Version
   --collect-only             Do not process data on termination
-  --collect-delay            Specify a delay(ms) before collecting data
   --visualize-only datapath  Build or rebuild visualization from data
   --sample-interval interval Sample interval in milliseconds
   --on-port                  Run a script when the server starts listening on a port.

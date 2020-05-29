@@ -10,11 +10,11 @@
     "clinic": "./bin.js"
   },
   "scripts": {
-    "test": "standard | snazzy && tap -j4 --timeout 0 --no-cov test/*.test.js",
-    "test-local": "standard | snazzy && tap -j4 --timeout 0 --no-cov test/*.test.js test-local/*.test.js",
+    "test": "standard | snazzy && tap -j1 --timeout 0 --no-cov test/*.test.js",
+    "test-local": "standard | snazzy && tap -j1 --timeout 0 --no-cov test/*.test.js test-local/*.test.js",
     "ci-lint": "standard | snazzy",
-    "ci-test-no-cov": "tap -j4 --timeout 0 --no-cov test/*.test.js",
-    "ci-test-cov": "tap -j4 --timeout 0 test/*.test.js",
+    "ci-test-no-cov": "tap -j1 --timeout 0 --no-cov test/*.test.js",
+    "ci-test-cov": "tap -j1 --timeout 0 test/*.test.js",
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {

@@ -485,16 +485,9 @@ async function runTool (args, Tool, version, uiOptions) {
     }
   }
 
-  // Validate usage of on-port flag
-  if (args['on-port'] > 0 && onPort) {
-    console.log('You must provide on-port with the autocannon config')
-    process.exit(0)
-  }
-
   const openLocalFile = args.open && !args.upload
 
   const tool = new Tool({
-    collectDelay: parseInt(args['collect-delay'], 10),
     sampleInterval: parseInt(args['sample-interval'], 10),
     detectPort: !!onPort,
     dest: args.dest,

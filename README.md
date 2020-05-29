@@ -117,7 +117,6 @@ clinic ask --help
 -h | --help                Display Help
 -v | --version             Display Version
 --collect-only             Do not process data on termination
---collect-delay            Specify a delay(ms) before collecting data.
 --visualize-only datapath  Build or rebuild visualization from data
 --on-port                  Run a script when the server starts listening on a port.
 --autocannon               Run the autocannon benchmarking tool when the server starts listening on a port.

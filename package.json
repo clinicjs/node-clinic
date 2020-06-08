@@ -2,7 +2,7 @@
   "name": "clinic",
   "description": "Clinic.js diagnoses your performance issues",
   "repository": "nearform/node-clinic",
-  "version": "6.0.1",
+  "version": "6.0.2",
   "engines": {
     "node": "^13.0.0 || ^12.0.0 || ^11.0.0 || ^10.12.0"
   },
@@ -18,8 +18,8 @@
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {
-    "@nearform/bubbleprof": "^4.0.1",
-    "@nearform/doctor": "^5.0.1",
+    "@nearform/bubbleprof": "^4.0.2",
+    "@nearform/doctor": "^5.0.2",
     "@nearform/flame": "^6.0.1",
     "any-shell-escape": "^0.1.1",
     "async": "^3.0.1",

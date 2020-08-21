@@ -59,10 +59,8 @@ Release process:
 
 ## Licensing and Certification
 
-While the Clinic.js project as a whole is distributed under the GPL 3.0
-license, all contributions to the Clinic.js project are submitted *to* the
-project under the MIT license. This gives the project maintainers flexibility
-while ensuring that your rights to your contributions do not change.
+All contributions to the Clinic.js project are submitted *to* the
+project under the MIT license.
 
 The Clinic.js project uses a Contribution Certification that is derived from
 the [Developer Certificate of Origin][DCO]. It is important to note that the

@@ -27,11 +27,6 @@
 
     <link>https://github.com/nearform/node-clinic/issues</link>
 
-  When creating an issue, it will be a huge help for us if you upload your
-  data to the Clinic.js cloud. To do this, use <code>clinic upload</code>:
-
-    <code>clinic upload 1000.clinic-doctor</code>
-
   <h1>Utilities</h1>
   When using Clinic.js a bunch you have fill up your directory with data folders and files.
   You can clean these easily using <code>clinic clean</code>.
@@ -41,7 +36,6 @@
 
     <code>clinic doctor --help</code>
     <code>clinic bubbleprof --help</code>
-    <code>clinic upload --help</code>
     <code>clinic clean --help</code>
     <code>clinic flame --help</code>
 

@@ -19,15 +19,6 @@ A perfect bug report would have the following:
 
 We would like to avoid issues that require a follow up questions to identify the bug. These follow ups are difficult to do unless we have a repeatable test case.
 
-In addition, it is helpful if you upload your Clinic.js data to help us diagnose your issues.
-Use the `clinic upload` tool to do this:
-
-```
-clinic upload 10000.clinic-doctor
-```
-
-After the upload has finished, add the printed upload id to your issue.
-
 ## For Developers
 
 All contributions should fit the [standard](https://github.com/standard/standard) linter, and pass the tests.

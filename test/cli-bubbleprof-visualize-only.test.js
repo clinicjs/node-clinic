@@ -25,8 +25,6 @@ test('clinic bubbleprof --collect-only - no issues', function (t) {
       t.strictEqual(
         stdout,
         `Generated HTML file is ${url.pathToFileURL(dirpath)}.html
-You can use this command to upload it:
-clinic upload ${dirpath}
 `)
 
       // check that HTML file exists
@@ -69,8 +67,6 @@ test('clinic bubbleprof --visualize-only - with trailing /', function (t) {
       t.strictEqual(
         stdout,
         `Generated HTML file is ${url.pathToFileURL(dirpath)}.html
-You can use this command to upload it:
-clinic upload ${dirpath}
 `)
 
       // check that HTML file exists

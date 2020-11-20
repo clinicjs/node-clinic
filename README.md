@@ -94,7 +94,6 @@ For more information use the `--help` option:
 clinic doctor --help
 clinic bubbleprof --help
 clinic flame --help
-clinic ask --help
 ```
 
 - The `doctor` functionality is provided by [Clinic.js Doctor](https://github.com/nearform/node-clinic-doctor).

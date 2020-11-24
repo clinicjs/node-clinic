@@ -86,15 +86,6 @@ If you encounter any issue, feel free to send us an issue report at:
 https://github.com/nearform/node-clinic/issues
 ```
 
-When creating an issue, it will be a huge help for us if you upload your
-data to [Clinic.js Upload](https://upload.clinicjs.org). To do this, use `clinic upload`:
-
-```
-clinic upload .clinic/1000.clinic-doctor
-```
-
-and include the URL that it returns.
-
 ## More information
 
 For more information use the `--help` option:
@@ -103,8 +94,6 @@ For more information use the `--help` option:
 clinic doctor --help
 clinic bubbleprof --help
 clinic flame --help
-clinic upload --help
-clinic ask --help
 ```
 
 - The `doctor` functionality is provided by [Clinic.js Doctor](https://github.com/nearform/node-clinic-doctor).

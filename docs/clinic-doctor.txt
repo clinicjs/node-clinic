@@ -44,5 +44,3 @@
   --autocannon               Run the autocannon benchmarking tool when the server starts listening on a port.
   --open                     Boolean to enable or disable your report opening in your web browser.
   --dest                     Destination for the collected data (default <code>.clinic/</code>).
-  --upload                   Upload the visualization using <code>clinic upload</code> instead of saving it locally.
-  --server URL               Use a different Clinic Upload server than the default (<link>https://upload.clinicjs.org/</link>).

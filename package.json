@@ -2,12 +2,12 @@
   "name": "clinic",
   "description": "Clinic.js diagnoses your performance issues",
   "repository": "nearform/node-clinic",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "engines": {
     "node": "^14.0.0 || ^13.0.0 || ^12.0.0 || ^11.0.0 || ^10.12.0"
   },
   "bin": {
-    "clinic": "./bin.js"
+    "clinic": "bin.js"
   },
   "scripts": {
     "test": "standard | snazzy && tap -j1 --timeout 0 --no-cov test/*.test.js",
@@ -18,12 +18,12 @@
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {
-    "@nearform/bubbleprof": "^5.0.0",
-    "@nearform/doctor": "^6.0.0",
-    "@nearform/flame": "^7.0.0",
+    "@nearform/bubbleprof": "^6.0.0",
+    "@nearform/doctor": "^7.0.0",
+    "@nearform/flame": "^8.0.0",
     "any-shell-escape": "^0.1.1",
     "async": "^3.0.1",
-    "autocannon": "^4.0.0",
+    "autocannon": "^6.5.0",
     "commist": "^1.0.0",
     "cross-argv": "^1.0.0",
     "dargs": "^7.0.0",
@@ -31,19 +31,19 @@
     "execspawn": "^1.0.1",
     "insight": "^0.10.1",
     "minimist": "^1.2.0",
-    "open": "^7.0.0",
-    "ora": "^4.0.0",
+    "open": "^7.3.0",
+    "ora": "^5.1.0",
     "rimraf": "^3.0.0",
     "stream-collector": "^1.0.1",
     "subarg": "^1.0.0",
-    "update-notifier": "^4.0.0"
+    "update-notifier": "^5.0.1"
   },
   "devDependencies": {
     "proxyquire": "^2.1.0",
-    "snazzy": "^8.0.0",
-    "standard": "^14.3.1",
-    "tap": "^14.2.2",
-    "tar-stream": "^2.0.1"
+    "snazzy": "^9.0.0",
+    "standard": "^16.0.3",
+    "tap": "^14.11.0",
+    "tar-stream": "^2.1.4"
   },
   "keywords": [
     "performance",

@@ -43,7 +43,7 @@ test('clinic bubbleprof --collect-only - missing data', function (t) {
   ], function (err, stdout, stderr) {
     t.strictDeepEqual(err, new Error('process exited with exit code 1'))
     t.strictEqual(stdout, '')
-    t.ok(stderr.includes(`Unknown argument "${arg}". Pattern: {pid}.clinic-{command}`))
+    t.ok(stderr.includes('No data found.'))
     t.end()
   })
 })

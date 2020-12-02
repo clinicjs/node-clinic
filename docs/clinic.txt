@@ -38,6 +38,7 @@
     <code>clinic bubbleprof --help</code>
     <code>clinic clean --help</code>
     <code>clinic flame --help</code>
+    <code>clinic heapprofiler --help</code>
 
   <h1>Flags</h1>
   -h | --help                Display Help

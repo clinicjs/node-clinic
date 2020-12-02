@@ -92,9 +92,9 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-doctor', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      checkArgs(args, 'clinic-doctor', version)
+      checkArgs('doctor', args, 'clinic-doctor', version)
       await trackTool('doctor', args, version)
-      await runTool(args, require('@nearform/doctor'), version, { color: 'green' })
+      await runTool('doctor', require('@nearform/doctor'), version, args, { color: 'green' })
     } else {
       printHelp('clinic-doctor', version)
       process.exit(1)
@@ -132,9 +132,9 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-bubbleprof', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      checkArgs(args, 'clinic-bubbleprof', version)
+      checkArgs('bubbleprof', args, 'clinic-bubbleprof', version)
       await trackTool('bubbleprof', args, version)
-      await runTool(args, require('@nearform/bubbleprof'), version, { color: 'blue' })
+      await runTool('bubbleprof', require('@nearform/bubbleprof'), version, args, { color: 'blue' })
     } else {
       printHelp('clinic-bubbleprof', version)
       process.exit(1)
@@ -172,11 +172,50 @@ const result = commist()
     } else if (args.help) {
       printHelp('clinic-flame', version)
     } else if (args['visualize-only'] || args['--'].length > 1) {
-      checkArgs(args, 'clinic-flame', version)
+      checkArgs('flame', args, 'clinic-flame', version)
       await trackTool('flame', args, version)
-      await runTool(args, require('@nearform/flame'), version, { color: 'yellow' })
+      await runTool('flame', require('@nearform/flame'), version, args, { color: 'yellow' })
     } else {
       printHelp('clinic-flame', version)
+      process.exit(1)
+    }
+  }))
+  .register('heapprofiler', catchify(async function (argv) {
+    const version = require('@nearform/heap-profiler/package.json').version
+
+    const args = subarg(argv, {
+      alias: {
+        help: 'h',
+        version: 'v'
+      },
+      boolean: [
+        'help',
+        'version',
+        'collect-only',
+        'open',
+        'debug'
+      ],
+      string: [
+        'visualize-only',
+        'dest'
+      ],
+      default: {
+        open: true,
+        debug: false
+      },
+      '--': true
+    })
+
+    if (args.version) {
+      printVersion(version)
+    } else if (args.help) {
+      printHelp('clinic-heap-profiler', version)
+    } else if (args['visualize-only'] || args['--'].length > 1) {
+      checkArgs('heap-profiler', args, 'clinic-heap-profiler', version)
+      await trackTool('heap-profiler', args, version)
+      await runTool('heap-profiler', require('@nearform/heap-profiler'), version, args, { color: 'yellow' })
+    } else {
+      printHelp('clinic-heap-profiler', version)
       process.exit(1)
     }
   }))
@@ -215,9 +254,9 @@ function catchify (asyncFn) {
   }
 }
 
-function checkArgs (args, help, version) {
+function checkArgs (toolname, args, help, version) {
   if (args['--'] && args['--'].length >= 1 && !/^node(\.exe)?$/.test(path.basename(args['--'][0]))) {
-    console.error('Clinic.js must be called with a `node` command line: `clinic doctor -- node script.js`\n')
+    console.error(`Clinic.js must be called with a \`node\` command line: \`clinic ${toolname} -- node script.js\`\n`)
 
     printHelp(help, version)
     process.exit(1)
@@ -252,7 +291,7 @@ async function trackTool (toolName, args, toolVersion) {
   })
 }
 
-async function runTool (args, Tool, version, uiOptions) {
+async function runTool (toolName, Tool, version, args, uiOptions) {
   const autocannonOpts = typeof args.autocannon === 'string'
     // --autocannon /url
     ? { _: [args.autocannon] }
@@ -342,7 +381,7 @@ async function runTool (args, Tool, version, uiOptions) {
     })
   } else if (args['visualize-only']) {
     const dataPath = args['visualize-only'].replace(/[\\/]$/, '')
-    viz(dataPath, function (err) {
+    viz(toolName, dataPath, function (err) {
       if (err) return defer.reject(err)
 
       defer.resolve({ data: dataPath, visualizer: `${dataPath}.html` })
@@ -352,7 +391,7 @@ async function runTool (args, Tool, version, uiOptions) {
     tool.collect(args['--'], function (err, filename) {
       if (err) return defer.reject(err)
 
-      viz(filename, function (err) {
+      viz(toolName, filename, function (err) {
         if (err) return defer.reject(err)
         if (spinner.isEnabled) {
           spinner.stop()
@@ -380,24 +419,27 @@ async function runTool (args, Tool, version, uiOptions) {
 
   // rest is util functions
 
-  function viz (filename, cb) {
-    if (!/\d+\.clinic-.+$/.test(filename)) {
-      return cb(new Error(`Unknown argument "${filename}". Pattern: {pid}.clinic-{command}`))
-    }
-    const html = filename + '.html'
-    const name = filename.match(/clinic-([^-]+)/)[1]
-    tool.visualize(filename, html, function (err) {
-      if (err) return cb(err)
-      hash(html, function (err, h) {
-        /* istanbul ignore next */ if (err) return cb(err)
+  function viz (toolName, filename, cb) {
+    // Before getting to the tool, make sure the filename exists. We don't care whether is a file or a directory.
+    fs.access(filename, function (err) {
+      if (err) {
+        return cb(new Error('No data found.'))
+      }
 
-        const info = {
-          tool: name,
-          toolVersion: version,
-          hash: h.toString('hex')
-        }
+      const html = filename + '.html'
+      tool.visualize(filename, html, function (err) {
+        if (err) return cb(err)
+        hash(html, function (err, h) {
+          /* istanbul ignore next */ if (err) return cb(err)
 
-        fs.appendFile(html, `<!-- ${JSON.stringify(info)} -->\n`, cb)
+          const info = {
+            tool: toolName,
+            toolVersion: version,
+            hash: h.toString('hex')
+          }
+
+          fs.appendFile(html, `<!-- ${JSON.stringify(info)} -->\n`, cb)
+        })
       })
     })
   }

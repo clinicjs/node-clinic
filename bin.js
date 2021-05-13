@@ -181,7 +181,7 @@ const result = commist()
     }
   }))
   .register('heapprofiler', catchify(async function (argv) {
-    const version = require('@nearform/heap-profiler/package.json').version
+    const version = require('node-clinic-heap-profiler/package.json').version
 
     const args = subarg(argv, {
       alias: {
@@ -213,7 +213,7 @@ const result = commist()
     } else if (args['visualize-only'] || args['--'].length > 1) {
       checkArgs('heap-profiler', args, 'clinic-heap-profiler', version)
       await trackTool('heap-profiler', args, version)
-      await runTool('heap-profiler', require('@nearform/heap-profiler'), version, args, { color: 'yellow' })
+      await runTool('heap-profiler', require('node-clinic-heap-profiler'), version, args, { color: 'yellow' })
     } else {
       printHelp('clinic-heap-profiler', version)
       process.exit(1)

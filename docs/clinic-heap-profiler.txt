@@ -1,35 +1,37 @@
 
-  <title>Clinic.js BubbleProf</title> - v{{version}}
+  <title>Clinic.js Heap Profiler</title> - v{{version}}
 
-  <code>clinic bubbleprof</code> helps you find asynchronous bottlenecks and debug event loop blocking.
+  <code>clinic heapprofiler</code> helps you find memory leaks
+  by creating a flamegraph visualization that assists in identifying
+  function calls that may be leaking memory.
 
-  To run <code>clinic bubbleprof</code>
+  To run <code>clinic heapprofiler</code>
 
-    <code>clinic bubbleprof -- node server.js</code>
+    <code>clinic heapprofiler -- node server.js</code>
 
   Once you exit (Ctrl-C) the process, your report will open in a browser window. You can disable this behavior:
 
-    <code>clinic bubbleprof --open=false -- node server.js</code>
+    <code>clinic heapprofiler --open=false -- node server.js</code>
 
   If profiling on a server, it can be useful to only do data collection:
 
-    <code>clinic bubbleprof --collect-only -- node server.js</code>
+    <code>clinic heapprofiler --collect-only -- node server.js</code>
 
   You can then transfer the data and visualize it locally:
 
-    <code>clinic bubbleprof --visualize-only PID.clinic-bubbleprof-sample</code>
+    <code>clinic heapprofiler --visualize-only PID.clinic.heapprofile</code>
 
   You can use the --autocannon flag to simulate load on your server.
   --autocannon accepts configuration for autocannon using "subarg" syntax:
 
-    <code>clinic bubbleprof --autocannon [ -m POST /api/example ] -- node server.js</code>
+    <code>clinic heapprofiler --autocannon [ -m POST /api/example ] -- node server.js</code>
 
   When configuring --autocannon, the $PORT environment variable contains the
   port your server is listening on:
 
-    <code>clinic bubbleprof --autocannon [ -m POST 'http://localhost:$PORT/?\$page=1' ] -- node server.js</code>
+    <code>clinic heapprofiler --autocannon [ -m POST 'http://localhost:$PORT/?\$page=1' ] -- node server.js</code>
 
-  Note that dollar signs (`$`) appearing in the URL must be escaped (`\$`), else they
+  Note that dollar signs ($) appearing in the URL must be escaped, else they
   will be treated as environment variables as well.
 
   <h1>Flags</h1>

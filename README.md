@@ -4,7 +4,7 @@
 [![npm version][npm-version]][npm-url] [![Stability Stable][stability-stable]][stability-docs] [![Azure build status][azure-status]][azure-url]
 [![Downloads][npm-downloads]][npm-url] [![Code style][lint-standard]][lint-standard-url]
 
-An Open Source Node.js performance profiling suite by [NearForm][].
+An Open Source Node.js performance profiling suite originally developed by [NearForm][].
 
 Demo and detailed documentation: https://clinicjs.org/
 

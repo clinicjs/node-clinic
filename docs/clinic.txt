@@ -25,7 +25,7 @@
   <h1>Report an issue</h1>
   If you encounter any issue, feel free to send us an issue report at:
 
-    <link>https://github.com/nearform/node-clinic/issues</link>
+    <link>https://github.com/clinicjs/node-clinic/issues</link>
 
   <h1>Utilities</h1>
   When using Clinic.js a bunch you have fill up your directory with data folders and files.

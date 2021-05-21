@@ -1,7 +1,7 @@
 {
   "name": "clinic",
   "description": "Clinic.js diagnoses your performance issues",
-  "repository": "nearform/node-clinic",
+  "repository": "clinicjs/node-clinic",
   "version": "9.0.0",
   "engines": {
     "node": ">= 12.13.0"

@@ -5,7 +5,7 @@ const cli = require('./cli.js')
 
 test('clinic doctor --help', function (t) {
   cli({}, ['clinic', 'doctor', '--help'], function (err, stdout) {
-    t.ifError(err)
+    t.error(err)
     t.ok(/Clinic.js Doctor[^\w ]/.test(stdout.split('\n')[1]))
     t.end()
   })
@@ -13,7 +13,7 @@ test('clinic doctor --help', function (t) {
 
 test('clinic doctor -h', function (t) {
   cli({}, ['clinic', 'doctor', '-h'], function (err, stdout) {
-    t.ifError(err)
+    t.error(err)
     t.ok(/Clinic.js Doctor[^\w ]/.test(stdout.split('\n')[1]))
     t.end()
   })

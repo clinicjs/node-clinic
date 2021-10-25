@@ -10,15 +10,15 @@ test('clinic doctor --collect-only - no issues', function (t) {
     'clinic', 'doctor', '--collect-only',
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
-    t.ifError(err)
+    t.error(err)
     t.ok(/Output file is \.clinic[/\\](\d+).clinic-doctor/.test(stdout))
 
     const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-doctor)/)[1]
     fs.access(path.resolve(tempdir, dirname), function (err) {
-      t.ifError(err)
+      t.error(err)
 
       fs.access(path.resolve(tempdir, dirname + '.html'), function (err) {
-        t.strictEqual(err.code, 'ENOENT')
+        t.equal(err.code, 'ENOENT')
         t.end()
       })
     })
@@ -30,15 +30,15 @@ test('clinic doctor --collect-only - bad status code', function (t) {
     'clinic', 'doctor', '--collect-only',
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr, tempdir) {
-    t.ifError(err)
+    t.error(err)
     t.ok(/Output file is \.clinic[/\\](\d+).clinic-doctor/.test(stdout))
 
     const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-doctor)/)[1]
     fs.access(path.resolve(tempdir, dirname), function (err) {
-      t.ifError(err)
+      t.error(err)
 
       fs.access(path.resolve(tempdir, dirname + '.html'), function (err) {
-        t.strictEqual(err.code, 'ENOENT')
+        t.equal(err.code, 'ENOENT')
         t.end()
       })
     })
@@ -53,10 +53,10 @@ test('clinic doctor --collect-only - signal', {
     '--', 'node', '-e', 'process.kill(process.pid, "SIGKILL")'
   ], function (err, stdout, stderr) {
     // check exit code of `clinic doctor` itself
-    t.strictDeepEqual(err, new Error('process exited with exit code 1'))
+    t.strictSame(err, new Error('process exited with exit code 1'))
     // check exit output for the child process
-    t.includes(stderr, 'Error: process exited by signal SIGKILL')
-    t.strictEqual(stdout, 'To stop data collection press: Ctrl + C\n')
+    t.match(stderr, 'Error: process exited by signal SIGKILL')
+    t.equal(stdout, 'To stop data collection press: Ctrl + C\n')
     t.end()
   })
 })

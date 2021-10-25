@@ -12,7 +12,7 @@ test('clinic heapprofiler --visualize-only - no issues', function (t) {
     {},
     ['clinic', 'heapprofiler', '--collect-only', '--', 'node', '-e', 'require("util").inspect(process)'],
     function (err, stdout, stderr, tempdir) {
-      t.ifError(err)
+      t.error(err)
       t.ok(/Output file is \.clinic[/\\](\d+).clinic-heapprofile/.test(stdout))
 
       const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
@@ -20,12 +20,12 @@ test('clinic heapprofiler --visualize-only - no issues', function (t) {
 
       // visualize data
       cli({}, ['clinic', 'heapprofiler', '--visualize-only', dirpath], function (err, stdout) {
-        t.ifError(err)
-        t.strictEqual(stdout.trim(), `Generated HTML file is ${url.pathToFileURL(dirpath)}.html`)
+        t.error(err)
+        t.equal(stdout.trim(), `Generated HTML file is ${url.pathToFileURL(dirpath)}.html`)
 
         // check that HTML file exists
         fs.access(dirpath + '.html', function (err) {
-          t.ifError(err)
+          t.error(err)
           t.end()
         })
       })
@@ -36,8 +36,8 @@ test('clinic heapprofiler --visualize-only - no issues', function (t) {
 test('clinic heapprofiler --visualize-only - missing data', function (t) {
   const arg = 'missing.clinic-heapprofile'
   cli({ relayStderr: false }, ['clinic', 'heapprofiler', '--visualize-only', arg], function (err, stdout, stderr) {
-    t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, '')
+    t.strictSame(err, new Error('process exited with exit code 1'))
+    t.equal(stdout, '')
     t.ok(stderr.includes('No data found.'))
     t.end()
   })
@@ -49,19 +49,19 @@ test('clinic heapprofiler --visualize-only - supports trailing slash', function 
     {},
     ['clinic', 'heapprofiler', '--collect-only', '--', 'node', '-e', 'require("util").inspect(process)'],
     function (err, stdout, stderr, tempdir) {
-      t.ifError(err)
+      t.error(err)
       t.ok(/Output file is \.clinic[/\\](\d+).clinic-heapprofile/.test(stdout))
       const filename = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
       const dirpath = path.resolve(tempdir, filename)
 
       // visualize data
       cli({}, ['clinic', 'heapprofiler', '--visualize-only', `${dirpath}${path.sep}`], function (err, stdout) {
-        t.ifError(err)
-        t.strictEqual(stdout.trim(), `Generated HTML file is ${url.pathToFileURL(dirpath)}.html`)
+        t.error(err)
+        t.equal(stdout.trim(), `Generated HTML file is ${url.pathToFileURL(dirpath)}.html`)
 
         // check that HTML file exists
         fs.access(dirpath + '.html', function (err) {
-          t.ifError(err)
+          t.error(err)
           t.end()
         })
       })

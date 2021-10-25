@@ -13,12 +13,12 @@ test('clinic flame -- node - no issues', function (t) {
     'clinic', 'flame', '--no-open',
     '--', 'node', '-e', 'require("util").inspect(process)'
   ], function (err, stdout, stderr, tempdir) {
-    t.ifError(err)
+    t.error(err)
     const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-flame)/)[1]
     const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
-    t.strictEqual(stdout.split('\n')[1], 'Analysing data')
-    t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
+    t.equal(stdout.split('\n')[1], 'Analysing data')
+    t.equal(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
 
     // check that files exists
     async.parallel({
@@ -29,7 +29,7 @@ test('clinic flame -- node - no issues', function (t) {
         fs.access(path.resolve(tempdir, dirname + '.html'), done)
       }
     }, function (err) {
-      t.ifError(err)
+      t.error(err)
       t.end()
     })
   })
@@ -41,12 +41,12 @@ test('clinic flame -- node - bad status code', function (t) {
     'clinic', 'flame', '--no-open',
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr, tempdir) {
-    t.ifError(err)
+    t.error(err)
     const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-flame)/)[1]
     const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
-    t.strictEqual(stdout.split('\n')[1], 'Analysing data')
-    t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
+    t.equal(stdout.split('\n')[1], 'Analysing data')
+    t.equal(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
 
     // check that files exists
     async.parallel({
@@ -57,7 +57,7 @@ test('clinic flame -- node - bad status code', function (t) {
         fs.access(path.resolve(tempdir, dirname + '.html'), done)
       }
     }, function (err) {
-      t.ifError(err)
+      t.error(err)
       t.end()
     })
   })
@@ -69,9 +69,9 @@ test('clinic flame --on-port', function (t) {
     '--on-port', 'autocannon localhost:$PORT -d 2',
     '--', 'node', path.join(__dirname, 'server.js')
   ], function (err, stdout, stderr) {
-    t.ifError(err)
+    t.error(err)
     t.ok(stderr.indexOf('Running 2s test @ http://localhost:') > -1)
-    t.strictEqual(stdout.split('\n')[0], 'Analysing data')
+    t.equal(stdout.split('\n')[0], 'Analysing data')
     t.end()
   })
 })
@@ -84,9 +84,9 @@ test('clinic flame --autocannon', function (t) {
     '--autocannon', '/test',
     '--', 'node', path.join(__dirname, 'server.js')
   ], function (err, stdout, stderr) {
-    t.ifError(err)
+    t.error(err)
     t.ok(stderr.indexOf('Running 10s test @ http://localhost:') > -1)
-    t.strictEqual(stdout.split('\n')[0], 'Analysing data')
+    t.equal(stdout.split('\n')[0], 'Analysing data')
     t.end()
   })
 })
@@ -97,7 +97,7 @@ test('clinic flame -- node - configure output destination', function (t) {
     '--dest', 'test-flame-destination',
     '--', 'node', '-e', 'require("util").inspect(process)'
   ], function (err, stdout, stderr, tempdir) {
-    t.ifError(err)
+    t.error(err)
     const basename = stdout.match(/(\d+.clinic-flame)/)[1]
     t.ok(fs.statSync(path.join(tempdir, 'test-flame-destination', basename)).isDirectory())
     t.ok(fs.statSync(path.join(tempdir, 'test-flame-destination', `${basename}.html`)).isFile())

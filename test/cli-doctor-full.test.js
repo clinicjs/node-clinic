@@ -13,12 +13,12 @@ test('clinic doctor -- node - no issues', function (t) {
     'clinic', 'doctor', '--no-open',
     '--', 'node', '-e', 'setTimeout(() => {}, 400)'
   ], function (err, stdout, stderr, tempdir) {
-    t.ifError(err)
+    t.error(err)
     const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-doctor)/)[1]
     const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
-    t.strictEqual(stdout.split('\n')[1], 'Analysing data')
-    t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
+    t.equal(stdout.split('\n')[1], 'Analysing data')
+    t.equal(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
 
     // check that files exists
     async.parallel({
@@ -29,7 +29,7 @@ test('clinic doctor -- node - no issues', function (t) {
         fs.access(path.resolve(tempdir, dirname + '.html'), done)
       }
     }, function (err) {
-      t.ifError(err)
+      t.error(err)
       t.end()
     })
   })
@@ -41,12 +41,12 @@ test('clinic doctor -- node - bad status code', function (t) {
     'clinic', 'doctor', '--no-open',
     '--', 'node', '-e', 'setTimeout(() => { process.exit(1) }, 400)'
   ], function (err, stdout, stderr, tempdir) {
-    t.ifError(err)
+    t.error(err)
     const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-doctor)/)[1]
     const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
-    t.strictEqual(stdout.split('\n')[1], 'Analysing data')
-    t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
+    t.equal(stdout.split('\n')[1], 'Analysing data')
+    t.equal(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
 
     // check that files exists
     async.parallel({
@@ -57,7 +57,7 @@ test('clinic doctor -- node - bad status code', function (t) {
         fs.access(path.resolve(tempdir, dirname + '.html'), done)
       }
     }, function (err) {
-      t.ifError(err)
+      t.error(err)
       t.end()
     })
   })
@@ -71,10 +71,10 @@ test('clinic doctor - signal', {
     '--', 'node', '-e', 'process.kill(process.pid, "SIGKILL")'
   ], function (err, stdout, stderr) {
     // `clinic doctor` exit code
-    t.strictDeepEqual(err, new Error('process exited with exit code 1'))
+    t.strictSame(err, new Error('process exited with exit code 1'))
     // subprocess should be sigkilled
-    t.includes(stderr, 'Error: process exited by signal SIGKILL')
-    t.includes(stdout, 'To generate the report press: Ctrl + C')
+    t.match(stderr, 'Error: process exited by signal SIGKILL')
+    t.match(stdout, 'To generate the report press: Ctrl + C')
     t.end()
   })
 })
@@ -95,9 +95,9 @@ test('clinic doctor -- node - visualization error', function (t) {
       ))
     `
   ], function (err, stdout, stderr) {
-    t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.includes(stdout, 'To generate the report press: Ctrl + C')
-    t.includes(stdout, 'Analysing data')
+    t.strictSame(err, new Error('process exited with exit code 1'))
+    t.match(stdout, 'To generate the report press: Ctrl + C')
+    t.match(stdout, 'Analysing data')
     t.ok(stderr.includes('ENOENT: no such file or directory'))
     t.end()
   })
@@ -113,9 +113,9 @@ test('clinic doctor --on-port', function (t) {
       http.createServer((req, res) => res.end('ok')).listen(0)
     `
   ], function (err, stdout, stderr) {
-    t.ifError(err)
+    t.error(err)
     t.ok(stderr.indexOf('Running 1s test @ http://localhost:') > -1)
-    t.strictEqual(stdout.split('\n')[0], 'Analysing data')
+    t.equal(stdout.split('\n')[0], 'Analysing data')
     t.end()
   })
 })
@@ -130,9 +130,9 @@ test('clinic doctor --autocannon', function (t) {
       http.createServer((req, res) => res.end('ok')).listen(0)
     `
   ], function (err, stdout, stderr) {
-    t.ifError(err)
+    t.error(err)
     t.ok(stderr.indexOf('Running 2s test @ http://localhost:') > -1)
-    t.strictEqual(stdout.split('\n')[0], 'Analysing data')
+    t.equal(stdout.split('\n')[0], 'Analysing data')
     t.end()
   })
 })
@@ -143,7 +143,7 @@ test('clinic doctor -- node - configure output destination', function (t) {
     '--dest', 'test-doctor-destination',
     '--', 'node', '-e', 'setTimeout(() => {}, 400)'
   ], function (err, stdout, stderr, tempdir) {
-    t.ifError(err)
+    t.error(err)
     const basename = stdout.match(/(\d+.clinic-doctor)/)[1]
     t.ok(fs.statSync(path.join(tempdir, 'test-doctor-destination', basename)).isDirectory())
     t.ok(fs.statSync(path.join(tempdir, 'test-doctor-destination', `${basename}.html`)).isFile())

@@ -5,8 +5,8 @@ const cli = require('./cli.js')
 
 test('clinic bubbleprof --version', function (t) {
   cli({}, ['clinic', 'bubbleprof', '--version'], function (err, stdout) {
-    t.ifError(err)
-    t.strictEqual(
+    t.error(err)
+    t.equal(
       stdout,
       `v${require('@nearform/bubbleprof/package.json').version}\n`
     )
@@ -16,8 +16,8 @@ test('clinic bubbleprof --version', function (t) {
 
 test('clinic bubbleprof -v', function (t) {
   cli({}, ['clinic', 'bubbleprof', '-v'], function (err, stdout) {
-    t.ifError(err)
-    t.strictEqual(
+    t.error(err)
+    t.equal(
       stdout,
       `v${require('@nearform/bubbleprof/package.json').version}\n`
     )

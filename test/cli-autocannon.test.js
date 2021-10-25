@@ -14,9 +14,9 @@ test('clinic --autocannon with $PORT', function (t) {
       http.createServer((req, res) => res.end('ok')).listen(0)
     `
   ], function (err, stdout, stderr) {
-    t.ifError(err)
+    t.error(err)
     t.ok(stderr.indexOf('Running 1s test @ http://localhost:') > -1)
-    t.strictEqual(stdout.split('\n')[0], 'Analysing data')
+    t.equal(stdout.split('\n')[0], 'Analysing data')
     t.end()
   })
 })
@@ -36,10 +36,10 @@ test('clinic --autocannon with escaped $', function (t) {
       }).listen(0)
     `
   ], function (err, stdout, stderr) {
-    t.ifError(err)
+    t.error(err)
     t.ok(stderr.indexOf('Running 1s test @ http://localhost:') > -1)
-    t.strictEqual(stdout.split('\n')[0], '/$PORT?$page=10')
-    t.strictEqual(stdout.split('\n')[1], 'Analysing data')
+    t.equal(stdout.split('\n')[0], '/$PORT?$page=10')
+    t.equal(stdout.split('\n')[1], 'Analysing data')
     t.end()
   })
 })
@@ -54,9 +54,9 @@ test('clinic --autocannon with /path', function (t) {
       http.createServer((req, res) => res.end(req.url)).listen(0)
     `
   ], function (err, stdout, stderr) {
-    t.ifError(err)
+    t.error(err)
     t.ok(stderr.indexOf('Running 1s test @ http://localhost:') > -1)
-    t.strictEqual(stdout.split('\n')[0], 'Analysing data')
+    t.equal(stdout.split('\n')[0], 'Analysing data')
     t.end()
   })
 })

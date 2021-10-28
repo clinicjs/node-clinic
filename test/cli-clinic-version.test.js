@@ -5,8 +5,8 @@ const cli = require('./cli.js')
 
 test('clinic --version', function (t) {
   cli({}, ['clinic', '--version'], function (err, stdout) {
-    t.ifError(err)
-    t.strictEqual(
+    t.error(err)
+    t.equal(
       stdout,
       `v${require('../package.json').version}\n`
     )
@@ -16,8 +16,8 @@ test('clinic --version', function (t) {
 
 test('clinic -v', function (t) {
   cli({}, ['clinic', '-v'], function (err, stdout) {
-    t.ifError(err)
-    t.strictEqual(
+    t.error(err)
+    t.equal(
       stdout,
       `v${require('../package.json').version}\n`
     )

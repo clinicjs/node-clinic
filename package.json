@@ -10,11 +10,11 @@
     "clinic": "bin.js"
   },
   "scripts": {
-    "test": "standard | snazzy && tap -j1 --timeout 0 --no-cov test/*.test.js",
-    "test-local": "standard | snazzy && tap -j1 --timeout 0 --no-cov test/*.test.js test-local/*.test.js",
+    "test": "standard | snazzy && tap --no-cov test/*.test.js",
+    "test-local": "standard | snazzy && tap --no-cov test/*.test.js test-local/*.test.js",
     "ci-lint": "standard | snazzy",
-    "ci-test-no-cov": "tap -j1 --timeout 0 --no-cov test/*.test.js",
-    "ci-test-cov": "tap -j1 --timeout 0 test/*.test.js",
+    "ci-test-no-cov": "tap --no-cov test/*.test.js",
+    "ci-test-cov": "tap test/*.test.js",
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {
@@ -43,7 +43,7 @@
     "proxyquire": "^2.1.0",
     "snazzy": "^9.0.0",
     "standard": "^16.0.3",
-    "tap": "^14.11.0",
+    "tap": "^15.0.10",
     "tar-stream": "^2.1.4"
   },
   "keywords": [

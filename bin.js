@@ -339,6 +339,7 @@ async function runTool (toolName, Tool, version, args, uiOptions) {
   })
 
   tool.on('analysing', function (message = 'Analysing data') {
+    /* istanbul ignore if: isEnabled is always false when spawn process. See: https://github.com/sindresorhus/ora#isenabled */
     if (spinner.isEnabled) {
       spinner.text = message
       if (!spinner.isSpinning) {
@@ -351,6 +352,7 @@ async function runTool (toolName, Tool, version, args, uiOptions) {
   tool.on('status', status)
 
   function status (message) {
+    /* istanbul ignore next: isEnabled is always false when spawn process. See: https://github.com/sindresorhus/ora#isenabled */
     if (spinner.isEnabled) {
       spinner.text = message
     } else {
@@ -358,6 +360,7 @@ async function runTool (toolName, Tool, version, args, uiOptions) {
     }
   }
 
+  /* istanbul ignore next: SIGINT by spawned process is tricky */
   function onsigint () {
     status('Received Ctrl+C, closing process...')
     if (!spinner.isSpinning) spinner.start()
@@ -372,6 +375,7 @@ async function runTool (toolName, Tool, version, args, uiOptions) {
     process.once('SIGINT', onsigint)
     tool.collect(args['--'], function (err, filename) {
       if (err) return defer.reject(err)
+      /* istanbul ignore if: isEnabled is always false when spawn process. See: https://github.com/sindresorhus/ora#isenabled */
       if (spinner.isEnabled) {
         spinner.stop()
         spinner.stream.write(`${spinner.text}\n`)
@@ -393,6 +397,7 @@ async function runTool (toolName, Tool, version, args, uiOptions) {
 
       viz(toolName, filename, function (err) {
         if (err) return defer.reject(err)
+        /* istanbul ignore if: isEnabled is always false when spawn process. See: https://github.com/sindresorhus/ora#isenabled */
         if (spinner.isEnabled) {
           spinner.stop()
           spinner.stream.write(`${spinner.text}\n`)

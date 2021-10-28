@@ -12,7 +12,7 @@ test('clinic flame -- node - no issues', function (t) {
     'clinic', 'flame', '--no-open',
     '--', 'node', '-e', 'setTimeout(() => {}, 300)'
   ], function (err, stdout, stderr, tempdir) {
-    t.ifError(err)
+    t.error(err)
 
     const htmlFilename = stdout.match(/(\d+\.clinic-flame\.html)/)[1]
     const dirname = path.dirname(htmlFilename)
@@ -26,7 +26,7 @@ test('clinic flame -- node - no issues', function (t) {
         fs.access(path.resolve(tempdir, htmlFilename), done)
       }
     }, function (err) {
-      t.ifError(err)
+      t.error(err)
       t.end()
     })
   })
@@ -38,8 +38,8 @@ test('clinic flame -- node - bad status code', function (t) {
     'clinic', 'flame', '--no-open',
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr) {
-    t.strictDeepEqual(err, new Error('process exited with exit code 1'))
-    t.strictEqual(stdout, 'To generate the report press: Ctrl + C\n')
+    t.strictSame(err, new Error('process exited with exit code 1'))
+    t.equal(stdout, 'To generate the report press: Ctrl + C\n')
     t.ok(stderr.includes('subprocess error, code: 1'))
     t.end()
   })

@@ -11,19 +11,19 @@ test('clinic clean', function (t) {
     'clinic', 'doctor', '--no-open',
     '--', 'node', '-e', 'setTimeout(() => {}, 500)'
   ], function (err, stdout, stderr, tempdir) {
-    t.ifError(err)
+    t.error(err)
 
     fs.readdir(tempdir, function (err, files) {
-      t.ifError(err)
+      t.error(err)
       t.same(files, ['.clinic'])
       fs.writeFileSync(path.join(tempdir, 'some-other-file'), 'sup')
 
       cli({ cwd: tempdir }, ['clinic', 'clean'], function (err) {
-        t.ifError(err)
+        t.error(err)
 
         fs.readdir(tempdir, function (err, files) {
-          t.ifError(err)
-          t.deepEqual(files, ['some-other-file'])
+          t.error(err)
+          t.same(files, ['some-other-file'])
           t.end()
         })
       })

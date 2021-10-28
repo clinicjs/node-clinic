@@ -5,8 +5,8 @@ const cli = require('./cli.js')
 
 test('clinic doctor --version', function (t) {
   cli({}, ['clinic', 'doctor', '--version'], function (err, stdout) {
-    t.ifError(err)
-    t.strictEqual(
+    t.error(err)
+    t.equal(
       stdout,
       `v${require('@nearform/doctor/package.json').version}\n`
     )
@@ -16,8 +16,8 @@ test('clinic doctor --version', function (t) {
 
 test('clinic doctor -v', function (t) {
   cli({}, ['clinic', 'doctor', '-v'], function (err, stdout) {
-    t.ifError(err)
-    t.strictEqual(
+    t.error(err)
+    t.equal(
       stdout,
       `v${require('@nearform/doctor/package.json').version}\n`
     )

@@ -13,12 +13,12 @@ test('clinic heapprofiler -- node - no issues', function (t) {
     {},
     ['clinic', 'heapprofiler', '--no-open', '--', 'node', '-e', 'require("util").inspect(process)'],
     function (err, stdout, stderr, tempdir) {
-      t.ifError(err)
+      t.error(err)
 
       const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
       const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
-      t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
+      t.equal(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
 
       // check that files exists
       async.parallel(
@@ -31,7 +31,7 @@ test('clinic heapprofiler -- node - no issues', function (t) {
           }
         },
         function (err) {
-          t.ifError(err)
+          t.error(err)
           t.end()
         }
       )
@@ -45,11 +45,11 @@ test('clinic heapprofiler -- node - bad status code', function (t) {
     { relayStderr: true },
     ['clinic', 'heapprofiler', '--no-open', '--', 'node', '-e', 'process.exitCode = 1'],
     function (err, stdout, stderr, tempdir) {
-      t.ifError(err)
+      t.error(err)
       const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
       const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
-      t.strictEqual(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
+      t.equal(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
 
       // check that files exists
       async.parallel(
@@ -62,7 +62,7 @@ test('clinic heapprofiler -- node - bad status code', function (t) {
           }
         },
         function (err) {
-          t.ifError(err)
+          t.error(err)
           t.end()
         }
       )
@@ -84,14 +84,14 @@ test('clinic heapprofiler --on-port', function (t) {
       path.join(__dirname, 'server.js')
     ],
     function (err, stdout, stderr, tempdir) {
-      t.ifError(err)
+      t.error(err)
 
       const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
       const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
       t.ok(stderr.indexOf('Running 2s test @ http://localhost:') > -1)
-      t.strictEqual(stdout.split('\n')[0], 'Analysing data')
-      t.strictEqual(stdout.split('\n')[1], `Generated HTML file is ${fullpath}.html`)
+      t.equal(stdout.split('\n')[0], 'Analysing data')
+      t.equal(stdout.split('\n')[1], `Generated HTML file is ${fullpath}.html`)
       t.end()
     }
   )
@@ -113,14 +113,14 @@ test('clinic heapprofiler --autocannon', function (t) {
       path.join(__dirname, 'server.js')
     ],
     function (err, stdout, stderr, tempdir) {
-      t.ifError(err)
+      t.error(err)
 
       const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
       const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
       t.ok(stderr.indexOf('Running 10s test @ http://localhost:') > -1)
-      t.strictEqual(stdout.split('\n')[0], 'Analysing data')
-      t.strictEqual(stdout.split('\n')[1], `Generated HTML file is ${fullpath}.html`)
+      t.equal(stdout.split('\n')[0], 'Analysing data')
+      t.equal(stdout.split('\n')[1], `Generated HTML file is ${fullpath}.html`)
       t.end()
     }
   )
@@ -141,7 +141,7 @@ test('clinic heapprofiler -- node - configure output destination', function (t) 
       'require("util").inspect(process)'
     ],
     function (err, stdout, stderr, tempdir) {
-      t.ifError(err)
+      t.error(err)
 
       t.ok(fs.statSync(path.join(tempdir, 'test-heapprofiler-destination.clinic-heapprofile')).isFile())
       t.ok(fs.statSync(path.join(tempdir, 'test-heapprofiler-destination.clinic-heapprofile.html')).isFile())

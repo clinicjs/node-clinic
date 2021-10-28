@@ -5,8 +5,8 @@ const cli = require('./cli.js')
 
 test('clinic flame --version', function (t) {
   cli({}, ['clinic', 'flame', '--version'], function (err, stdout) {
-    t.ifError(err)
-    t.strictEqual(
+    t.error(err)
+    t.equal(
       stdout,
       `v${require('@nearform/flame/version')}\n`
     )
@@ -16,8 +16,8 @@ test('clinic flame --version', function (t) {
 
 test('clinic flame -v', function (t) {
   cli({}, ['clinic', 'flame', '-v'], function (err, stdout) {
-    t.ifError(err)
-    t.strictEqual(
+    t.error(err)
+    t.equal(
       stdout,
       `v${require('@nearform/flame/version')}\n`
     )

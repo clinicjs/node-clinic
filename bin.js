@@ -58,7 +58,7 @@ const result = commist()
     }
   })
   .register('doctor', catchify(async function (argv) {
-    const version = require('@nearform/doctor/package.json').version
+    const version = require('@clinic/doctor/package.json').version
 
     const args = subarg(argv, {
       alias: {
@@ -94,14 +94,14 @@ const result = commist()
     } else if (args['visualize-only'] || args['--'].length > 1) {
       checkArgs('doctor', args, 'clinic-doctor', version)
       await trackTool('doctor', args, version)
-      await runTool('doctor', require('@nearform/doctor'), version, args, { color: 'green' })
+      await runTool('doctor', require('@clinic/doctor'), version, args, { color: 'green' })
     } else {
       printHelp('clinic-doctor', version)
       process.exit(1)
     }
   }))
   .register('bubbleprof', catchify(async function (argv) {
-    const version = require('@nearform/bubbleprof/package.json').version
+    const version = require('@clinic/bubbleprof/package.json').version
 
     const args = subarg(argv, {
       alias: {
@@ -134,14 +134,14 @@ const result = commist()
     } else if (args['visualize-only'] || args['--'].length > 1) {
       checkArgs('bubbleprof', args, 'clinic-bubbleprof', version)
       await trackTool('bubbleprof', args, version)
-      await runTool('bubbleprof', require('@nearform/bubbleprof'), version, args, { color: 'blue' })
+      await runTool('bubbleprof', require('@clinic/bubbleprof'), version, args, { color: 'blue' })
     } else {
       printHelp('clinic-bubbleprof', version)
       process.exit(1)
     }
   }))
   .register('flame', catchify(async function (argv) {
-    const version = require('@nearform/flame/version')
+    const version = require('@clinic/flame/version')
 
     const args = subarg(argv, {
       alias: {
@@ -174,14 +174,14 @@ const result = commist()
     } else if (args['visualize-only'] || args['--'].length > 1) {
       checkArgs('flame', args, 'clinic-flame', version)
       await trackTool('flame', args, version)
-      await runTool('flame', require('@nearform/flame'), version, args, { color: 'yellow' })
+      await runTool('flame', require('@clinic/flame'), version, args, { color: 'yellow' })
     } else {
       printHelp('clinic-flame', version)
       process.exit(1)
     }
   }))
   .register('heapprofiler', catchify(async function (argv) {
-    const version = require('@nearform/clinic-heap-profiler/package.json').version
+    const version = require('@clinic/heap-profiler/package.json').version
 
     const args = subarg(argv, {
       alias: {
@@ -213,7 +213,7 @@ const result = commist()
     } else if (args['visualize-only'] || args['--'].length > 1) {
       checkArgs('heap-profiler', args, 'clinic-heap-profiler', version)
       await trackTool('heap-profiler', args, version)
-      await runTool('heap-profiler', require('@nearform/clinic-heap-profiler'), version, args, { color: 'yellow' })
+      await runTool('heap-profiler', require('@clinic/heap-profiler'), version, args, { color: 'yellow' })
     } else {
       printHelp('clinic-heap-profiler', version)
       process.exit(1)

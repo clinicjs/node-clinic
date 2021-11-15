@@ -2,7 +2,7 @@
   "name": "clinic",
   "description": "Clinic.js diagnoses your performance issues",
   "repository": "clinicjs/node-clinic",
-  "version": "9.1.0",
+  "version": "10.0.0",
   "engines": {
     "node": ">= 12.13.0"
   },
@@ -18,10 +18,10 @@
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {
-    "@nearform/bubbleprof": "^7.0.1",
-    "@nearform/doctor": "^8.1.0",
-    "@nearform/flame": "^9.1.0",
-    "@nearform/clinic-heap-profiler": "^1.1.0",
+    "@clinic/bubbleprof": "^8.0.0",
+    "@clinic/doctor": "^9.0.0",
+    "@clinic/flame": "^10.0.0",
+    "@clinic/heap-profiler": "^3.0.0",
     "any-shell-escape": "^0.1.1",
     "async": "^3.0.1",
     "autocannon": "^6.5.0",

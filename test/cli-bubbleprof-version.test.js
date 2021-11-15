@@ -8,7 +8,7 @@ test('clinic bubbleprof --version', function (t) {
     t.error(err)
     t.equal(
       stdout,
-      `v${require('@nearform/bubbleprof/package.json').version}\n`
+      `v${require('@clinic/bubbleprof/package.json').version}\n`
     )
     t.end()
   })
@@ -19,7 +19,7 @@ test('clinic bubbleprof -v', function (t) {
     t.error(err)
     t.equal(
       stdout,
-      `v${require('@nearform/bubbleprof/package.json').version}\n`
+      `v${require('@clinic/bubbleprof/package.json').version}\n`
     )
     t.end()
   })

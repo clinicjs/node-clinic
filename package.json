@@ -27,7 +27,7 @@
     "autocannon": "^7.5.0",
     "commist": "^1.0.0",
     "cross-argv": "^1.0.0",
-    "dargs": "^7.0.0",
+    "dargs": "^8.1.0",
     "env-string": "^1.0.1",
     "execspawn": "^1.0.1",
     "insight": "^0.10.1",

@@ -33,7 +33,7 @@
     "insight": "^0.10.1",
     "minimist": "^1.2.0",
     "open": "^7.3.0",
-    "ora": "^5.1.0",
+    "ora": "^6.0.1",
     "rimraf": "^3.0.0",
     "stream-collector": "^1.0.1",
     "subarg": "^1.0.0",

@@ -24,7 +24,7 @@
     "@clinic/heap-profiler": "^3.0.0",
     "any-shell-escape": "^0.1.1",
     "async": "^3.0.1",
-    "autocannon": "^6.5.0",
+    "autocannon": "^7.5.0",
     "commist": "^1.0.0",
     "cross-argv": "^1.0.0",
     "dargs": "^7.0.0",

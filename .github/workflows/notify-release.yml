@@ -10,6 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Notify release
-        uses: nearform/github-action-notify-release@v1.2.2
+        uses: nearform/github-action-notify-release@v1.2.7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

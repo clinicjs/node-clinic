@@ -26,7 +26,7 @@
     "async": "^3.0.1",
     "autocannon": "^7.5.0",
     "commist": "^1.0.0",
-    "cross-argv": "^1.0.0",
+    "cross-argv": "^2.0.0",
     "dargs": "^7.0.0",
     "env-string": "^1.0.1",
     "execspawn": "^1.0.1",

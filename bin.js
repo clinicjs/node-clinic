@@ -153,7 +153,8 @@ const result = commist()
         'version',
         'collect-only',
         'open',
-        'debug'
+        'debug',
+        'kernel-tracing'
       ],
       string: [
         'visualize-only',
@@ -317,7 +318,8 @@ async function runTool (toolName, Tool, version, args, uiOptions) {
     sampleInterval: parseInt(args['sample-interval'], 10),
     detectPort: !!onPort,
     dest: args.dest,
-    debug: args.debug
+    debug: args.debug,
+    kernelTracing: args['kernel-tracing']
   })
 
   const spinner = ora({

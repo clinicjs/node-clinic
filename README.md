@@ -70,7 +70,7 @@ these factors together.
 ## Supported Node.js versions
 
 Clinic.js relies heavily on Node.js core instrumentation available in later versions.
-Currently the supported Node.js versions are `>= 10.12.0`.
+Currently the supported Node.js versions are `>= 12.13.0`.
 
 ## Examples and Demos
 

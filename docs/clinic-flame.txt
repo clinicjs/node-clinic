@@ -36,6 +36,10 @@
   Note that dollar signs ($) appearing in the URL must be escaped, else they
   will be treated as environment variables as well.
 
+  You can profile the application using kernel tracing. This will capture native stack frames (C++ modules and Libuv I/O)
+
+    <code>clinic flame --kernel-tracing -- node server.js</code>
+
   <h1>Flags</h1>
   -h | --help                Display Help
   -v | --version             Display Version
@@ -45,3 +49,4 @@
   --autocannon               Run the autocannon benchmarking tool when the server starts listening on a port.
   --open                     Boolean to enable or disable your report opening in your web browser.
   --dest                     Destination for the collected data (default <code>.clinic/</code>).
+  --kernel-tracing            Profile application using linux_perf (linux only).

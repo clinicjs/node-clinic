@@ -69,13 +69,13 @@ these factors together.
 
 ### Windows + PowerShell
 
-In order to diagnostic your application with node clinic, is mandatory execute your application after double hyphen(`--`),
+In order to diagnose your application with node clinic, you should execute your application after double hyphens(`--`),
 e.g: `clinic doctor -- node myapplication.js`.
 
-However, if you are using Windows and PowerShell need to know that a double hyphen instructs PowerShell to
-treat everything coming after as literal arguments rather than options.
+On Windows using PowerShell as terminal the above statement might not work because PowerShell parses everything after `--`
+as literal arguments instead of options.
 
-To avoid that behavior you can either quote ("--", '--') or escape (`--) the double hyphen
+To avoid that behavior you can either quote ("--", '--') or escape (`--`) the double hyphens.
 
 ## Supported Node.js versions
 

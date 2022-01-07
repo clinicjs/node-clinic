@@ -67,6 +67,16 @@ optimizations on background threads. With worker threads, the CPU will also
 utilize more than 100%. The visible percentage is always the combination of all
 these factors together.
 
+### Windows + PowerShell
+
+In order to diagnose your application with node clinic, you should execute your application after double hyphens(`--`),
+e.g: `clinic doctor -- node myapplication.js`.
+
+On Windows using PowerShell as terminal the above statement might not work because PowerShell parses everything after `--`
+as literal arguments instead of options.
+
+To avoid that behavior you can either quote ("--", '--') or escape (`--`) the double hyphens.
+
 ## Supported Node.js versions
 
 Clinic.js relies heavily on Node.js core instrumentation available in later versions.

@@ -55,6 +55,10 @@
     "doctor",
     "flamegraph",
     "flame",
+    "heap",
+    "memory",
+    "memory leak",
+    "profiler",
     "bubble"
   ],
   "license": "MIT"

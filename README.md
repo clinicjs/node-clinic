@@ -123,6 +123,7 @@ clinic heapprofiler --help
 --on-port                  Run a script when the server starts listening on a port.
 --autocannon               Run the autocannon benchmarking tool when the server starts listening on a port.
 --dest                     Destination for the collect data (default .).
+--stop-delay               Add a delay to close the process when a job is done through either `autocannon` or `on-port` flag (milliseconds)
 ```
 
 ## Programmable Interfaces

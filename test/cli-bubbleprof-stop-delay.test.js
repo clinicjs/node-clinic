@@ -9,7 +9,7 @@ const cli = require('./cli.js')
 
 test('clinic bubbleprof --stop-delay --on-port - no issues', function (t) {
   cli({}, [
-    'clinic', 'bubbleprof', '--no-open', '--stop-delay', '2000', '--on-port', 'node -e "setTimeout(() => {}, 1000)"',
+    'clinic', 'bubbleprof', '--no-open', '--stop-delay', '500', '--on-port', 'node -e "setTimeout(() => {}, 0)"',
     '--', 'node', '-e', `
       const http = require('http')
 

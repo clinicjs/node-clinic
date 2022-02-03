@@ -9,7 +9,7 @@ const cli = require('./cli.js')
 
 test('clinic doctor --stop-delay --on-port - no issues', function (t) {
   cli({}, [
-    'clinic', 'doctor', '--no-open', '--stop-delay', '2000', '--on-port', 'node -e "setTimeout(() => {}, 1000)"',
+    'clinic', 'doctor', '--no-open', '--stop-delay', '500', '--on-port', 'node -e "setTimeout(() => {}, 0)"',
     '--', 'node', '-e', `
       const http = require('http')
 
@@ -39,23 +39,20 @@ test('clinic doctor --stop-delay --on-port - no issues', function (t) {
   })
 })
 
-// TODO: skipping until the above statement is fulfilled
-test('clinic doctor --stop-delay --on-port - exceeding timeout', { skip: true }, function (t) {
-  // TODO: rafaelgss
-  // Not sure yet how to make it work
-  // Looks like node-tap doesn't accept a assertion when timeout is expected
-  t.timeout(2000)
-  t.on('timeout', () => {
-    t.pass()
+test('clinic doctor --stop-delay --on-port - exceeding timeout', function (t) {
+  const onPortDuration = 500
+  setTimeout(() => {
+    t.pass('timeout should be called before t.fail')
     t.end()
-  })
+    process.exit(0)
+  }, onPortDuration + 500)
   cli({}, [
-    'clinic', 'doctor', '--no-open', '--stop-delay', '6000', '--on-port', 'node -e "setTimeout(() => {}, 1000)"',
+    'clinic', 'doctor', '--no-open', '--stop-delay', '2000', '--on-port', `node -e "setTimeout(() => {}, ${onPortDuration})"`,
     '--', 'node', '-e', `
-      const http = require('http')
+        const http = require('http')
 
-      http.createServer((req, res) => res.end('ok')).listen(0)
-    `
+        http.createServer((req, res) => res.end('ok')).listen(0)
+      `
   ], function () {
     t.fail('it should not be called once timeout is reached')
   })

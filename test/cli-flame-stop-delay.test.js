@@ -9,7 +9,7 @@ const cli = require('./cli.js')
 
 test('clinic flame --stop-delay --on-port - no issues', function (t) {
   cli({}, [
-    'clinic', 'flame', '--no-open', '--stop-delay', '2000', '--on-port', 'node -e "setTimeout(() => {}, 1000)"',
+    'clinic', 'flame', '--no-open', '--stop-delay', '500', '--on-port', 'node -e "setTimeout(() => {}, 0)"',
     '--', 'node', '-e', `
       const http = require('http')
 

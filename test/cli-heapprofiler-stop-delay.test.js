@@ -9,7 +9,7 @@ const cli = require('./cli.js')
 
 test('clinic heapprofiler --stop-delay --on-port - no issues', function (t) {
   cli({}, [
-    'clinic', 'heapprofiler', '--no-open', '--stop-delay', '2000', '--on-port', 'node -e "setTimeout(() => {}, 1000)"',
+    'clinic', 'heapprofiler', '--no-open', '--stop-delay', '500', '--on-port', 'node -e "setTimeout(() => {}, 0)"',
     '--', 'node', '-e', `
       const http = require('http')
 

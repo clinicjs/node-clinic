@@ -80,7 +80,7 @@ To avoid that behavior you can either quote ("--", '--') or escape (`--`) the do
 ## Supported Node.js versions
 
 Clinic.js relies heavily on Node.js core instrumentation available in later versions.
-Currently the supported Node.js versions are `>= 12.13.0`.
+Currently the supported Node.js versions are `>= 12.22.7`.
 
 ## Examples and Demos
 

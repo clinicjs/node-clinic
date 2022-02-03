@@ -4,7 +4,7 @@
   "repository": "clinicjs/node-clinic",
   "version": "11.0.0",
   "engines": {
-    "node": ">= 12.13.0"
+    "node": ">= 12.22.7"
   },
   "bin": {
     "clinic": "bin.js"

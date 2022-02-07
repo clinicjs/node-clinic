@@ -80,7 +80,7 @@ To avoid that behavior you can either quote ("--", '--') or escape (`--`) the do
 ## Supported Node.js versions
 
 Clinic.js relies heavily on Node.js core instrumentation available in later versions.
-Currently the supported Node.js versions are `>= 12.13.0`.
+Currently the supported Node.js versions are `>= 12.22.7`.
 
 ## Examples and Demos
 
@@ -123,6 +123,7 @@ clinic heapprofiler --help
 --on-port                  Run a script when the server starts listening on a port.
 --autocannon               Run the autocannon benchmarking tool when the server starts listening on a port.
 --dest                     Destination for the collect data (default .).
+--stop-delay               Add a delay to close the process when a job is done through either `autocannon` or `on-port` flag (milliseconds)
 ```
 
 ## Programmable Interfaces

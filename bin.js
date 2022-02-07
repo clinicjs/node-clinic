@@ -76,7 +76,8 @@ const result = commist()
         'visualize-only',
         'sample-interval',
         'on-port',
-        'dest'
+        'dest',
+        'stop-delay'
       ],
       default: {
         'sample-interval': '10',
@@ -117,7 +118,8 @@ const result = commist()
       ],
       string: [
         'visualize-only',
-        'dest'
+        'dest',
+        'stop-delay'
       ],
       default: {
         open: true,
@@ -158,7 +160,8 @@ const result = commist()
       ],
       string: [
         'visualize-only',
-        'dest'
+        'dest',
+        'stop-delay'
       ],
       default: {
         open: true,
@@ -198,7 +201,8 @@ const result = commist()
       ],
       string: [
         'visualize-only',
-        'dest'
+        'dest',
+        'stop-delay'
       ],
       default: {
         open: true,
@@ -322,6 +326,8 @@ async function runTool (toolName, Tool, version, args, uiOptions) {
     kernelTracing: args['kernel-tracing']
   })
 
+  const stopDelayMs = parseInt(args['stop-delay'])
+
   const spinner = ora({
     text: 'Analysing data',
     color: uiOptions.color,
@@ -337,7 +343,16 @@ async function runTool (toolName, Tool, version, args, uiOptions) {
   tool.on('port', function (port, proc, cb) {
     process.env.PORT = port
     // inline the PORT env to make it easier for cross platform usage
-    execspawn(envString(onPort, { PORT: port }), { stdio: 'inherit' }).on('exit', cb)
+    execspawn(envString(onPort, { PORT: port }), { stdio: 'inherit' })
+      .on('exit', () => {
+        if (stopDelayMs) {
+          tool.emit('status', 'Waiting to close the process')
+          if (spinner.isEnabled && !spinner.isSpinning) spinner.start()
+          setTimeout(() => cb(), stopDelayMs)
+        } else {
+          cb()
+        }
+      })
   })
 
   tool.on('analysing', function (message = 'Analysing data') {

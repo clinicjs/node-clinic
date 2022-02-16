@@ -2,7 +2,7 @@
   "name": "clinic",
   "description": "Clinic.js diagnoses your performance issues",
   "repository": "clinicjs/node-clinic",
-  "version": "11.0.0",
+  "version": "11.1.0",
   "engines": {
     "node": ">= 12.22.7"
   },

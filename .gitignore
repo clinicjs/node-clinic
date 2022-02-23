@@ -66,3 +66,6 @@ typings/
 .vscode
 # IntelliJ Idea
 .idea
+
+# ctags
+tags

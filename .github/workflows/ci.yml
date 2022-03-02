@@ -7,7 +7,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install Node.js 12
         uses: actions/setup-node@v3.0.0
         with:
@@ -27,7 +27,7 @@ jobs:
 
     runs-on: ${{matrix.os}}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install Node.js ${{matrix.node-version}}
         uses: actions/setup-node@v3.0.0
         with:

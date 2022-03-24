@@ -78,7 +78,7 @@ test('clinic heapprofiler --on-port', function (t) {
       'heapprofiler',
       '--no-open',
       '--on-port',
-      'autocannon localhost:$PORT -d 2',
+      'echo "on port was called"',
       '--',
       'node',
       path.join(__dirname, 'server.js')
@@ -89,9 +89,9 @@ test('clinic heapprofiler --on-port', function (t) {
       const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
       const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
-      t.ok(stderr.indexOf('Running 2s test @ http://localhost:') > -1)
-      t.equal(stdout.split('\n')[0], 'Analysing data')
-      t.equal(stdout.split('\n')[1], `Generated HTML file is ${fullpath}.html`)
+      t.equal(stdout.split('\n')[0], 'on port was called')
+      t.equal(stdout.split('\n')[1], 'Analysing data')
+      t.equal(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
       t.end()
     }
   )

@@ -7,6 +7,8 @@ const async = require('async')
 const test = require('tap').test
 const cli = require('./cli.js')
 
+const pkg = require('../package.json')
+
 test('clinic heapprofiler -- node - no issues', function (t) {
   // collect data
   cli(
@@ -78,7 +80,7 @@ test('clinic heapprofiler --on-port', function (t) {
       'heapprofiler',
       '--no-open',
       '--on-port',
-      'echo "on port was called"',
+      'clinic -v',
       '--',
       'node',
       path.join(__dirname, 'server.js')
@@ -89,7 +91,7 @@ test('clinic heapprofiler --on-port', function (t) {
       const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
       const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
-      t.equal(stdout.split('\n')[0], 'on port was called')
+      t.equal(stdout.split('\n')[0], `v${pkg.version}`)
       t.equal(stdout.split('\n')[1], 'Analysing data')
       t.equal(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
       t.end()

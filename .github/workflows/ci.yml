@@ -34,5 +34,9 @@ jobs:
           node-version: ${{matrix.node-version}}
       - name: Install dependencies
         run: npm install
+
+      - name: Install global dependencies
+        run: npm install autocannon -g
+
       - name: Run tests
         run: npm run ci-test-cov

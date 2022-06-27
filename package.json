@@ -37,7 +37,7 @@
     "rimraf": "^3.0.0",
     "stream-collector": "^1.0.1",
     "subarg": "^1.0.0",
-    "update-notifier": "^5.0.1"
+    "update-notifier": "^6.0.2"
   },
   "devDependencies": {
     "proxyquire": "^2.1.0",

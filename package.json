@@ -30,7 +30,7 @@
     "dargs": "^7.0.0",
     "env-string": "^1.0.1",
     "execspawn": "^1.0.1",
-    "insight": "^0.10.1",
+    "insight": "^0.11.1",
     "minimist": "^1.2.0",
     "open": "^7.3.0",
     "ora": "^5.1.0",

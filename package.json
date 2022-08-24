@@ -20,7 +20,7 @@
   "dependencies": {
     "@clinic/bubbleprof": "^8.0.0",
     "@clinic/doctor": "^9.0.0",
-    "@clinic/flame": "^11.0.0",
+    "@clinic/flame": "^12.0.0",
     "@clinic/heap-profiler": "^3.0.0",
     "any-shell-escape": "^0.1.1",
     "async": "^3.0.1",

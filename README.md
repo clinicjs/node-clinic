@@ -147,7 +147,7 @@ Then when you run container it exits immediately with `0` code.
 It is caused by a [question to collect anonymous usage statistics](https://github.com/clinicjs/node-clinic/issues/79#issuecomment-1226515723).
 
 A workaround is to use environment variable `NO_INSIGHT` with any value.
-In this case profiling and application server start as expected.
+In this case the question to collect anonymous usage statistics is suppressed. Thus profinling and application server start as expected.
 ```
 CMD NO_INSIGHT=true clinic flame -- node index.js
 ```

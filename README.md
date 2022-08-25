@@ -135,7 +135,7 @@ Each of the tools has a programmable interface which you can read about in their
 - [Clinic.js Flame](https://github.com/clinicjs/node-clinic-flame)
 - [Clinic.js Heap Profiler](https://github.com/clinicjs/node-clinic-heap-profiler)
 
-## Profiling in [Podman](https://podman.io/) container
+## Profiling In [Podman](https://podman.io/) Container
 _Applicable for `doctor`, `bubbleprof`, `flame` or `heapprofiler`_
 
 In case you profile your application inside of container environment using [podman](https://podman.io/) (docker alternative).

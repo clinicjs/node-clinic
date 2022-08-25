@@ -143,7 +143,7 @@ And you start profling by providing `CMD` step in the dockerfile.
 ```
 CMD clinic flame -- node index.js
 ```
-Then you run container exits immediately with `0` code.
+Then when you run container it exits immediately with `0` code.
 It is caused by a [question to collect anonymous usage statistics](https://github.com/clinicjs/node-clinic/issues/79#issuecomment-1226515723).
 
 A workaround is to use environment variable `NO_INSIGHT` with any value.

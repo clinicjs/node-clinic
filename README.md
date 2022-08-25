@@ -135,6 +135,23 @@ Each of the tools has a programmable interface which you can read about in their
 - [Clinic.js Flame](https://github.com/clinicjs/node-clinic-flame)
 - [Clinic.js Heap Profiler](https://github.com/clinicjs/node-clinic-heap-profiler)
 
+## Profiling In [Podman](https://podman.io/) Container
+_Applicable for `doctor`, `bubbleprof`, `flame` or `heapprofiler`_
+
+In case you profile your application inside of container environment using [podman](https://podman.io/) (docker alternative).
+And you start profling by providing `CMD` step in the dockerfile.
+```
+CMD clinic flame -- node index.js
+```
+Then when you run container it exits immediately with `0` code.
+It is caused by a [question to collect anonymous usage statistics](https://github.com/clinicjs/node-clinic/issues/79#issuecomment-1226515723).
+
+A workaround is to use environment variable `NO_INSIGHT` with any value.
+In this case the question to collect anonymous usage statistics is suppressed. Thus profinling and application server start as expected.
+```
+CMD NO_INSIGHT=true clinic flame -- node index.js
+```
+
 ## License
 
 [MIT](LICENSE)

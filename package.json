@@ -3,9 +3,6 @@
   "description": "Clinic.js diagnoses your performance issues",
   "repository": "clinicjs/node-clinic",
   "version": "11.1.2",
-  "engines": {
-    "node": ">= 12.22.7"
-  },
   "bin": {
     "clinic": "bin.js"
   },

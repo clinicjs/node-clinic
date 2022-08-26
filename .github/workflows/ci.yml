@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install Node.js 12
+      - name: Install Node.js 18
         uses: actions/setup-node@v3
         with:
-          node-version: 12.x
+          node-version: 18
       - name: Install dependencies
         run: npm install
       - name: Check linting
@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        node-version: [12.x, 14.x, 16.x, 17.x]
+        node-version: [14, 16, 18]
 
     runs-on: ${{matrix.os}}
     steps:

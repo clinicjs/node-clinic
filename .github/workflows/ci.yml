@@ -12,8 +12,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: npm
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Check linting
         run: npm run ci-lint
 
@@ -32,8 +33,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{matrix.node-version}}
+          cache: npm
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install global dependencies
         run: npm install autocannon -g

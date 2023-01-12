@@ -1,5 +1,4 @@
 const async = require('async')
-const shell = require('shelljs')
 
 module.exports = function (exit) {
   async.waterfall([
@@ -12,4 +11,4 @@ module.exports = function (exit) {
   ], exit)
 }
 
-!module.parent && module.exports(shell.exit)
+!module.parent && module.exports(process.exit)

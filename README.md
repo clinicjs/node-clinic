@@ -67,6 +67,8 @@ optimizations on background threads. With worker threads, the CPU will also
 utilize more than 100%. The visible percentage is always the combination of all
 these factors together.
 
+__NOTE__: Exiting the process forcefully can result in wrong or no generation of log files.
+
 ### Windows + PowerShell
 
 In order to diagnose your application with node clinic, you should execute your application after double hyphens(`--`),

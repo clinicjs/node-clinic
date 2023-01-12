@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "proxyquire": "^2.1.0",
+    "shelljs": "^0.8.5",
     "snazzy": "^9.0.0",
     "standard": "^17.0.0",
     "tap": "^16.0.0",

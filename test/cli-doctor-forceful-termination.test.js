@@ -8,7 +8,7 @@ test('clinic doctor throws error when process is forcefully closed before proces
   // collect data
   cli({}, [
     'clinic', 'doctor', '--no-open',
-    '--', 'node', path.join(__dirname, 'fail.js')
+    '--', 'node', path.join(__dirname, 'forceful-termination.js')
   ], function (err, stdout, stderr) {
     t.ok(err)
     t.ok(stderr.includes('Process forcefully closed before processstat file generation'))

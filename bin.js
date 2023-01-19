@@ -413,7 +413,6 @@ async function runTool (toolName, Tool, version, args, uiOptions) {
       if (err) return defer.reject(err)
 
       viz(toolName, filename, function (err) {
-        console.log(err)
         if (err?.code === 'ENOENT' && err?.message.includes('processstat')) return defer.reject(new Error('Process forcefully closed before processstat file generation'))
         if (err) return defer.reject(err)
         /* istanbul ignore if: isEnabled is always false when spawn process. See: https://github.com/sindresorhus/ora#isenabled */

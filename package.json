@@ -11,7 +11,7 @@
     "test-local": "standard | snazzy && tap --no-cov test/*.test.js test-local/*.test.js",
     "ci-lint": "standard | snazzy",
     "ci-test-no-cov": "tap --no-cov test/*.test.js",
-    "ci-test-cov": "tap --grep=/^test\/(?!.*cli-doctor-forceful-termination\\.test\\.js$).*\\.test\\.js$/",
+    "ci-test-cov": "tap test/*.test.js",
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {

@@ -1,6 +1,5 @@
 on:
   push:
-    - main
   pull_request:
   workflow_dispatch:
 

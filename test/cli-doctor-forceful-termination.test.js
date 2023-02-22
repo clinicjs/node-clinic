@@ -5,7 +5,7 @@ const test = require('tap').test
 const cli = require('./cli.js')
 const fs = require('fs')
 
-test('clinic doctor throws error when process is forcefully closed before processstat file is generated', { skip: process.version.startsWith('v14')}, function (t) {
+test('clinic doctor throws error when process is forcefully closed before processstat file is generated', { skip: process.version.startsWith('v14') }, function (t) {
   // collect data
   cli({}, [
     'clinic', 'doctor', '--no-open',

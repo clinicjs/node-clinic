@@ -126,6 +126,7 @@ clinic heapprofiler --help
 --autocannon               Run the autocannon benchmarking tool when the server starts listening on a port.
 --dest                     Destination for the collect data (default .).
 --stop-delay               Add a delay to close the process when a job is done through either `autocannon` or `on-port` flag (milliseconds)
+--name                     The --name flag sets a name for the output data, allowing you to replace existing reports without generating new ones. Example: <code>.clinic/node-19-test.clinic-flame</code>
 ```
 
 ## Programmable Interfaces

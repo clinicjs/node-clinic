@@ -77,7 +77,8 @@ const result = commist()
         'sample-interval',
         'on-port',
         'dest',
-        'stop-delay'
+        'stop-delay',
+        'name'
       ],
       default: {
         'sample-interval': '10',
@@ -119,7 +120,8 @@ const result = commist()
       string: [
         'visualize-only',
         'dest',
-        'stop-delay'
+        'stop-delay',
+        'name'
       ],
       default: {
         open: true,
@@ -161,7 +163,8 @@ const result = commist()
       string: [
         'visualize-only',
         'dest',
-        'stop-delay'
+        'stop-delay',
+        'name'
       ],
       default: {
         open: true,
@@ -202,7 +205,8 @@ const result = commist()
       string: [
         'visualize-only',
         'dest',
-        'stop-delay'
+        'stop-delay',
+        'name'
       ],
       default: {
         open: true,
@@ -323,7 +327,8 @@ async function runTool (toolName, Tool, version, args, uiOptions) {
     detectPort: !!onPort,
     dest: args.dest,
     debug: args.debug,
-    kernelTracing: args['kernel-tracing']
+    kernelTracing: args['kernel-tracing'],
+    name: args.name
   })
 
   const stopDelayMs = parseInt(args['stop-delay'])

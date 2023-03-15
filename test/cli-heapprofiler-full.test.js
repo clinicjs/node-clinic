@@ -15,7 +15,7 @@ test('clinic heapprofiler -- node - no issues', function (t) {
     function (err, stdout, stderr, tempdir) {
       t.error(err)
 
-      const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
+      const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofiler)/)[1]
       const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
       t.equal(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
@@ -46,7 +46,7 @@ test('clinic heapprofiler -- node - bad status code', function (t) {
     ['clinic', 'heapprofiler', '--no-open', '--', 'node', '-e', 'process.exitCode = 1'],
     function (err, stdout, stderr, tempdir) {
       t.error(err)
-      const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
+      const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofiler)/)[1]
       const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
       t.equal(stdout.split('\n')[2], `Generated HTML file is ${fullpath}.html`)
@@ -86,7 +86,7 @@ test('clinic heapprofiler --on-port', function (t) {
     function (err, stdout, stderr, tempdir) {
       t.error(err)
 
-      const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
+      const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofiler)/)[1]
       const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
       t.ok(stderr.indexOf('Running 2s test @ http://localhost:') > -1)
@@ -115,7 +115,7 @@ test('clinic heapprofiler --autocannon', function (t) {
     function (err, stdout, stderr, tempdir) {
       t.error(err)
 
-      const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
+      const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofiler)/)[1]
       const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
       t.ok(stderr.indexOf('Running 10s test @ http://localhost:') > -1)
@@ -134,7 +134,7 @@ test('clinic heapprofiler -- node - configure output destination', function (t) 
       'heapprofiler',
       '--no-open',
       '--dest',
-      'test-heapprofiler-destination.clinic-heapprofile',
+      'test-heapprofiler-destination.clinic-heapprofiler',
       '--',
       'node',
       '-e',
@@ -143,8 +143,8 @@ test('clinic heapprofiler -- node - configure output destination', function (t) 
     function (err, stdout, stderr, tempdir) {
       t.error(err)
 
-      t.ok(fs.statSync(path.join(tempdir, 'test-heapprofiler-destination.clinic-heapprofile')).isFile())
-      t.ok(fs.statSync(path.join(tempdir, 'test-heapprofiler-destination.clinic-heapprofile.html')).isFile())
+      t.ok(fs.statSync(path.join(tempdir, 'test-heapprofiler-destination.clinic-heapprofiler')).isFile())
+      t.ok(fs.statSync(path.join(tempdir, 'test-heapprofiler-destination.clinic-heapprofiler.html')).isFile())
       t.end()
     }
   )

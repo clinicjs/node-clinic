@@ -13,9 +13,9 @@ test('clinic heapprofiler --visualize-only - no issues', function (t) {
     ['clinic', 'heapprofiler', '--collect-only', '--', 'node', '-e', 'require("util").inspect(process)'],
     function (err, stdout, stderr, tempdir) {
       t.error(err)
-      t.ok(/Output file is \.clinic[/\\](\d+).clinic-heapprofile/.test(stdout))
+      t.ok(/Output file is \.clinic[/\\](\d+).clinic-heapprofiler/.test(stdout))
 
-      const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
+      const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofiler)/)[1]
       const dirpath = path.resolve(tempdir, dirname)
 
       // visualize data
@@ -34,7 +34,7 @@ test('clinic heapprofiler --visualize-only - no issues', function (t) {
 })
 
 test('clinic heapprofiler --visualize-only - missing data', function (t) {
-  const arg = 'missing.clinic-heapprofile'
+  const arg = 'missing.clinic-heapprofiler'
   cli({ relayStderr: false }, ['clinic', 'heapprofiler', '--visualize-only', arg], function (err, stdout, stderr) {
     t.strictSame(err, new Error('process exited with exit code 1'))
     t.equal(stdout, '')
@@ -50,8 +50,8 @@ test('clinic heapprofiler --visualize-only - supports trailing slash', function 
     ['clinic', 'heapprofiler', '--collect-only', '--', 'node', '-e', 'require("util").inspect(process)'],
     function (err, stdout, stderr, tempdir) {
       t.error(err)
-      t.ok(/Output file is \.clinic[/\\](\d+).clinic-heapprofile/.test(stdout))
-      const filename = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
+      t.ok(/Output file is \.clinic[/\\](\d+).clinic-heapprofiler/.test(stdout))
+      const filename = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofiler)/)[1]
       const dirpath = path.resolve(tempdir, filename)
 
       // visualize data

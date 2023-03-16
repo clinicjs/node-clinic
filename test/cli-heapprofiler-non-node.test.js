@@ -29,7 +29,7 @@ test('clinic heapprofiler - should accept full path to node.js', function (t) {
     ['clinic', 'heapprofiler', '--no-open', '--', process.execPath, '-e', 'setTimeout(() => {}, 10)'],
     function (err, stdout) {
       t.error(err)
-      t.ok(/Generated HTML file is (.*?)\.clinic[/\\](\d+).clinic-heapprofile/.test(stdout))
+      t.ok(/Generated HTML file is (.*?)\.clinic[/\\](\d+).clinic-heapprofiler/.test(stdout))
       t.end()
     }
   )

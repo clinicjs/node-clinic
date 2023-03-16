@@ -18,7 +18,7 @@ test('clinic heapprofiler --stop-delay --on-port - no issues', function (t) {
   ], function (err, stdout, stderr, tempdir) {
     t.error(err)
 
-    const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofile)/)[1]
+    const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofiler)/)[1]
     const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
     t.equal(stdout.split('\n')[0], 'Waiting to close the process')
     t.equal(stdout.split('\n')[1], 'Analysing data')

@@ -5,6 +5,7 @@
 [![Downloads][npm-downloads]][npm-url] [![Code style][lint-standard]][lint-standard-url]
 
 An Open Source Node.js performance profiling suite originally developed by [NearForm][].
+This documentation shall allow to view metrics of your server
 
 Demo and detailed documentation: https://clinicjs.org/
 
@@ -67,7 +68,7 @@ optimizations on background threads. With worker threads, the CPU will also
 utilize more than 100%. The visible percentage is always the combination of all
 these factors together.
 
-__NOTE__: Exiting the process forcefully can result in wrong or no generation of log files.
+**NOTE**: Exiting the process forcefully can result in wrong or no generation of log files.
 
 ### Windows + PowerShell
 
@@ -139,18 +140,22 @@ Each of the tools has a programmable interface which you can read about in their
 - [Clinic.js Heap Profiler](https://github.com/clinicjs/node-clinic-heap-profiler)
 
 ## Profiling In [Podman](https://podman.io/) Container
+
 _Applicable for `doctor`, `bubbleprof`, `flame` or `heapprofiler`_
 
 In case you profile your application inside of container environment using [podman](https://podman.io/) (docker alternative).
 And you start profling by providing `CMD` step in the dockerfile.
+
 ```
 CMD clinic flame -- node index.js
 ```
+
 Then when you run container it exits immediately with `0` code.
 It is caused by a [question to collect anonymous usage statistics](https://github.com/clinicjs/node-clinic/issues/79#issuecomment-1226515723).
 
 A workaround is to use environment variable `NO_INSIGHT` with any value.
 In this case the question to collect anonymous usage statistics is suppressed. Thus profinling and application server start as expected.
+
 ```
 CMD NO_INSIGHT=true clinic flame -- node index.js
 ```

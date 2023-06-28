@@ -4,7 +4,7 @@ const url = require('url')
 const fs = require('fs')
 const path = require('path')
 const async = require('async')
-const test = require('tap').test
+const { test } = require('tap')
 const cli = require('./cli.js')
 
 test('clinic heapprofiler -- node - no issues', function (t) {
@@ -78,7 +78,7 @@ test('clinic heapprofiler --on-port', function (t) {
       'heapprofiler',
       '--no-open',
       '--on-port',
-      'autocannon localhost:$PORT -d 2',
+      'node -p "\'Hello world\'"',
       '--',
       'node',
       path.join(__dirname, 'server.js')
@@ -89,9 +89,10 @@ test('clinic heapprofiler --on-port', function (t) {
       const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-heapprofiler)/)[1]
       const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
-      t.ok(stderr.indexOf('Running 2s test @ http://localhost:') > -1)
-      t.equal(stdout.split('\n')[0], 'Analysing data')
-      t.equal(stdout.split('\n')[1], `Generated HTML file is ${fullpath}.html`)
+      const [hello, analysing, generated] = stdout.split('\n')
+      t.equal(hello, 'Hello world')
+      t.equal(analysing, 'Analysing data')
+      t.equal(generated, `Generated HTML file is ${fullpath}.html`)
       t.end()
     }
   )
@@ -143,8 +144,37 @@ test('clinic heapprofiler -- node - configure output destination', function (t) 
     function (err, stdout, stderr, tempdir) {
       t.error(err)
 
-      t.ok(fs.statSync(path.join(tempdir, 'test-heapprofiler-destination.clinic-heapprofiler')).isFile())
-      t.ok(fs.statSync(path.join(tempdir, 'test-heapprofiler-destination.clinic-heapprofiler.html')).isFile())
+      t.ok(fs.statSync(path.join(tempdir, 'test-heapprofiler-destination.clinic-heapprofiler')).isDirectory())
+      t.end()
+    }
+  )
+})
+
+test('clinic heapprofiler -- node - configure output destination and name', function (t) {
+  cli(
+    { relayStderr: false },
+    [
+      'clinic',
+      'heapprofiler',
+      '--no-open',
+      '--dest',
+      'test-heapprofiler-destination.clinic-heapprofiler',
+      '--name',
+      'test-name',
+      '--',
+      'node',
+      '-e',
+      'require("util").inspect(process)'
+    ],
+    function (err, stdout, stderr, tempdir) {
+      t.error(err)
+
+      t.ok(fs.statSync(
+        path.join(
+          tempdir,
+          'test-heapprofiler-destination.clinic-heapprofiler',
+          'test-name.clinic-heapprofiler.html'
+        )).isFile())
       t.end()
     }
   )

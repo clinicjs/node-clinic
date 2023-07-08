@@ -29,7 +29,7 @@
     "execspawn": "^1.0.1",
     "insight": "^0.11.1",
     "minimist": "^1.2.0",
-    "open": "^7.3.0",
+    "open": "^8.4.2",
     "ora": "^5.1.0",
     "rimraf": "^3.0.0",
     "stream-collector": "^1.0.1",

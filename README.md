@@ -1,5 +1,8 @@
 # Clinic.js
 
+> [!NOTE]  
+> Clinic.js is not being actively maintained. Due to its strong ties to Node.js internals, it may not work or the results you get may not be accurate.
+
 [![Greenkeeper badge](https://badges.greenkeeper.io/nearform/node-clinic.svg)](https://greenkeeper.io/)
 [![npm version][npm-version]][npm-url] [![Stability Stable][stability-stable]][stability-docs] [![Azure build status][azure-status]][azure-url]
 [![Downloads][npm-downloads]][npm-url] [![Code style][lint-standard]][lint-standard-url]

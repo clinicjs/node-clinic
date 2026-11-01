@@ -1,0 +1,40 @@
+{
+  "scripts": {
+    "profile:clinic": "node bin/profile-clinic.js"
+  },
+  "profile_workloads": {
+    "fibonacci": {
+      "executable": "node",
+      "argv": ["/workspace/bench/profile-fibonacci.js", "${iterations}"],
+      "cwd": "/workspace",
+      "env_allowlist": [],
+      "profilers": ["clinic-flame"],
+      "limits": {
+        "wall_clock_ms": 120000,
+        "cpu_ms": 120000,
+        "memory_mb": 1024,
+        "artifact_mb": 512
+      },
+      "network": "disabled",
+      "input_mounts": [],
+      "parameters": {
+        "iterations": {
+          "type": "integer",
+          "min": 1,
+          "max": 100,
+          "binding": {"kind": "argv", "index": 1}
+        }
+      },
+      "throughput": {
+        "unit": "iterations_per_second",
+        "definition": "completed iterations divided by measured wall-clock seconds"
+      },
+      "measurement": {
+        "warmup_runs": 3,
+        "measured_runs": 10,
+        "max_wall_clock_ms": 30000,
+        "value_field": "throughput"
+      }
+    }
+  }
+}

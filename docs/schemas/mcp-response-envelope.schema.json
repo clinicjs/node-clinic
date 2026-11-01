@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinicjs.org/schemas/mcp-response-envelope.schema.json",
+  "title": "Clinic.js MCP response envelope",
+  "type": "object",
+  "required": ["request_id", "ok"],
+  "additionalProperties": false,
+  "properties": {
+    "request_id": {"type": "string", "minLength": 1},
+    "ok": {"type": "boolean"},
+    "data": {"type": ["object", "null"]},
+    "error": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "required": ["code", "message", "retryable"],
+          "additionalProperties": false,
+          "properties": {
+            "code": {"type": "string", "minLength": 1},
+            "message": {"type": "string", "minLength": 1},
+            "retryable": {"type": "boolean"},
+            "approval_token": {"type": "string", "minLength": 1},
+            "resource_cost_estimate": {"$ref": "#/$defs/resource_cost_estimate"}
+          }
+        }
+      ]
+    },
+    "usage": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "required": ["estimated_input_tokens", "estimated_output_tokens", "token_counts_are_estimates", "truncated"],
+          "additionalProperties": false,
+          "properties": {
+            "estimated_input_tokens": {"type": "integer", "minimum": 0},
+            "estimated_output_tokens": {"type": "integer", "minimum": 0},
+            "token_counts_are_estimates": {"const": true},
+            "truncated": {"type": "boolean"},
+            "low_information": {"type": "boolean"},
+            "call_count": {"type": "integer", "minimum": 0},
+            "scope": {"enum": ["response", "run", "session", "window"]},
+            "session_tokens_remaining": {"type": "integer", "minimum": 0},
+            "window_tokens_remaining": {"type": "integer", "minimum": 0},
+            "process_tokens_remaining": {"type": "integer", "minimum": 0},
+            "run_tokens_remaining": {"anyOf": [{"type": "integer", "minimum": 0}, {"type": "null"}]}
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "resource_cost_estimate": {
+      "type": "object",
+      "required": ["basis", "wall_clock_ms", "cpu_ms", "memory_mb", "artifact_mb"],
+      "additionalProperties": false,
+      "properties": {
+        "basis": {"const": "declared_limits"},
+        "wall_clock_ms": {"type": "integer", "minimum": 1},
+        "cpu_ms": {"type": "integer", "minimum": 1},
+        "memory_mb": {"type": "integer", "minimum": 1},
+        "artifact_mb": {"type": "integer", "minimum": 1}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"ok": {"const": true}}},
+      "then": {"required": ["data"], "properties": {"data": {"type": "object"}, "error": {"type": "null"}}},
+      "else": {
+        "required": ["error"],
+        "properties": {
+          "data": {"type": "null"},
+          "error": {
+            "type": "object",
+            "required": ["code", "message", "retryable"],
+            "additionalProperties": false,
+            "properties": {
+              "code": {"type": "string", "minLength": 1},
+              "message": {"type": "string", "minLength": 1},
+              "retryable": {"type": "boolean"},
+              "approval_token": {"type": "string", "minLength": 1},
+              "resource_cost_estimate": {"$ref": "#/$defs/resource_cost_estimate"}
+            }
+          }
+        }
+      }
+    }
+  ]
+}

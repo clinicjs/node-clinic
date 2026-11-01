@@ -14,7 +14,12 @@ test('clinic bubbleprof -- node - no issues', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 100)'
   ], function (err, stdout, stderr, tempdir) {
     t.error(err)
-    const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-bubbleprof)/)[1]
+    const match = stdout && stdout.match(/(\.clinic[/\\]\d+.clinic-bubbleprof)/)
+    if (err || !match) {
+      if (!match) t.fail(`expected Bubbleprof output path; stdout=${JSON.stringify(stdout)} stderr=${JSON.stringify(stderr)}`)
+      return t.end()
+    }
+    const dirname = match[1]
     const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
     t.equal(stdout.split('\n')[1], 'Analysing data')
@@ -42,7 +47,12 @@ test('clinic bubbleprof -- node - bad status code', function (t) {
     '--', 'node', '-e', 'process.exit(1)'
   ], function (err, stdout, stderr, tempdir) {
     t.error(err)
-    const dirname = stdout.match(/(\.clinic[/\\]\d+.clinic-bubbleprof)/)[1]
+    const match = stdout && stdout.match(/(\.clinic[/\\]\d+.clinic-bubbleprof)/)
+    if (err || !match) {
+      if (!match) t.fail(`expected Bubbleprof output path; stdout=${JSON.stringify(stdout)} stderr=${JSON.stringify(stderr)}`)
+      return t.end()
+    }
+    const dirname = match[1]
     const fullpath = url.pathToFileURL(fs.realpathSync(path.resolve(tempdir, dirname)))
 
     t.equal(stdout.split('\n')[1], 'Analysing data')
@@ -64,25 +74,29 @@ test('clinic bubbleprof -- node - bad status code', function (t) {
 })
 
 test('clinic bubbleprof -- node - visualization error', function (t) {
-  // collect data
-  cli({ relayStderr: false }, [
-    'clinic', 'bubbleprof', '--no-open',
-    '--', 'node', '-e', `
-      const fs = require('fs')
-      const path = require('path')
+  cli({}, [
+    'clinic', 'bubbleprof', '--collect-only',
+    '--', 'node', '-e', 'setTimeout(() => {}, 100)'
+  ], function (err, stdout, stderr, tempdir) {
+    t.error(err)
+    const match = stdout && stdout.match(/(\.clinic[/\\]\d+.clinic-bubbleprof)/)
+    if (err || !match) {
+      if (!match) t.fail(`expected Bubbleprof data path; stdout=${JSON.stringify(stdout)} stderr=${JSON.stringify(stderr)}`)
+      return t.end()
+    }
 
-      // Delete the systeminfo file, such that the visualizer fails.
-      fs.unlinkSync(path.join(
-        '.clinic',
-        process.pid + '.clinic-bubbleprof',
-        process.pid + '.clinic-bubbleprof-systeminfo'
-      ))
-    `
-  ], function (err, stdout, stderr) {
-    t.strictSame(err, new Error('process exited with exit code 1'))
-    t.equal(stdout, 'To generate the report press: Ctrl + C\nAnalysing data\n')
-    t.ok(stderr.includes('ENOENT: no such file or directory'))
-    t.end()
+    const dirname = match[1]
+    const filename = path.basename(dirname) + '-systeminfo'
+    fs.unlinkSync(path.join(tempdir, dirname, filename))
+
+    cli({ cwd: tempdir, relayStderr: false }, [
+      'clinic', 'bubbleprof', '--visualize-only', path.resolve(tempdir, dirname)
+    ], function (err, stdout, stderr) {
+      t.strictSame(err, new Error('process exited with exit code 1'))
+      t.equal(stdout, '')
+      t.ok(stderr.includes('ENOENT: no such file or directory'))
+      t.end()
+    })
   })
 })
 
@@ -93,7 +107,12 @@ test('clinic bubbleprof -- node - configure output destination', function (t) {
     '--', 'node', '-e', 'setTimeout(() => {}, 200)'
   ], function (err, stdout, stderr, tempdir) {
     t.error(err)
-    const basename = stdout.match(/(\d+.clinic-bubbleprof)/)[1]
+    const match = stdout && stdout.match(/(\d+.clinic-bubbleprof)/)
+    if (err || !match) {
+      if (!match) t.fail(`expected Bubbleprof destination path; stdout=${JSON.stringify(stdout)} stderr=${JSON.stringify(stderr)}`)
+      return t.end()
+    }
+    const basename = match[1]
     t.ok(fs.statSync(path.join(tempdir, 'test-bubbleprof-destination', basename)).isDirectory())
     t.ok(fs.statSync(path.join(tempdir, 'test-bubbleprof-destination', `${basename}.html`)).isFile())
     t.end()

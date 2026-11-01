@@ -454,21 +454,36 @@ async function runTool (toolName, Tool, version, args, uiOptions) {
         return cb(new Error('No data found.'))
       }
 
-      const html = filename + '.html'
-      tool.visualize(filename, html, function (err) {
-        if (err) return cb(err)
-        hash(html, function (err, h) {
-          /* istanbul ignore next */ if (err) return cb(err)
+      function visualize () {
+        const html = filename + '.html'
+        tool.visualize(filename, html, function (err) {
+          if (err) return cb(err)
+          hash(html, function (err, h) {
+            /* istanbul ignore next */ if (err) return cb(err)
 
-          const info = {
-            tool: toolName,
-            toolVersion: version,
-            hash: h.toString('hex')
-          }
+            const info = {
+              tool: toolName,
+              toolVersion: version,
+              hash: h.toString('hex')
+            }
 
-          fs.appendFile(html, `<!-- ${JSON.stringify(info)} -->\n`, cb)
+            fs.appendFile(html, `<!-- ${JSON.stringify(info)} -->\n`, cb)
+          })
         })
-      })
+      }
+
+      if (toolName === 'bubbleprof') {
+        const getLoggingPaths = require('@clinic/clinic-common').getLoggingPaths('bubbleprof')
+        const paths = getLoggingPaths({ path: filename })
+        const requiredFiles = ['/systeminfo', '/stacktrace', '/traceevent'].map(key => paths[key])
+        const checkFile = index => {
+          if (index === requiredFiles.length) return visualize()
+          fs.access(requiredFiles[index], err => err ? cb(err) : checkFile(index + 1))
+        }
+        return checkFile(0)
+      }
+
+      visualize()
     })
   }
 }

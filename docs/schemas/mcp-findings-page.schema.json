@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinicjs.org/schemas/mcp-findings-page.schema.json",
+  "title": "Clinic.js MCP findings page",
+  "type": "object",
+  "required": ["run_id", "classification", "snapshot_id", "sort", "expires_at", "items", "next_cursor", "has_more", "truncated", "low_information"],
+  "additionalProperties": false,
+  "properties": {
+    "run_id": {"type": "string", "minLength": 1},
+    "classification": {"enum": ["public-diagnostic", "sensitive-diagnostic", "restricted"]},
+    "snapshot_id": {"type": "string", "minLength": 1},
+    "sort": {"type": "string", "minLength": 1},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "items": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "anyOf": [
+          {"$ref": "performance-report.schema.json#/$defs/finding"},
+          {"$ref": "#/$defs/compactedFinding"}
+        ]
+      }
+    },
+    "next_cursor": {"anyOf": [{"type": "null"}, {"type": "string", "minLength": 22, "pattern": "^[A-Za-z0-9_-]+$"}]},
+    "has_more": {"type": "boolean"},
+    "truncated": {"type": "boolean"},
+    "low_information": {"type": "boolean"}
+  },
+  "$defs": {
+    "compactedFinding": {
+      "type": "object",
+      "required": ["id", "severity", "category", "title", "observation", "location", "hypotheses", "next_checks", "confidence", "evidence", "truncated"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["low", "medium", "high"]},
+        "category": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+        "title": {"type": "string", "minLength": 1},
+        "observation": {
+          "type": "object",
+          "required": ["metric", "values"],
+          "additionalProperties": false,
+          "properties": {
+            "metric": {"type": "string", "minLength": 1},
+            "values": {"type": "object"}
+          }
+        },
+        "location": {"type": "null"},
+        "hypotheses": {"type": "array", "maxItems": 0},
+        "next_checks": {"type": "array", "maxItems": 0},
+        "confidence": {"const": "unsupported"},
+        "evidence": {
+          "type": "object",
+          "required": ["adapter", "adapter_schema_version", "confidence_basis"],
+          "additionalProperties": false,
+          "properties": {
+            "adapter": {"type": "string", "pattern": "^[a-z][a-z0-9-]*-v[0-9]+$"},
+            "adapter_schema_version": {"type": "string", "pattern": "^[0-9]+$"},
+            "confidence_basis": {"enum": ["profiler_sample_count", "profiler_sample_count_unavailable", "doctor_issue_classification", "bubbleprof_event_sources", "heapprofiler_single_snapshot", "compacted_unavailable"]}
+          }
+        },
+        "truncated": {"const": true}
+      }
+    }
+  }
+}

@@ -1,0 +1,423 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinicjs.org/schemas/performance-report.schema.json",
+  "title": "Clinic.js performance report",
+  "type": "object",
+  "required": ["schema_version", "run", "summary", "findings", "artifacts"],
+  "additionalProperties": false,
+  "$defs": {
+    "host_conditions": {
+      "type": "object",
+      "required": ["cpu_affinity", "cpu_governor", "cpu_frequency_khz", "thermal_millicelsius"],
+      "additionalProperties": false,
+      "properties": {
+        "cpu_affinity": {"anyOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+        "cpu_governor": {"anyOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+        "cpu_frequency_khz": {"anyOf": [{"type": "integer", "minimum": 0}, {"type": "null"}]},
+        "thermal_millicelsius": {"anyOf": [{"type": "integer"}, {"type": "null"}]}
+      }
+    },
+    "error": {
+      "type": "object",
+      "required": ["code", "message", "retryable"],
+      "additionalProperties": false,
+      "properties": {
+        "code": {"type": "string", "minLength": 1},
+        "message": {"type": "string", "minLength": 1},
+        "retryable": {"type": "boolean"}
+      }
+    },
+    "uncertainty": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["method", "algorithm_version", "seed", "low_pct", "high_pct"],
+          "additionalProperties": false,
+          "properties": {
+            "method": {"const": "bootstrap_95_ci"},
+            "algorithm_version": {"type": "string", "minLength": 1},
+            "seed": {"type": "integer", "minimum": 0},
+            "low_pct": {"type": "number"},
+            "high_pct": {"type": "number"}
+          }
+        },
+        {
+          "type": "object",
+          "required": ["method", "reason"],
+          "additionalProperties": false,
+          "properties": {
+            "method": {"const": "unsupported"},
+            "reason": {"enum": ["single_run_measurement", "repeated_samples_unavailable"]}
+          }
+        }
+      ]
+    },
+    "throughput": {
+      "type": "object",
+      "required": ["value", "unit", "definition"],
+      "additionalProperties": false,
+      "properties": {
+        "value": {"type": "number", "minimum": 0},
+        "unit": {"type": "string", "minLength": 1},
+        "definition": {"type": "string", "minLength": 1}
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "required": ["samples", "sample_count", "warmup_count", "value_field", "max_wall_clock_ms", "elapsed_ms"],
+      "additionalProperties": false,
+      "properties": {
+        "samples": {"type": "array", "minItems": 1, "maxItems": 30, "items": {"type": "number", "minimum": 0}},
+        "sample_count": {"type": "integer", "minimum": 1, "maximum": 30},
+        "warmup_count": {"type": "integer", "minimum": 0, "maximum": 20},
+        "value_field": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$"},
+        "max_wall_clock_ms": {"type": "integer", "minimum": 1},
+        "elapsed_ms": {"type": "integer", "minimum": 0}
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "required": ["schema_version", "workload", "manifest_hash", "profiler", "input_digest", "isolation", "runtime", "architecture", "repository"],
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {"const": 1},
+        "workload": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+        "manifest_hash": {"anyOf": [{"type": "string", "pattern": "^sha256-[a-f0-9]{64}$"}, {"type": "null"}]},
+        "profiler": {
+          "type": "object",
+          "required": ["name", "adapter_version", "configuration_digest", "canonicalization_version"],
+          "additionalProperties": false,
+          "properties": {
+            "name": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+            "adapter_version": {"type": "string", "pattern": "^[0-9]+$"},
+            "configuration_digest": {"type": "string", "pattern": "^sha256-[a-f0-9]{64}$"},
+            "canonicalization_version": {"type": "string", "pattern": "^[0-9]+$"}
+          }
+        },
+        "input_digest": {"type": "string", "pattern": "^sha256-[a-f0-9]{64}$"},
+        "isolation": {"anyOf": [{"type": "null"}, {
+          "type": "object",
+          "required": ["provider", "version", "limits"],
+          "additionalProperties": true,
+          "properties": {
+            "provider": {"type": "string", "minLength": 1},
+            "version": {"type": "string", "minLength": 1},
+            "limits": {
+              "type": "object",
+              "required": ["wall_clock_ms", "cpu_ms", "memory_mb", "artifact_mb", "network"],
+              "additionalProperties": false,
+              "properties": {
+                "wall_clock_ms": {"type": "integer", "minimum": 1},
+                "cpu_ms": {"type": "integer", "minimum": 1},
+                "memory_mb": {"type": "integer", "minimum": 1},
+                "artifact_mb": {"type": "integer", "minimum": 1},
+                "network": {"const": "disabled"}
+              }
+            }
+          }
+        }]},
+        "runtime": {
+          "type": "object",
+          "required": ["node_version", "clinic_version", "os_version", "toolchain_digest"],
+          "additionalProperties": false,
+          "properties": {
+            "node_version": {"type": "string", "pattern": "^node-v[0-9]+\\.[0-9]+\\.[0-9]+$"},
+            "toolchain_digest": {"anyOf": [{"type": "string", "pattern": "^sha256-[a-f0-9]{64}$"}, {"type": "null"}]},
+            "clinic_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$"},
+            "os_version": {"type": "string", "minLength": 1}
+          }
+        },
+        "architecture": {"type": "string", "minLength": 1},
+        "repository": {
+          "type": "object",
+          "required": ["identity", "revision"],
+          "additionalProperties": false,
+          "properties": {
+            "identity": {"anyOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+            "revision": {"anyOf": [{"type": "string", "pattern": "^[a-f0-9]{40,64}$"}, {"type": "null"}]}
+          }
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["id", "severity", "category", "title", "observation", "location", "hypotheses", "next_checks", "confidence", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["low", "medium", "high"]},
+        "category": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+        "title": {"type": "string", "minLength": 1},
+        "observation": {
+          "anyOf": [
+            {
+              "type": "object",
+              "required": ["metric", "self_time_pct", "total_time_pct"],
+              "additionalProperties": false,
+              "properties": {
+                "metric": {"type": "string", "minLength": 1},
+                "self_time_pct": {"type": "number", "minimum": 0, "maximum": 100},
+                "total_time_pct": {"type": "number", "minimum": 0, "maximum": 100}
+              }
+            },
+            {
+              "type": "object",
+              "required": ["metric", "values"],
+              "additionalProperties": false,
+              "properties": {
+                "metric": {"type": "string", "minLength": 1},
+                "values": {"type": "object"}
+              }
+            }
+          ]
+        },
+        "location": {
+          "anyOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "required": ["file", "line"],
+              "additionalProperties": false,
+              "properties": {
+                "file": {"type": "string", "minLength": 1},
+                "line": {"type": "integer", "minimum": 1}
+              }
+            }
+          ]
+        },
+        "hypotheses": {"type": "array", "items": {"type": "string"}},
+        "next_checks": {"type": "array", "items": {"type": "string"}},
+        "confidence": {"enum": ["low", "medium", "high", "unsupported"]},
+        "evidence": {
+          "type": "object",
+          "required": ["adapter", "adapter_schema_version", "confidence_basis"],
+          "additionalProperties": false,
+          "properties": {
+            "adapter": {"type": "string", "pattern": "^[a-z][a-z0-9-]*-v[0-9]+$"},
+            "adapter_schema_version": {"type": "string", "pattern": "^[0-9]+$"},
+            "sample_count": {"type": "integer", "minimum": 1},
+            "confidence_basis": {"enum": ["profiler_sample_count", "profiler_sample_count_unavailable", "doctor_issue_classification", "bubbleprof_event_sources", "heapprofiler_single_snapshot"]}
+          }
+        }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {"const": 1},
+    "run": {
+      "type": "object",
+      "required": ["id", "workload", "profiler", "commit", "clinic_version", "os_version", "node", "architecture", "status", "exit_code", "termination_reason", "lifecycle", "compatibility"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "workload": {"type": "string", "minLength": 1},
+        "profiler": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+        "commit": {"anyOf": [{"type": "string", "pattern": "^[a-f0-9]{40,64}$"}, {"type": "null"}]},
+        "clinic_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$"},
+        "os_version": {"type": "string", "minLength": 1},
+        "node": {"type": "string", "pattern": "^node-v[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "architecture": {"type": "string", "minLength": 1},
+        "status": {"enum": ["completed", "failed", "timed_out", "cancelled", "partial"]},
+        "exit_code": {"anyOf": [{"type": "integer"}, {"type": "null"}]},
+        "termination_reason": {"type": "string", "minLength": 1, "maxLength": 128},
+        "lifecycle": {
+          "type": "object",
+          "required": ["created_at"],
+          "additionalProperties": false,
+          "properties": {
+            "created_at": {"type": "string", "format": "date-time"},
+            "finished_at": {"type": "string", "format": "date-time"}
+          }
+        },
+        "command": {
+          "type": "object",
+          "required": ["executable", "working_directory", "argument_count"],
+          "additionalProperties": false,
+          "properties": {
+            "executable": {"type": "string", "minLength": 1, "maxLength": 256},
+            "working_directory": {"type": "string", "pattern": "^(?:\\.|[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*)$"},
+            "argument_count": {"type": "integer", "minimum": 0, "maximum": 1000}
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "maxProperties": 64,
+          "propertyNames": {"pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$"},
+          "additionalProperties": {"type": "integer"}
+        },
+        "error": {"anyOf": [{"$ref": "#/$defs/error"}, {"type": "null"}]},
+        "compatibility": {"anyOf": [{"$ref": "#/$defs/compatibility"}, {"type": "null"}]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"enum": ["failed", "timed_out", "cancelled", "partial"]}}},
+          "then": {
+            "required": ["error"],
+            "properties": {"error": {"$ref": "#/$defs/error"}}
+          }
+        },
+        {
+          "if": {"properties": {"status": {"enum": ["completed", "failed", "timed_out", "cancelled", "partial"]}}},
+          "then": {
+            "properties": {
+              "lifecycle": {
+                "required": ["finished_at"]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "summary": {
+      "anyOf": [
+      {"type": "null"},
+      {
+      "type": "object",
+      "required": ["duration_ms", "throughput", "confidence", "capabilities", "findings_truncated"],
+      "additionalProperties": false,
+      "properties": {
+        "duration_ms": {"type": "number", "minimum": 0},
+        "throughput": {"anyOf": [{"$ref": "#/$defs/throughput"}, {"type": "null"}]},
+        "measurement": {"anyOf": [{"$ref": "#/$defs/measurement"}, {"type": "null"}]},
+        "findings_truncated": {"type": "boolean"},
+        "measurement_environment": {
+          "type": "object",
+          "required": ["isolation_mode", "scheduler_mode", "start", "finish", "limitations"],
+          "additionalProperties": false,
+          "properties": {
+            "isolation_mode": {"type": "string", "minLength": 1},
+            "scheduler_mode": {"type": "string", "minLength": 1},
+            "start": {"$ref": "#/$defs/host_conditions"},
+            "finish": {"$ref": "#/$defs/host_conditions"},
+            "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}}
+          }
+        },
+        "confidence": {"enum": ["low", "medium", "high", "unsupported"]},
+        "capabilities": {
+          "type": "object",
+          "required": ["cpu_call_tree", "event_loop_delay", "heap_retained_delta"],
+          "additionalProperties": true,
+          "properties": {
+            "cpu_call_tree": {"enum": ["supported", "unsupported"]},
+            "event_loop_delay": {"enum": ["supported", "unsupported"]},
+            "heap_retained_delta": {"enum": ["supported", "unsupported"]}
+          }
+        }
+      }
+      }
+      ]
+    },
+    "comparison": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "required": ["baseline_run_id", "metric", "units", "metric_definition", "direction", "denominator", "compatibility"],
+          "additionalProperties": false,
+          "properties": {
+            "baseline_run_id": {"type": "string", "minLength": 1},
+            "metric": {"const": "throughput"},
+            "units": {"type": "string", "minLength": 1},
+            "metric_definition": {"type": "string", "minLength": 1},
+            "direction": {"enum": ["higher_is_better", "lower_is_better"]},
+            "denominator": {"const": "baseline_median"},
+            "candidate_sample_count": {"type": "integer", "minimum": 1},
+            "candidate_warmup_count": {"type": "integer", "minimum": 0},
+            "candidate_uncertainty": {"$ref": "#/$defs/uncertainty"},
+            "baseline_sample_count": {"type": "integer", "minimum": 1},
+            "baseline_warmup_count": {"type": "integer", "minimum": 0},
+            "baseline_uncertainty": {"$ref": "#/$defs/uncertainty"},
+            "delta_uncertainty": {"$ref": "#/$defs/uncertainty"},
+            "delta_pct": {"type": "number"},
+            "finding_changes": {
+              "type": "object",
+              "required": ["scope", "complete", "items", "total", "truncated"],
+              "additionalProperties": false,
+              "properties": {
+                "scope": {"const": "reported_findings"},
+                "complete": {"type": "boolean"},
+                "items": {"type": "array", "maxItems": 20, "items": {"type": "object", "required": ["kind"], "properties": {"kind": {"enum": ["candidate_only", "baseline_only", "changed"]}}}},
+                "total": {"type": "integer", "minimum": 0},
+                "truncated": {"type": "boolean"}
+              }
+            },
+            "compatibility": {"enum": ["compatible", "incompatible"]}
+          },
+          "allOf": [
+            {
+              "if": {"properties": {"compatibility": {"const": "compatible"}}},
+              "then": {
+                "required": ["candidate_sample_count", "candidate_warmup_count", "candidate_uncertainty", "baseline_sample_count", "baseline_warmup_count", "baseline_uncertainty", "delta_uncertainty", "delta_pct"]
+              },
+              "else": {
+                "not": {
+                  "anyOf": [
+                    {"required": ["candidate_sample_count"]},
+                    {"required": ["candidate_warmup_count"]},
+                    {"required": ["candidate_uncertainty"]},
+                    {"required": ["baseline_sample_count"]},
+                    {"required": ["baseline_warmup_count"]},
+                    {"required": ["baseline_uncertainty"]},
+                    {"required": ["delta_uncertainty"]},
+                    {"required": ["delta_pct"]}
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "findings": {"anyOf": [{"type": "null"}, {"type": "array", "maxItems": 20, "items": {"$ref": "#/$defs/finding"}}]},
+    "artifacts": {
+      "anyOf": [
+        {"type": "null"},
+        {"type": "array", "items": {
+        "type": "object",
+        "required": ["kind", "ref", "classification"],
+        "additionalProperties": false,
+        "properties": {
+          "kind": {"const": "clinic"},
+          "ref": {"type": "string", "pattern": "^artifact_[A-Za-z0-9_-]{22,}$"},
+          "classification": {"enum": ["public-diagnostic", "sensitive-diagnostic", "restricted"]}
+        }
+        }}
+      ]
+    },
+    "usage": {"anyOf": [{"type": "null"}, {
+      "type": "object",
+      "required": ["estimated_input_tokens", "estimated_output_tokens", "token_counts_are_estimates", "truncated"],
+      "additionalProperties": false,
+      "properties": {
+        "estimated_input_tokens": {"type": "integer", "minimum": 0},
+        "estimated_output_tokens": {"type": "integer", "minimum": 0},
+        "token_counts_are_estimates": {"const": true},
+        "truncated": {"type": "boolean"},
+        "low_information": {"type": "boolean"},
+        "call_count": {"type": "integer", "minimum": 0},
+        "scope": {"enum": ["response", "run", "session", "window"]}
+      }
+    }]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"run": {"properties": {"status": {"const": "completed"}}}}},
+      "then": {
+        "properties": {
+          "summary": {"not": {"type": "null"}},
+          "findings": {"not": {"type": "null"}},
+          "artifacts": {"not": {"type": "null"}},
+          "run": {"properties": {"compatibility": {"anyOf": [{"$ref": "#/$defs/compatibility"}, {"type": "null"}]}}}
+        }
+      }
+    },
+    {
+      "if": {"required": ["comparison"], "properties": {"comparison": {"not": {"type": "null"}}}},
+      "then": {
+        "properties": {
+          "run": {"properties": {"compatibility": {"$ref": "#/$defs/compatibility"}}}
+        }
+      }
+    }
+  ]
+}

@@ -6,7 +6,7 @@ const cli = require('./cli.js')
 
 test('clinic doctor throws error when process is forcefully closed before processstat file is generated', { skip: process.version.startsWith('v14') }, function (t) {
   // collect data
-  cli({}, [
+  cli({ relayStderr: false }, [
     'clinic', 'doctor', '--no-open',
     '--', 'node', path.join(__dirname, 'forceful-termination.js')
   ], function (err, stdout, stderr) {

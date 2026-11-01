@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinicjs.org/schemas/run-status.schema.json",
+  "title": "Clinic.js profile run status",
+  "type": "object",
+  "required": ["run_id", "run_capability", "status", "created_at"],
+  "additionalProperties": false,
+  "properties": {
+    "run_id": {"type": "string", "minLength": 1},
+    "run_capability": {"type": "string", "minLength": 1},
+    "status": {"enum": ["queued", "running"]},
+    "created_at": {"type": "string", "format": "date-time"},
+    "started_at": {"type": "string", "format": "date-time"},
+    "progress_pct": {"type": "number", "minimum": 0, "maximum": 100},
+    "phase": {"enum": ["queued", "preparing", "measuring", "profiling", "analyzing", "exporting", "completed", "failed", "timed_out", "cancelled", "partial"]},
+    "message": {"type": "string"},
+    "wait_timed_out": {"type": "boolean"},
+    "elapsed_ms": {"type": "number", "minimum": 0},
+    "next_poll_after_ms": {"type": "integer", "minimum": 1}
+  }
+}

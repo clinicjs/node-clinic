@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinicjs.org/schemas/profile-workload.schema.json",
+  "title": "Clinic.js profile workload manifest",
+  "type": "object",
+  "required": ["scripts", "profile_workloads"],
+  "additionalProperties": false,
+  "properties": {
+    "scripts": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    },
+    "profile_workloads": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"$ref": "profile-workload-entry.schema.json"}
+    }
+  }
+}

@@ -19,31 +19,33 @@ implemented yet. The current MCP implementation provides:
 * findings pages with a default of 10 items and 8,000 characters, capped at 20
   items and 20,000 characters. Cursors continue through the report's findings.
 
-The following RFC requirements are not implemented in full: `start_profile_run`
-currently waits for the profiling run to finish instead of returning an
-asynchronous queued run; cancellation and progress polling are not connected to
-a live child process; there are no per-call token estimates or per-session or
-time-window token quotas;
-cursor values are encoded offsets rather than signed, snapshot-bound opaque
-tokens; and the runner does not pin and revalidate an immutable manifest and
-executable as specified below. The profiler collector code paths are present,
-but this status does not claim that all four adapters have passed end-to-end
-validation. The findings endpoint sorts by severity and then measured impact,
-even though its response currently labels the sort as `impact_desc`.
-`get_profile_status` returns the full report when a run is
-complete, rather than a compact summary. The `detail_level` input is accepted
-but does not select the RFC's proposed response modes. `get_finding_detail`
-returns the selected finding with a placeholder one-node call tree; it does
-not read source files or return source context. Artifact references are
-included in reports, but there is no MCP tool to retrieve artifact files.
-Report identity fields also use placeholders today: the commit defaults to an
-all-zero revision and the manifest hash falls back to a hash of the workload
-name. The comparison code does not implement repeated-run sampling or a valid
-bootstrap interval, so comparisons must not be interpreted as the statistical
-regression analysis described later in this RFC.
+The current runner returns a queued run promptly, executes it asynchronously,
+exposes status, and connects cancellation to the collector child process group.
+Status polling has no meaningful progress percentage yet. The runner enforces
+concurrent/stored-run limits and retention, but there are no per-call token
+estimates or per-session or time-window token quotas. Findings are sorted by
+severity and measured impact; opaque server-side cursors bind paging to the
+session, run, findings snapshot, severity filter, sort, and expiry. The
+runner does not yet pin and revalidate the executable at launch as specified
+below. It reports the canonical hash of the manifest loaded at startup, hashes
+the Node executable contents, and records the Git revision plus a hashed remote
+identity when available; it sets compatibility to null when critical identity
+or isolation metadata is unavailable. End-to-end worker tests
+cover Doctor, Bubbleprof, Flame, and Heap Profiler. `get_profile_status`
+returns the full report when a run is complete, rather than a compact summary.
+The `detail_level` input is accepted but does not select the RFC's proposed
+response modes. `get_finding_detail` returns the selected finding with a
+placeholder one-node call tree; it does not read source files or return source
+context. Artifact references are included in reports, but there is no MCP tool
+to retrieve artifact files. The comparison code does not implement
+repeated-run sampling or a valid bootstrap interval, so comparisons must not
+be interpreted as the statistical regression analysis described later in
+this RFC.
 Strict isolation is enabled by default and fails closed without a configured
 provider; setting `CLINIC_PROFILE_ISOLATION=disabled` runs the declared workload
-directly on the host without that isolation boundary.
+directly on the host without that isolation boundary. The bundled Bubblewrap
+setup does not provide the required atomic executable-selection guarantee and
+therefore cannot currently run strict profiles; it fails closed.
 
 The MCP SDK adapter currently returns each tool's `data` or `error` payload
 directly as MCP content. The `{request_id, ok, data, error, usage}` envelope
@@ -188,8 +190,8 @@ directory, environment allowlist, resource limits, and network policy.
       "network": "disabled",
       "input_mounts": [],
       "parameters": {
-        "iterations": {"type": "integer", "min": 1, "max": 100, "binding": {"kind": "argv", "index": 3}},
-        "warmup_iterations": {"type": "integer", "min": 0, "max": 20, "binding": {"kind": "argv", "index": 5}}
+      "iterations": {"type": "integer", "min": 1, "max": 100, "binding": {"kind": "argv", "index": 2}},
+      "warmup_iterations": {"type": "integer", "min": 0, "max": 20, "binding": {"kind": "argv", "index": 4}}
       },
       "throughput": {
         "unit": "documents_per_second",
@@ -675,10 +677,10 @@ inside the `parameters` object, not at the top level of the tool input:
 }
 ```
 
-For a successful, approved workload, the current MCP implementation waits for
-Clinic to finish and returns a terminal status such as `completed`, along with
-`run_id` and `run_capability`. This is not the asynchronous `queued` flow
-proposed above.
+For a successful, approved workload, the current MCP implementation returns
+`queued` with `run_id` and `run_capability`; poll `get_profile_status` to see
+when the run reaches a terminal state. The internal facade envelope is shown
+below; the MCP SDK returns its data or error payload directly.
 The MCP SDK returns the tool's data or error payload directly. The envelope
 below is the internal facade response, not the MCP wire response:
 
@@ -689,7 +691,7 @@ below is the internal facade response, not the MCP wire response:
   "data": {
     "run_id": "run_2026-11-01T12-00-00Z_abc123",
     "run_capability": "cap_opaque_value",
-    "status": "completed",
+    "status": "queued",
     "created_at": "2026-11-01T12:00:00Z"
   },
   "error": null,

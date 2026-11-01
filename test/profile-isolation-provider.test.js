@@ -12,6 +12,7 @@ test('provider fails closed when no supervisor is configured', async t => {
 test('provider forwards the strict guarantee contract', async t => {
   let received
   const provider = createLinuxIsolationProvider({
+    atomicExec: true,
     supervisor: async context => {
       received = context
       return { status: 'completed' }
@@ -22,6 +23,12 @@ test('provider forwards the strict guarantee contract', async t => {
   t.equal(received.workload, 'smoke')
   t.equal(received.guarantees.private_network, true)
   t.equal(received.guarantees.atomic_exec, true)
+  t.end()
+})
+
+test('provider fails closed without atomic executable selection', async t => {
+  const provider = createLinuxIsolationProvider({ supervisor: async () => ({ status: 'completed' }) })
+  await t.rejects(provider.run({ execute: async () => ({ status: 'completed' }) }), { code: 'ISOLATION_UNAVAILABLE' })
   t.end()
 })
 

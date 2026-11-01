@@ -147,10 +147,10 @@ For repeatable runs, add a workload to `profile-workloads.json` in your project.
 Run it with Clinic Flame from that project directory:
 
 ```sh
-node /path/to/node-clinic/bin/profile-clinic.js --workload smoke --param iterations=10
+node /path/to/node-clinic/bin/profile-clinic.js --workload fibonacci --param iterations=10
 ```
 
-This command runs the `smoke` workload with Clinic Flame. It writes a JSON
+This command runs the `fibonacci` workload with Clinic Flame. It writes a JSON
 report and saves the profile files in `.clinic-runs/` in your project directory.
 
 ## Use the profiling MCP server
@@ -158,10 +158,10 @@ report and saves the profile files in `.clinic-runs/` in your project directory.
 The MCP server reads `profile-workloads.json` from its configured working
 directory. Set `cwd` to the project you want to profile so workload definitions
 and `.clinic-runs/` stay with that project. Each workload lists the profilers it
-allows. For example, when `tok2vec` allows `clinic-flame`, start it with:
+allows. For example, when `fibonacci` allows `clinic-flame`, start it with:
 
 ```json
-{"workload":"tok2vec","profiler":"clinic-flame"}
+{"workload":"fibonacci","profiler":"clinic-flame"}
 ```
 
 Available profilers are `clinic-doctor`, `clinic-bubbleprof`, `clinic-flame`,
@@ -169,7 +169,7 @@ and `clinic-heapprofiler`. The profiler must be listed for that workload in the
 project manifest.
 
 The MCP server can show available workloads and start a profile. Use
-`get_profile_findings` to see the highest impact findings first; long result
+`get_profile_findings` to see the highest severity and impact findings first; long result
 lists are split into pages. Request individual finding details when needed.
 Profile files stay in the project and are not uploaded automatically.
 
@@ -190,8 +190,10 @@ environment:
 CLINIC_PROFILE_ISOLATION = "disabled"
 ```
 
-Alternatively, configure `CLINIC_PROFILE_SUPERVISOR = "systemd-bwrap"` on a
-Linux host with Bubblewrap and a working user systemd session.
+The bundled Bubblewrap supervisor does not currently guarantee atomic
+executable selection, so strict profiling requests fail closed. Use direct host
+execution only for trusted workloads until a provider with that guarantee is
+configured.
 
 ## Profiling In [Podman](https://podman.io/) Container
 _Applicable for `doctor`, `bubbleprof`, `flame` or `heapprofiler`_

@@ -3,9 +3,9 @@
     "profile:clinic": "node bin/profile-clinic.js"
   },
   "profile_workloads": {
-    "smoke": {
+    "fibonacci": {
       "executable": "node",
-      "argv": ["/workspace/bench/profile-smoke.js", "${iterations}"],
+      "argv": ["/workspace/bench/profile-fibonacci.js", "${iterations}"],
       "cwd": "/workspace",
       "env_allowlist": [],
       "profilers": ["clinic-flame"],

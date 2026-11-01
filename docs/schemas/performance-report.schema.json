@@ -17,16 +17,29 @@
       }
     },
     "uncertainty": {
-      "type": "object",
-      "required": ["method", "algorithm_version", "seed", "low_pct", "high_pct"],
-      "additionalProperties": false,
-      "properties": {
-        "method": {"const": "bootstrap_95_ci"},
-        "algorithm_version": {"type": "string", "minLength": 1},
-        "seed": {"type": "integer", "minimum": 0},
-        "low_pct": {"type": "number", "minimum": 0, "maximum": 100},
-        "high_pct": {"type": "number", "minimum": 0, "maximum": 100}
-      }
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["method", "algorithm_version", "seed", "low_pct", "high_pct"],
+          "additionalProperties": false,
+          "properties": {
+            "method": {"const": "bootstrap_95_ci"},
+            "algorithm_version": {"type": "string", "minLength": 1},
+            "seed": {"type": "integer", "minimum": 0},
+            "low_pct": {"type": "number", "minimum": 0, "maximum": 100},
+            "high_pct": {"type": "number", "minimum": 0, "maximum": 100}
+          }
+        },
+        {
+          "type": "object",
+          "required": ["method", "reason"],
+          "additionalProperties": false,
+          "properties": {
+            "method": {"const": "unsupported"},
+            "reason": {"enum": ["single_run_measurement", "repeated_samples_unavailable"]}
+          }
+        }
+      ]
     },
     "throughput": {
       "type": "object",
@@ -45,7 +58,7 @@
       "properties": {
         "schema_version": {"const": 1},
         "workload": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
-        "manifest_hash": {"type": "string", "pattern": "^sha256-[a-f0-9]{64}$"},
+        "manifest_hash": {"anyOf": [{"type": "string", "pattern": "^sha256-[a-f0-9]{64}$"}, {"type": "null"}]},
         "profiler": {
           "type": "object",
           "required": ["name", "adapter_version", "configuration_digest", "canonicalization_version"],
@@ -58,7 +71,7 @@
           }
         },
         "input_digest": {"type": "string", "pattern": "^sha256-[a-f0-9]{64}$"},
-        "isolation": {
+        "isolation": {"anyOf": [{"type": "null"}, {
           "type": "object",
           "required": ["provider", "version", "limits"],
           "additionalProperties": true,
@@ -78,14 +91,14 @@
               }
             }
           }
-        },
+        }]},
         "runtime": {
           "type": "object",
           "required": ["node_version", "toolchain_digest"],
           "additionalProperties": false,
           "properties": {
             "node_version": {"type": "string", "pattern": "^node-v[0-9]+\\.[0-9]+\\.[0-9]+$"},
-            "toolchain_digest": {"type": "string", "pattern": "^sha256-[a-f0-9]{64}$"}
+            "toolchain_digest": {"anyOf": [{"type": "string", "pattern": "^sha256-[a-f0-9]{64}$"}, {"type": "null"}]}
           }
         },
         "architecture": {"type": "string", "minLength": 1},
@@ -94,8 +107,8 @@
           "required": ["identity", "revision"],
           "additionalProperties": false,
           "properties": {
-            "identity": {"type": "string", "minLength": 1},
-            "revision": {"type": "string", "pattern": "^[a-f0-9]{40,64}$"}
+            "identity": {"anyOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+            "revision": {"anyOf": [{"type": "string", "pattern": "^[a-f0-9]{40,64}$"}, {"type": "null"}]}
           }
         }
       }
@@ -151,7 +164,7 @@
         "confidence": {"enum": ["low", "medium", "high", "unsupported"]},
         "evidence": {
           "type": "object",
-          "required": ["adapter", "adapter_schema_version", "sample_count"],
+          "required": ["adapter", "adapter_schema_version"],
           "additionalProperties": false,
           "properties": {
             "adapter": {"type": "string", "pattern": "^[a-z][a-z0-9-]*-v[0-9]+$"},
@@ -172,7 +185,7 @@
         "id": {"type": "string", "minLength": 1},
         "workload": {"type": "string", "minLength": 1},
         "profiler": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
-        "commit": {"type": "string", "pattern": "^[a-f0-9]{40,64}$"},
+        "commit": {"anyOf": [{"type": "string", "pattern": "^[a-f0-9]{40,64}$"}, {"type": "null"}]},
         "node": {"type": "string", "pattern": "^node-v[0-9]+\\.[0-9]+\\.[0-9]+$"},
         "architecture": {"type": "string", "minLength": 1},
         "status": {"enum": ["completed", "failed", "timed_out", "cancelled", "partial"]},

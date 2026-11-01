@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinicjs.org/schemas/run-status.schema.json",
+  "title": "Clinic.js profile run status",
+  "type": "object",
+  "required": ["run_id", "run_capability", "status", "created_at"],
+  "additionalProperties": false,
+  "properties": {
+    "run_id": {"type": "string", "minLength": 1},
+    "run_capability": {"type": "string", "minLength": 1},
+    "status": {"enum": ["queued", "running"]},
+    "created_at": {"type": "string", "format": "date-time"},
+    "started_at": {"type": "string", "format": "date-time"},
+    "progress_pct": {"type": "number", "minimum": 0, "maximum": 100},
+    "message": {"type": "string"}
+  }
+}

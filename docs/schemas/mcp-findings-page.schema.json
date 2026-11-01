@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clinicjs.org/schemas/mcp-findings-page.schema.json",
+  "title": "Clinic.js MCP findings page",
+  "type": "object",
+  "required": ["run_id", "snapshot_id", "sort", "expires_at", "items", "next_cursor", "has_more", "truncated", "low_information"],
+  "additionalProperties": false,
+  "properties": {
+    "run_id": {"type": "string", "minLength": 1},
+    "snapshot_id": {"type": "string", "minLength": 1},
+    "sort": {"type": "string", "minLength": 1},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "items": {"type": "array", "maxItems": 20, "items": {"$ref": "performance-report.schema.json#/$defs/finding"}},
+    "next_cursor": {"anyOf": [{"type": "null"}, {"type": "string", "minLength": 22, "pattern": "^[A-Za-z0-9_-]+$"}]},
+    "has_more": {"type": "boolean"},
+    "truncated": {"type": "boolean"},
+    "low_information": {"type": "boolean"}
+  }
+}

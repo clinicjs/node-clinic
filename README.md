@@ -141,6 +141,58 @@ Each of the tools has a programmable interface which you can read about in their
 - [Clinic.js Flame](https://github.com/clinicjs/node-clinic-flame)
 - [Clinic.js Heap Profiler](https://github.com/clinicjs/node-clinic-heap-profiler)
 
+## Profile a declared workload
+
+For repeatable runs, add a workload to `profile-workloads.json` in your project.
+Run it with Clinic Flame from that project directory:
+
+```sh
+node /path/to/node-clinic/bin/profile-clinic.js --workload smoke --param iterations=10
+```
+
+This command runs the `smoke` workload with Clinic Flame. It writes a JSON
+report and saves the profile files in `.clinic-runs/` in your project directory.
+
+## Use the profiling MCP server
+
+The MCP server reads `profile-workloads.json` from its configured working
+directory. Set `cwd` to the project you want to profile so workload definitions
+and `.clinic-runs/` stay with that project. Each workload lists the profilers it
+allows. For example, when `tok2vec` allows `clinic-flame`, start it with:
+
+```json
+{"workload":"tok2vec","profiler":"clinic-flame"}
+```
+
+Available profilers are `clinic-doctor`, `clinic-bubbleprof`, `clinic-flame`,
+and `clinic-heapprofiler`. The profiler must be listed for that workload in the
+project manifest.
+
+The MCP server can show available workloads and start a profile. Use
+`get_profile_findings` to see the highest impact findings first; long result
+lists are split into pages. Request individual finding details when needed.
+Profile files stay in the project and are not uploaded automatically.
+
+Example MCP configuration:
+
+```toml
+[mcp_servers.node-clinic]
+command = "node"
+args = ["/absolute/path/to/node-clinic/bin/profile-mcp.js"]
+cwd = "/absolute/path/to/your/project"
+```
+
+By default, profiling requires a configured Linux isolation provider. For a
+trusted local project, direct host execution can be enabled in the MCP server's
+environment:
+
+```toml
+CLINIC_PROFILE_ISOLATION = "disabled"
+```
+
+Alternatively, configure `CLINIC_PROFILE_SUPERVISOR = "systemd-bwrap"` on a
+Linux host with Bubblewrap and a working user systemd session.
+
 ## Profiling In [Podman](https://podman.io/) Container
 _Applicable for `doctor`, `bubbleprof`, `flame` or `heapprofiler`_
 

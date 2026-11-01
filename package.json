@@ -12,6 +12,9 @@
     "ci-lint": "standard | snazzy",
     "ci-test-no-cov": "tap --no-cov test/*.test.js",
     "ci-test-cov": "tap test/*.test.js",
+    "profile:clinic": "node bin/profile-clinic.js",
+    "profile:mcp": "node bin/profile-mcp.js",
+    "postinstall": "node scripts/patch-0x.js",
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {
@@ -19,6 +22,7 @@
     "@clinic/doctor": "^11.0.0",
     "@clinic/flame": "^13.0.0",
     "@clinic/heap-profiler": "^5.0.0",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "any-shell-escape": "^0.1.1",
     "async": "^3.0.1",
     "autocannon": "^7.5.0",
@@ -42,6 +46,9 @@
     "standard": "^17.0.0",
     "tap": "^16.0.0",
     "tar-stream": "^3.0.0"
+  },
+  "overrides": {
+    "0x": "6.0.0"
   },
   "keywords": [
     "performance",

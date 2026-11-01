@@ -9,27 +9,54 @@ const { collectClinicProfiler, PROFILERS } = require('../lib/profile-clinic-coll
 const path = require('node:path')
 const { compareReports, findingDetail, analyzeClinicDiagnostics } = require('../lib/profile-analyzer')
 const { createLinuxIsolationProvider, createBubblewrapSupervisor, createSystemdCgroupSupervisor } = require('../lib/profile-isolation-provider')
-const { readRepositoryMetadata, hashExecutable } = require('../lib/profile-reproducibility')
+const { readRepositoryMetadata, hashDependencyTree, combineToolchainDigest, readHostMeasurementConditions, createMeasurementEnvironment } = require('../lib/profile-reproducibility')
+const { pinExecutable } = require('../lib/profile-executable')
+const { createSourceRoots } = require('../lib/profile-source-roots')
+const { commandMetadata, parameterMetadata } = require('../lib/profile-command')
 
 async function main () {
   const manifestPath = process.env.CLINIC_PROFILE_MANIFEST || 'profile-workloads.json'
   const loaded = loadManifest(manifestPath, { trustedRoot: process.cwd() })
   const workspaceRoot = path.resolve(process.env.CLINIC_PROFILE_WORKSPACE || process.cwd())
+  const declaredInputRoot = process.env.CLINIC_PROFILE_INPUT_ROOT ? path.resolve(process.env.CLINIC_PROFILE_INPUT_ROOT) : null
+  const sourceRootsForWorkload = workloadId => createSourceRoots(loaded.manifest.profile_workloads[workloadId], workspaceRoot, declaredInputRoot)
   const repository = readRepositoryMetadata(workspaceRoot)
-  const runtime = { node_version: `node-${process.version}`, toolchain_digest: await hashExecutable(process.execPath) }
+  const workerExecutablePin = await pinExecutable(process.execPath)
+  const clinicDependencies = path.resolve(__dirname, '../node_modules')
+  const dependencyDigest = await hashDependencyTree(clinicDependencies)
+  const toolchainDigest = combineToolchainDigest(workerExecutablePin.hash, dependencyDigest)
+  const runtimeRoot = path.dirname(workerExecutablePin.path)
+  const runtime = { node_version: `node-${process.version}`, toolchain_digest: toolchainDigest }
   const runRoot = path.resolve(process.env.CLINIC_PROFILE_RUN_ROOT || path.join(process.cwd(), '.clinic-runs'))
-  const strictIsolation = process.env.CLINIC_PROFILE_ISOLATION !== 'disabled'
+  await runner.recoverArtifactStaging(runRoot)
+  await runner.cleanupExpiredArtifactRuns(runRoot)
+  const retentionSweep = setInterval(() => {
+    runner.cleanupExpiredArtifactRuns(runRoot).catch(error => {
+      process.stderr.write(`profile-mcp: expired artifact cleanup failed (${error.code || 'ARTIFACT_CLEANUP_FAILED'})\n`)
+    })
+  }, 60 * 60 * 1000)
+  retentionSweep.unref()
+  // MCP-triggered runs always require the declared isolation policy. Manual
+  // host profiling remains available through the profile:clinic CLI.
+  const strictIsolation = true
   let isolationProvider
   if (strictIsolation && process.env.CLINIC_PROFILE_ISOLATION_PROVIDER) {
     const providerModule = require(path.resolve(process.env.CLINIC_PROFILE_ISOLATION_PROVIDER))
     isolationProvider = typeof providerModule.createProvider === 'function'
-      ? providerModule.createProvider({ workspaceRoot, runtimeRoot: path.dirname(process.execPath), runRoot })
+      ? providerModule.createProvider({ workspaceRoot, runtimeRoot, runRoot, declaredInputRoot, workerExecutablePin })
       : providerModule
   } else if (strictIsolation && process.env.CLINIC_PROFILE_SUPERVISOR === 'systemd-bwrap') {
     isolationProvider = createLinuxIsolationProvider({
+      name: 'systemd-bubblewrap',
+      version: '1',
+      atomicExec: true,
+      atomicTargetExec: true,
+      completeInputFilesystem: true,
       supervisor: createBubblewrapSupervisor({
         workspaceRoot,
-        runtimeRoot: path.dirname(process.execPath),
+        runtimeRoot,
+        declaredInputRoot,
+        workerExecutablePin,
         cgroupSupervisor: createSystemdCgroupSupervisor()
       })
     })
@@ -37,11 +64,13 @@ async function main () {
   const runManager = runner.createRunManager(async options => {
     const profiler = options.profiler || 'clinic-flame'
     if (!PROFILERS.includes(profiler)) throw new Error(`unsupported Clinic profiler: ${profiler}`)
+    const conditionsStart = readHostMeasurementConditions()
     const result = await runner.runWorkload({
       ...options,
       manifest: loaded.manifest,
       manifestSource: loaded,
       rootDir: workspaceRoot,
+      runtimeRoot,
       runRoot,
       collector: collectorOptions => collectClinicProfiler(profiler, collectorOptions)
     })
@@ -54,17 +83,29 @@ async function main () {
         run_id: result.runId,
         workload: result.workload,
         profiler,
+        command: commandMetadata(loaded.manifest.profile_workloads[options.workload]),
+        parameters: parameterMetadata(options.parameters),
+        source_roots: sourceRootsForWorkload(options.workload),
         manifest_hash: loaded.hash,
         commit: repository.revision,
         repository: repository.identity,
         runtime,
-        isolation: createIsolationMetadata({ strictIsolation, isolationProvider, workload: loaded.manifest.profile_workloads[options.workload] }),
+        isolation: createIsolationMetadata({ isolationProvider, workload: loaded.manifest.profile_workloads[options.workload] }),
         artifact_ref: result.artifactRef,
+        input_digest: result.inputDigest,
         input: JSON.stringify(options.parameters || {}),
+        measurement_environment: createMeasurementEnvironment({
+          isolationMode: isolationProvider ? isolationProvider.name : 'direct-host',
+          schedulerMode: isolationProvider && isolationProvider.name === 'systemd-bubblewrap' ? 'systemd-cgroup-cpu-quota' : isolationProvider ? 'provider-defined' : 'host-default',
+          start: conditionsStart,
+          finish: readHostMeasurementConditions()
+        }),
         sample_count: result.profile.sample_count,
         measurement: result.measurement,
         started_at: result.startedAt,
-        finished_at: result.finishedAt
+        finished_at: result.finishedAt,
+        exit_code: result.exitCode,
+        termination_reason: result.terminationReason
       })
     }
     return result
@@ -82,14 +123,14 @@ async function main () {
     },
     analyzer: {
       compare: compareReports,
-      detail: (report, finding, options) => findingDetail(report, finding, { ...options, source_root: workspaceRoot })
+      detail: (report, finding, options) => findingDetail(report, finding, { ...options, source_roots: sourceRootsForWorkload(report.run.workload) })
     }
   })
   await serveSdk(server)
 }
 
-function createIsolationMetadata ({ strictIsolation, isolationProvider, workload }) {
-  const provider = strictIsolation ? isolationProvider : { name: 'direct-host', version: '1' }
+function createIsolationMetadata ({ isolationProvider, workload }) {
+  const provider = isolationProvider
   if (!provider || !provider.name || !provider.version) return null
   const limits = workload && workload.limits
   if (!limits || !workload.network) return null

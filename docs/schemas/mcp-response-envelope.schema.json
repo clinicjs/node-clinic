@@ -20,7 +20,8 @@
             "code": {"type": "string", "minLength": 1},
             "message": {"type": "string", "minLength": 1},
             "retryable": {"type": "boolean"},
-            "approval_token": {"type": "string", "minLength": 1}
+            "approval_token": {"type": "string", "minLength": 1},
+            "resource_cost_estimate": {"$ref": "#/$defs/resource_cost_estimate"}
           }
         }
       ]
@@ -40,17 +41,27 @@
             "low_information": {"type": "boolean"},
             "call_count": {"type": "integer", "minimum": 0},
             "scope": {"enum": ["response", "run", "session", "window"]},
-            "session_input_tokens_remaining": {"type": "integer", "minimum": 0},
-            "session_output_tokens_remaining": {"type": "integer", "minimum": 0},
-            "window_input_tokens_remaining": {"type": "integer", "minimum": 0},
-            "window_output_tokens_remaining": {"type": "integer", "minimum": 0},
-            "process_input_tokens_remaining": {"type": "integer", "minimum": 0},
-            "process_output_tokens_remaining": {"type": "integer", "minimum": 0},
-            "run_input_tokens_remaining": {"anyOf": [{"type": "integer", "minimum": 0}, {"type": "null"}]},
-            "run_output_tokens_remaining": {"anyOf": [{"type": "integer", "minimum": 0}, {"type": "null"}]}
+            "session_tokens_remaining": {"type": "integer", "minimum": 0},
+            "window_tokens_remaining": {"type": "integer", "minimum": 0},
+            "process_tokens_remaining": {"type": "integer", "minimum": 0},
+            "run_tokens_remaining": {"anyOf": [{"type": "integer", "minimum": 0}, {"type": "null"}]}
           }
         }
       ]
+    }
+  },
+  "$defs": {
+    "resource_cost_estimate": {
+      "type": "object",
+      "required": ["basis", "wall_clock_ms", "cpu_ms", "memory_mb", "artifact_mb"],
+      "additionalProperties": false,
+      "properties": {
+        "basis": {"const": "declared_limits"},
+        "wall_clock_ms": {"type": "integer", "minimum": 1},
+        "cpu_ms": {"type": "integer", "minimum": 1},
+        "memory_mb": {"type": "integer", "minimum": 1},
+        "artifact_mb": {"type": "integer", "minimum": 1}
+      }
     }
   },
   "allOf": [
@@ -69,7 +80,8 @@
               "code": {"type": "string", "minLength": 1},
               "message": {"type": "string", "minLength": 1},
               "retryable": {"type": "boolean"},
-              "approval_token": {"type": "string", "minLength": 1}
+              "approval_token": {"type": "string", "minLength": 1},
+              "resource_cost_estimate": {"$ref": "#/$defs/resource_cost_estimate"}
             }
           }
         }

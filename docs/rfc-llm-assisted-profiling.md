@@ -1,71 +1,145 @@
 # RFC: LLM-Assisted Profiling and Controlled Measurement Runs
 
-* Status: Partially implemented; this document also specifies future requirements
+* Status: Implemented for the local stdio workflow with Linux strict isolation
 * Authors: Clinic.js maintainers and contributors
 * Target: Clinic.js and an optional companion package
 * Last updated: 2026-11-01
 
 ## Current implementation status
 
-This RFC is a target design, not a complete description of the current runtime.
-The sections below use normative language for requirements that are not all
-implemented yet. The current MCP implementation provides:
+This RFC describes the supported local workflow and its runtime contracts.
+Optional deployment extensions such as authenticated network transport and
+cross-reconnect quota ledgers remain outside this local stdio scope. The current
+MCP implementation provides:
 
 * project-local `profile-workloads.json` discovery from the MCP server's `cwd`;
 * per-workload profiler allowlists and selection with `workload` plus `profiler`;
+* a manual `profile-clinic` CLI that uses the same four profiler adapters and
+  enforces each workload's profiler allowlist;
 * local stdio tools for workload listing, profiling, approval, status, bounded
   waiting, findings, comparison, finding detail, and cancellation;
 * collector code paths for Doctor, Bubbleprof, Flame, and Heap Profiler; and
 * findings pages with a default of 10 items and 8,000 characters, capped at 20
-  items and 20,000 characters. Cursors continue through the report's findings.
+  items and the 12,000-character per-response limit. Workload and artifact
+  listings also use opaque cursors bound to their session and immutable list
+  snapshot; artifact byte pages use bounded offsets. Cursors continue through
+  the report's findings. Pagination is reported by `has_more` and
+  `next_cursor`; on a findings page, `truncated` means a finding was compacted.
+  A terminal report response that omits trailing findings at record boundaries
+  marks `report.usage.truncated`; the complete report remains available to the
+  findings pagination tool.
+  Reports also state `summary.findings_truncated` when the analyzer's top-20
+  finding limit omitted lower-ranked records. Compatible comparisons return
+  bounded candidate-only, baseline-only, and changed finding summaries beside
+  the metric delta, and mark the finding comparison incomplete when either
+  report was capped.
 
 The current runner returns a queued run promptly, executes it asynchronously,
 exposes status, and connects cancellation to the collector child process group.
 `start_profile_run` returns the run credentials for reuse; `wait_profile_run`
 polls that same run until a terminal response or its bounded timeout. The server
 limits active runs, so a queued response must not trigger a duplicate start.
-Status polling has no meaningful progress percentage yet. The runner enforces
+Status polling exposes a coarse phase and progress estimate, not a completion
+time prediction. The runner enforces
 concurrent/stored-run limits and retention. Tool calls include estimated token
 usage and enforce per-call character caps plus run, session, time-window, and
 process-lifetime token quotas; estimates use UTF-8 byte length divided by four
-and are explicitly approximate. Defaults are 20,000 input and output characters
-per call, 30,000 estimated input/output tokens per run, 100,000 per session,
-30,000 per rolling hour, and 200,000 per server-process lifetime. Findings are sorted by
-severity and measured impact; opaque server-side cursors bind paging to the
+and are explicitly approximate. Defaults are 20,000 input characters and
+12,000 output characters per call, 64,000 combined estimated tokens per run,
+256,000 per session, 1,000,000 per rolling 24-hour window, and 2,000,000 per
+server-process lifetime. Deployments may lower these limits. Findings are sorted by
+measured impact by default (or a requested allowlisted sort); opaque server-side cursors bind paging to the
 session, run, findings snapshot, severity filter, sort, and expiry. The
 runner revalidates the startup manifest's canonical hash and file identity
 before launching a profile worker, rejecting content edits, ownership changes,
-and path replacement. It does not yet pin and revalidate the executable at
-each target spawn as specified below. It reports the canonical hash of the
-manifest loaded at startup, hashes
-the Node executable contents, and records a clean Git revision plus a hashed
-remote identity when available. Dirty or unavailable repository state makes
-compatibility null rather than claiming the checked-out commit describes the
-profiled source. End-to-end worker tests
+and path replacement. It resolves the selected executable to a real path and
+pins its file identity and SHA-256 digest before handing it to the isolation
+provider. The Linux Bubblewrap provider opens and mounts the pinned worker and
+target executable descriptors read-only; this descriptor mount is the
+worker's atomic-selection guarantee inside the user namespace. The worker
+revalidates the target pin before launch and collection when it is not running
+with that descriptor-backed guarantee. Strict MCP runs fail closed unless the
+bundled systemd-Bubblewrap provider or another configured provider guarantees
+atomic selection for both executables and the other sandbox requirements. It
+reports the canonical hash of the manifest loaded at startup, hashes the Node
+executable contents and the installed Clinic dependency tree into a descriptive
+toolchain digest at server startup. The digest is report metadata, not a run
+precondition. It records Clinic and operating-system versions,
+measurement input digests, and host-condition snapshots when available. Clean
+Git revision plus a hashed remote identity are included when available. Dirty
+or unavailable repository state makes compatibility null rather than claiming
+the checked-out commit describes the profiled source. Failed strict runs retain
+bounded partial artifacts when present. End-to-end worker tests
 cover Doctor, Bubbleprof, Flame, and Heap Profiler. `get_profile_status`
-returns the full report when a run is complete, rather than a compact summary.
+returns the report when a run is complete, rather than a compact summary; if
+the response budget requires omitting findings, it marks that omission and
+keeps the full report available for pagination.
 `get_profile_findings` supports summary and paginated findings modes.
+MCP responses sanitize control characters, terminal escapes, credentials, and
+absolute paths in returned strings. Findings, finding details, comparisons,
+and artifact pages carry a diagnostic classification; Clinic artifacts are
+classified as sensitive by default.
 `get_finding_detail` returns a bounded source-line window only when explicitly
-requested and the file resolves inside the project workspace. `get_profile_artifact`
+requested and the file resolves inside the project workspace or a declared
+read-only input mount. Flame findings
+also return their matching call-tree subtree when requested, capped by
+`top_k`, `max_depth`, a 500-node response bound, and the response character
+budget; other profiler adapters report call trees as unavailable because they
+do not preserve hierarchy. Oversized detail responses are pruned at tree-node
+and source-line boundaries and marked `truncated`. `get_profile_artifact`
 lists files under a run-scoped artifact reference and returns bounded base64
 pages only after checking the run capability, artifact handle, and safe path.
-Call trees are currently reported as unavailable because the adapters do not preserve
-hierarchy. Workloads with a bounded `measurement` plan run unprofiled warmups
+Artifact exports use a same-filesystem staging directory, fsync copied files
+and completion metadata (including creation and expiry times), verify each
+stored file against the manifest, then atomically rename into place. Startup
+removes only recognized staging directories whose owning process is no longer
+alive, and startup/hourly sweeps delete expired run artifacts.
+Workloads with a bounded `measurement` plan run unprofiled warmups
 and measured samples inside the Clinic worker; reports retain those samples
 and their median, and compatible comparisons include deterministic bootstrap
 intervals for each median and for the candidate delta. Workloads without a
 measurement plan still produce descriptive single-run comparisons with
 uncertainty marked unsupported.
-Strict isolation is enabled by default and fails closed without a configured
-provider; setting `CLINIC_PROFILE_ISOLATION=disabled` runs the declared workload
-directly on the host without that isolation boundary. The bundled Bubblewrap
-setup does not provide the required atomic executable-selection guarantee and
-therefore cannot currently run strict profiles; it fails closed.
+MCP-triggered runs always require strict isolation and fail closed without a
+configured provider. Direct host profiling is available only through the
+manual `profile-clinic` CLI and is not represented as an RFC-compliant MCP run.
+The bundled Linux provider is available with
+`CLINIC_PROFILE_SUPERVISOR=systemd-bwrap`. It combines a systemd user scope
+(CPU quota/accounting, memory and swap limits, task limit, and whole-scope
+termination) with Bubblewrap user, network, and PID namespaces. It mounts the
+worker and target Node executable through already-open read-only file
+descriptors, mounts the ELF interpreter and the runtime libraries required by
+the running Node process, exposes declared workload files and input mounts,
+and provides only private writable `/run/profile`, `/tmp`, and `HOME` paths.
+An end-to-end Fibonacci `clinic-flame` run has completed through this provider
+on Linux. Strict MCP runs still fail closed if the supervisor is not selected
+or its rootless user namespaces, Bubblewrap, or systemd user scope are
+unavailable. The provider mounts the Clinic package's installed `node_modules`
+tree read-only. The toolchain digest is descriptive metadata rather than a
+precondition for starting a profile.
+The bundled command requires Bubblewrap's `--bind-fd`, `--disable-userns`, and
+`--assert-userns-disabled` options; it has been tested with Bubblewrap 0.9.0.
+
+The bundled provider mounts `/run/profile` as a size-limited `tmpfs` using the
+workload's `artifact_mb` limit, drops `CAP_SYS_ADMIN`, and disables nested user
+namespaces so the workload cannot regain mount privileges to enlarge it. It
+requires Bubblewrap to confirm that nested user namespaces are disabled. The
+trusted worker streams completed files
+over a dedicated pipe; the host validates every relative path and the aggregate
+logical byte count before creating files under the run directory. The export
+path independently enforces the same exact limit before retaining files. The
+tmpfs also accounts for filesystem metadata, so a run may hit `ENOSPC` before
+the sum of file contents reaches the configured maximum.
 
 The MCP SDK adapter returns the `{request_id, ok, data, error, usage}` envelope
-as structured MCP content and validates its envelope shape. Some tool-specific
-payload schemas and several normative budgets and analysis flows remain target
-requirements until their corresponding behavior is implemented and verified.
+as structured MCP content. At runtime it validates the envelope, tool payloads,
+queued/running statuses, terminal performance reports, and findings pages
+against the checked-in JSON Schemas. It also applies report semantic checks for
+measurement medians, compatibility identity, duplicate finding/artifact IDs,
+and uncertainty values; findings pages check per-page ID uniqueness,
+cursor/`has_more` consistency, and that `truncated` matches compacted findings.
+Some cross-field checks remain implemented in tool-specific validators rather
+than represented directly in the JSON Schemas.
 
 ## Abstract
 
@@ -126,7 +200,7 @@ The first implementation is intentionally narrow:
 The target MVP also applies bounded context output: summary responses are
 capped at 2,000 characters, findings responses at 12,000 characters, and raw
 profiles are never returned automatically. Current findings pages default to
-8,000 characters and have a 20,000-character maximum.
+8,000 characters and share the 12,000-character per-response maximum.
 
 The original proposal used this rollout order; it is historical and does not
 describe the current implementation status above:
@@ -250,6 +324,14 @@ non-negative numeric value, and stops the measurement process group on
 cancellation or timeout. The measured values and their median are retained in
 the report; throughput is never inferred from profiler sampling.
 
+When `measurement` is omitted, `throughput.value_field` is required and the
+worker makes one bounded, unprofiled execution to obtain a descriptive
+throughput sample. The report records that single sample; comparisons may show
+the point delta but must mark uncertainty unsupported. This fallback is not a
+repeated measurement plan and does not qualify a regression as high confidence.
+Workloads with no meaningful throughput metric set `throughput` to `null` and
+do not run this extra sample.
+
 The root `scripts` object is developer-only metadata for convenient local
 commands. It is excluded from the security-sensitive execution path and is
 never invoked, resolved, or interpreted by MCP. MCP execution uses only the
@@ -290,9 +372,10 @@ and descendant-process cleanup. A provider may use a rootless container or an
 equivalent supervisor; process-group termination alone is insufficient because
 detached descendants can escape it.
 
-The filesystem layout for the Linux provider is fixed. The trusted repository
-revision and its declared, lockfile-pinned dependencies are mounted read-only
-under `/workspace`; the resolved Node executable and required runtime files are
+The filesystem layout for the Linux provider is fixed. The exact workload
+source files and declared inputs are mounted read-only under `/workspace`; the
+Clinic package's installed runtime dependencies are mounted read-only under
+`/clinic`. The resolved Node executable and required runtime files are
 mounted read-only under `/runtime`; and only `/run/profile` and a private
 temporary directory are writable. The process receives no host home directory,
 credential directory, or unrestricted `/tmp`. The runner resolves the
@@ -368,16 +451,19 @@ least 128 bits of cryptographic randomness. They are scoped to the owning
 run_id, artifact_ref)` and must never resolve a reference globally. A forged,
 expired, or cross-run handle returns the same not-found/unauthorized error.
 Capabilities and artifact handles have a 24-hour maximum TTL, are stored only
-as hashes, and are revoked when a run is cancelled, deleted, or its retention
-period expires. After a server restart, in-memory capabilities are invalid;
+as hashes, and are revoked when a run is deleted or its retention period
+expires. Cancellation stops execution; the owner's read capability remains
+valid through the retention period so terminal
+status and any retained partial diagnostics can be inspected. After a server
+restart, in-memory capabilities are invalid;
 persisted capabilities require an explicit deployment policy and key rotation.
 
 Proposed tools:
 
 * `list_profile_workloads` — list registered, allowed workloads;
 * `start_profile_run` — start an asynchronous bounded run;
-* `approve_profile_run` — acknowledge a human/policy approval for an expensive
-  run;
+* `approve_profile_run` — request explicit human confirmation through MCP
+  elicitation for an expensive run;
 * `get_profile_status` — return progress and completion status;
 * `wait_profile_run` — poll the same run until terminal status or a bounded
   caller timeout, returning the current state when the timeout elapses;
@@ -397,7 +483,7 @@ active run per server.
 ## Baseline comparison and reproducibility
 
 A comparison is valid only when the reports reference compatible workload
-manifests, commits or source revisions, Node.js and Clinic.js versions,
+manifests and the same repository identity, Node.js and Clinic.js versions,
 operating-system/architecture, profiler settings, input corpus, and isolation
 limits. Otherwise `compatibility` is `incompatible` and no regression ranking
 is emitted.
@@ -407,10 +493,18 @@ implicit "latest" run. The comparison object records both candidate and
 baseline sample counts, warmup counts, and uncertainty metadata, making the
 comparison self-contained for audit. Consumers must still resolve the
 referenced baseline report to validate environment and manifest compatibility.
+The MCP comparison response contains only the throughput delta and bounded
+summaries of candidate-only, baseline-only, and changed findings. Those finding
+changes are limited to the findings actually present in each report; the
+`complete` flag is false if either analyzer capped its finding list.
 Each report carries immutable compatibility metadata: manifest hash, profiler
 configuration, input/corpus digest, isolation provider and limits, runtime
 version, operating-system architecture, and repository revision identity. A
 consumer compares this metadata before calculating a regression.
+The input digest is derived from the canonical workload parameters and sorted
+declared input-mount identities and content digests. Strict runs verify each
+declared content digest again while opening the read-only mount; direct CLI
+runs verify the same declaration before profiling.
 The semantic validator also requires duplicated identity fields to agree:
 workload, profiler name, repository revision, runtime, and architecture must
 match their corresponding `run` fields. Configuration and isolation limits are
@@ -444,9 +538,17 @@ version, making the interval calculation statistically reproducible for
 identical input samples. The measurement samples themselves remain subject to
 CPU scheduling, thermal frequency scaling, background load, benchmark
 nondeterminism, and other host effects. The runner records CPU affinity,
-scheduler/isolation mode, thermal/power information when available, and these
-limitations in the report. The `confidence` field is derived from these
-recorded facts and adapter quality, not generated by the LLM. The
+scheduler/isolation mode, CPU governor and frequency, thermal information when
+available, and these limitations in the report. Start and finish observations
+are host snapshots; unavailable readings are `null`. The `confidence` field is
+derived from recorded evidence and adapter quality, not generated by the LLM.
+Flame findings are low below two profiler samples, medium from two through 99,
+and high at 100 or more; missing sample counts are low. Doctor issue
+classifications and single heap snapshots are medium confidence. Bubbleprof
+findings are low for one source event, medium for two through nine, and high
+for ten or more. Each finding records its `confidence_basis`; a report summary
+uses the lowest confidence among its findings, or `unsupported` when it has
+none. The
 manifest/report validator rejects `low_pct > high_pct` as a semantic rule
 because standard JSON Schema cannot compare sibling values.
 
@@ -457,6 +559,11 @@ The canonical machine-readable output is `report.json`:
 Every workload defines its own throughput unit and numerator/denominator in
 the manifest. Reports must include both `unit` and `definition`; workloads
 without a meaningful throughput metric use `null` rather than a generic value.
+Run metadata records a canonical executable identifier, the working directory
+relative to the workspace, and the argument count. It records validated numeric
+workload parameters separately and omits resolved host paths, argument values,
+and environment values that could contain secrets. The manifest hash identifies
+the exact command template.
 
 ```json
 {
@@ -466,8 +573,13 @@ without a meaningful throughput metric use `null` rather than a generic value.
     "workload": "tokenizer",
     "profiler": "clinic-flame",
     "commit": "0123456789abcdef0123456789abcdef01234567",
+    "clinic_version": "13.0.0",
+    "os_version": "linux-6.8.0",
     "node": "node-v24.21.0",
     "architecture": "linux-x64",
+    "status": "completed",
+    "exit_code": 0,
+    "termination_reason": "completed",
     "compatibility": {
       "schema_version": 1,
       "workload": "tokenizer",
@@ -475,11 +587,12 @@ without a meaningful throughput metric use `null` rather than a generic value.
       "profiler": {"name": "clinic-flame", "adapter_version": "1", "configuration_digest": "sha256-abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789", "canonicalization_version": "1"},
       "input_digest": "sha256-abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
       "isolation": {"provider": "rootless-cgroup-v2", "version": "1", "limits": {"wall_clock_ms": 120000, "cpu_ms": 120000, "memory_mb": 1024, "artifact_mb": 512, "network": "disabled"}},
-      "runtime": {"node_version": "node-v24.21.0", "toolchain_digest": "sha256-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"},
+      "runtime": {"node_version": "node-v24.21.0", "clinic_version": "13.0.0", "os_version": "linux-6.8.0", "toolchain_digest": "sha256-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"},
       "architecture": "linux-x64",
       "repository": {"identity": "clinicjs/node-clinic", "revision": "0123456789abcdef0123456789abcdef01234567"}
     },
-    "status": "completed",
+    "command": {"executable": "node", "working_directory": ".", "argument_count": 5},
+    "parameters": {"iterations": 10, "warmup_iterations": 3},
     "lifecycle": {
       "created_at": "2026-11-01T12:00:00Z",
       "finished_at": "2026-11-01T12:00:31Z"
@@ -501,6 +614,7 @@ without a meaningful throughput metric use `null` rather than a generic value.
       "elapsed_ms": 1420
     },
     "confidence": "medium",
+    "findings_truncated": false,
     "capabilities": {
       "cpu_call_tree": "supported",
       "event_loop_delay": "unsupported",
@@ -550,6 +664,7 @@ without a meaningful throughput metric use `null` rather than a generic value.
       "evidence": {
         "adapter": "clinic-flame-v1",
         "adapter_schema_version": "1",
+        "confidence_basis": "profiler_sample_count",
         "sample_count": 10
       }
     }
@@ -625,6 +740,9 @@ The response contains `items`, `next_cursor`, and `has_more`. Clients pass
 `next_cursor` unchanged in the next request; they must not interpret or forge
 cursor contents. `page_size` is capped by the server, and a response with no
 remaining records returns `next_cursor: null` and `has_more: false`.
+`truncated` is true only when one or more returned findings were compacted to
+fit the character budget; merely having another page does not truncate the
+current page.
 Every findings page also returns `run_id`, `snapshot_id`, the canonical sort
 key, and `expires_at`. The server binds the opaque cursor to the requesting
 session, run, snapshot, sort key, and expiry; a mismatch or expired cursor
@@ -632,12 +750,19 @@ returns a structured `invalid_cursor` error.
 
 Ordering is part of the API contract. Findings default to descending measured
 impact: `total_cpu_time_pct` for CPU reports, event-loop delay for event-loop
-reports, retained bytes for heap reports, and absolute regression delta for
-comparisons. The client may request only an allowlisted sort field and
-direction. Ties are resolved by category, canonical source location, and
-finding ID, all in ascending order. The server creates the cursor from this
-complete sort key and a run snapshot, so records cannot move between pages
-during a query.
+reports, and retained or allocated bytes for heap reports. The client may
+request only an allowlisted sort field (`impact` or `severity`) and direction
+(`asc` or `desc`). Ties are resolved by category, canonical source location,
+and finding ID, all in ascending order. The server creates the opaque cursor
+from the selected sort, severity filter, and immutable findings snapshot, so
+records cannot move between pages during a query.
+
+The default information-density threshold is a quantified observation backed
+by at least two profiler samples (`evidence.sample_count >= 2`). This count is
+the profiler's sample count, not the independent benchmark measurement count.
+When the next page contains no finding above that threshold,
+`low_information` is true on the current page so a client can stop before
+fetching it. Deployments may lower the threshold to one quantified observation.
 
 The following token-efficiency rules are part of the MVP contract:
 
@@ -678,9 +803,11 @@ The target request policy is equivalent to:
 
 Clients may request a deeper level explicitly, but every field remains subject
 to the server's lower of the requested limit and the active budget.
-The target defaults are 12,000 response characters, 64,000 estimated tokens
-per run, 256,000 estimated tokens per MCP session, and 1,000,000 estimated
-tokens per 24-hour window; deployments may lower these values.
+The enforced defaults are 12,000 response characters, 64,000 combined
+estimated tokens per run, 256,000 combined estimated tokens per MCP session,
+and 1,000,000 combined estimated tokens per 24-hour window. The implementation
+also caps each server process at 2,000,000 estimated tokens. Deployments may
+lower these limits.
 
 The server may report `estimated_input_tokens` and `estimated_output_tokens`,
 but these are estimates because the connected client may use a different
@@ -730,9 +857,9 @@ inside the `parameters` object, not at the top level of the tool input:
 For a successful, approved workload, the current MCP implementation returns
 `queued` with `run_id` and `run_capability`; poll `get_profile_status` to see
 when the run reaches a terminal state. The response below is the MCP wire
-payload.
-The MCP SDK returns the tool's data or error payload directly. The envelope
-below is the internal facade response, not the MCP wire response:
+payload. The SDK exposes the common response envelope as structured content and
+includes its JSON serialization in text content; the facade and MCP wire shape
+are the same:
 
 ```json
 {
@@ -768,20 +895,24 @@ completion, the client requests:
 }
 ```
 
-The client can request one finding separately. The current detail response
-does not yet contain a real call tree or source context.
+The client can request one finding separately. Flame findings can return a
+bounded call-tree subtree; source context is returned only when requested and
+the source file resolves inside the project workspace. Other profiler adapters
+may report the call tree as unavailable.
 
-Currently, workloads with `wall_clock_ms > 30000` or `memory_mb > 512` require
-approval. `start_profile_run` returns `approval_required` with an
-`approval_token`; no cost estimate is produced. Call `approve_profile_run` with
-that token, then retry the same start request with the token. The token is bound
-to workload, profiler, and serialized parameters, and expires after 10 minutes.
-The manifest hash and estimated resource cost are not part of the current
-approval binding.
-
-The target design binds approval tokens to the workload key, manifest hash,
-profiler, validated parameters, and estimated resource cost. Any parameter,
-manifest, or policy change invalidates the token.
+Workloads with `wall_clock_ms > 30000` or `memory_mb > 512` require approval.
+`start_profile_run` returns `approval_required`, an `approval_token`, and a
+`resource_cost_estimate` whose basis is the manifest's declared wall-clock,
+CPU, memory, and artifact limits. This is a maximum resource envelope, not a
+prediction of actual consumption or a monetary price. Call `approve_profile_run`
+with that token. The MCP server uses form elicitation to show the workload,
+profiler, parameters, and resource envelope to the user, then accepts the
+approval only when the user explicitly confirms. Clients without elicitation
+support fail closed; calling the approval tool alone is not confirmation. After
+confirmation, retry the same start request with the token. The token is bound
+to the workload key, manifest hash, profiler, validated parameters, and resource
+estimate, and expires after 10 minutes. Any parameter, manifest, or limit
+change invalidates it.
 If approval races with cancellation or another approval, the first serialized
 state transition wins; a cancelled run is never spawned and a consumed token
 cannot be reused.
@@ -892,15 +1023,20 @@ Not proposed for the primary path. Exact aggregation and numerical comparison
 are more appropriate for CPU, latency, and memory data. Embeddings may be added
 later for searching historical human-written incident reports.
 
-## Open questions
+## Implementation decisions
 
-* Should the runner live in this repository or in a separate `clinic-insights`
-  package?
-* Which Clinic artifact formats can be normalized in the first release?
-* What default limits are appropriate for local development and CI?
-* Should baseline storage be a filesystem directory, SQLite, or another local
-  store?
-* Which MCP transports and client implementations should be supported first?
+* The opt-in CLI and MCP server live in this repository; they do not change the
+  existing Clinic commands.
+* The first implementation normalizes Doctor, Bubbleprof, Flame, and Heap
+  Profiler output through separate adapters.
+* The defaults are the bounded limits described in the Context and token
+  budgets section; deployments may lower them.
+* Completed reports are retained in the MCP process for the run retention
+  period, while raw artifacts are stored under the project's run directory.
+  Restarting the server revokes capabilities and in-memory reports, as required
+  by the capability lifecycle. Cross-restart baseline catalogs are not part of
+  this local stdio implementation.
+* Local stdio is the supported MCP transport. No network transport is exposed.
 
 ## Success criteria
 

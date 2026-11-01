@@ -63,6 +63,21 @@ test('measurement plan discards warmups and records bounded numeric samples', as
   t.end()
 })
 
+test('omitting a repeated plan captures one declared descriptive throughput sample', async t => {
+  const workload = options(JSON.stringify({ throughput: 7 }))
+  const result = await runMeasurementPlan(workload, null, {
+    unit: 'operations_per_second',
+    definition: 'completed operations divided by wall-clock seconds',
+    value_field: 'throughput'
+  })
+  t.same(result.samples, [7])
+  t.equal(result.sample_count, 1)
+  t.equal(result.warmup_count, 0)
+  t.equal(result.median, 7)
+  t.equal(workload.calls.length, 1)
+  t.end()
+})
+
 test('measurement plan rejects invalid JSON and undeclared metric values', async t => {
   const plan = { warmup_runs: 0, measured_runs: 2, max_wall_clock_ms: 2000, value_field: 'throughput' }
   await t.rejects(runMeasurementPlan(options('12'), plan, { unit: 'ops', definition: 'ops' }), { code: 'MEASUREMENT_INVALID_OUTPUT' })

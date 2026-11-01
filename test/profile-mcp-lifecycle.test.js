@@ -3,7 +3,12 @@
 const test = require('tap').test
 const Ajv2020 = require('ajv/dist/2020')
 const addFormats = require('ajv-formats')
+const fs = require('node:fs')
+const os = require('node:os')
+const path = require('node:path')
+const crypto = require('node:crypto')
 const { ProfileMcpServer } = require('../lib/profile-mcp')
+const { analyzeClinicFlame } = require('../lib/profile-analyzer')
 const reportSchema = require('../docs/schemas/performance-report.schema.json')
 const ajv = new Ajv2020({ allErrors: true, strict: false })
 addFormats(ajv)
@@ -47,6 +52,29 @@ test('start returns the queued state without waiting for run completion', async 
   t.end()
 })
 
+test('MCP cannot disable strict isolation through constructor options', async t => {
+  let startOptions
+  const server = new ProfileMcpServer({
+    workloads: {
+      smoke: {
+        profilers: ['clinic-flame'],
+        limits: { wall_clock_ms: 1000, memory_mb: 64 }
+      }
+    },
+    strictIsolation: false,
+    runner: {
+      start: async options => {
+        startOptions = options
+        return { runId: 'strict-mcp-run', status: 'queued' }
+      }
+    }
+  })
+  const response = await server.call('start_profile_run', { workload: 'smoke' }, 'req-strict')
+  t.equal(response.ok, true)
+  t.equal(startOptions.strict, true)
+  t.end()
+})
+
 test('status propagates running progress and then returns the completed report', async t => {
   let state = { status: 'running', startedAt: Date.parse('2026-11-01T12:00:01Z'), progress_pct: 35 }
   let statusRunId
@@ -64,11 +92,49 @@ test('status propagates running progress and then returns the completed report',
   const running = await server.call('get_profile_status', auth, 'req-running')
   t.equal(statusRunId, 'runner-status')
   t.equal(running.data.status, 'running')
+  t.equal(running.data.run_capability, auth.run_capability)
   t.equal(running.data.progress_pct, 35)
 
   state = { status: 'completed', runId: 'runner-status', report }
   const completed = await server.call('get_profile_status', auth, 'req-completed')
-  t.same(completed.data, report)
+  t.same(completed.data, {
+    ...report,
+    run: {
+      ...report.run,
+      command: { executable: 'configured-executable', working_directory: '.', argument_count: 0 },
+      parameters: {}
+    }
+  })
+  t.end()
+})
+
+test('oversized terminal reports drop whole findings and mark the response truncated', async t => {
+  const report = analyzeClinicFlame({
+    nodes: Array.from({ length: 20 }, (_, index) => ({
+      name: `function-${index}-${'x'.repeat(100)}`,
+      file: `src/${'y'.repeat(100)}.js`,
+      line: index + 1,
+      self_time_pct: 1,
+      total_time_pct: 10
+    }))
+  }, { workload: 'smoke', run_id: 'bounded-report' })
+  const server = new ProfileMcpServer({
+    workloads: { smoke: { profilers: ['clinic-flame'] } },
+    budgets: { maxOutputCharsPerCall: 4000 },
+    runner: { start: async () => ({ status: 'completed', report }) }
+  })
+  const started = await server.call('start_profile_run', { workload: 'smoke' })
+  const response = await server.call('get_profile_status', {
+    run_id: started.data.run_id,
+    run_capability: started.data.run_capability
+  })
+  t.equal(response.ok, true)
+  t.equal(response.data.usage.truncated, true)
+  t.equal(response.usage.truncated, true)
+  t.ok(response.data.findings.length < 20)
+  t.equal(validateReport(response.data), true, JSON.stringify(validateReport.errors))
+  t.equal(server.reports.get(started.data.run_id).findings.length, 20, 'the server retains the complete report for paged retrieval')
+  t.ok(JSON.stringify(response).length <= 4000)
   t.end()
 })
 
@@ -90,7 +156,14 @@ test('wait polls the same run until it returns the completed report', async t =>
     poll_interval_ms: 50
   }, 'req-wait')
   t.equal(polls, 2)
-  t.same(response.data, report)
+  t.same(response.data, {
+    ...report,
+    run: {
+      ...report.run,
+      command: { executable: 'configured-executable', working_directory: '.', argument_count: 0 },
+      parameters: {}
+    }
+  })
   t.end()
 })
 
@@ -133,10 +206,53 @@ test('status returns the runner failure details instead of hiding them', async t
 
   t.equal(response.ok, true)
   t.equal(response.data.run.status, 'failed')
+  t.equal(response.data.run.exit_code, null)
+  t.equal(response.data.run.termination_reason, 'failed')
   t.same(response.data.run.error, runError)
   t.equal(response.data.summary, null)
   t.equal(response.data.findings, null)
   t.equal(validateReport(response.data), true, JSON.stringify(validateReport.errors))
+  t.end()
+})
+
+test('terminal partial runs retain a run-scoped artifact reference', async t => {
+  const artifactRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'clinic-mcp-partial-'))
+  const artifactRef = `artifact_${crypto.randomBytes(16).toString('base64url')}`
+  const contents = Buffer.from('partial diagnostic')
+  const hash = `sha256-${crypto.createHash('sha256').update(contents).digest('hex')}`
+  const server = new ProfileMcpServer({
+    workloads: { smoke: { profilers: ['clinic-flame'], limits: { wall_clock_ms: 1000, memory_mb: 64 } } },
+    artifactRoot,
+    runner: {
+      start: async () => ({ runId: 'runner-partial', status: 'queued' }),
+      status: async () => ({
+        status: 'cancelled',
+        createdAt: new Date().toISOString(),
+        finishedAt: new Date().toISOString(),
+        error: { code: 'PROFILE_CANCELLED', message: 'cancelled', retryable: false },
+        artifactRef,
+        artifact: { files: [{ path: 'partial.clinic-data', size: contents.length, hash }] }
+      })
+    }
+  })
+  const started = await startRun(server)
+  const filePath = path.join(artifactRoot, started.data.run_id, 'artifacts', 'partial.clinic-data')
+  fs.mkdirSync(path.dirname(filePath), { recursive: true })
+  fs.writeFileSync(filePath, contents)
+  const credentials = { run_id: started.data.run_id, run_capability: started.data.run_capability }
+  const status = await server.call('get_profile_status', credentials)
+  t.equal(status.ok, true)
+  t.equal(status.data.run.status, 'cancelled')
+  const publicArtifactRef = status.data.artifacts[0].ref
+  t.match(publicArtifactRef, /^artifact_[A-Za-z0-9_-]{22}$/)
+  t.not(publicArtifactRef, artifactRef)
+  t.notOk(JSON.stringify(server.runs.get(started.data.run_id)).includes(artifactRef))
+  t.notOk(JSON.stringify(server.reports.get(started.data.run_id)).includes(artifactRef))
+  t.notOk(JSON.stringify([...server.artifactReferences.values()]).includes(artifactRef))
+  t.equal(validateReport(status.data), true, JSON.stringify(validateReport.errors))
+  const listing = await server.call('get_profile_artifact', { ...credentials, artifact_ref: publicArtifactRef })
+  t.equal(listing.ok, true)
+  t.same(listing.data.files.map(file => file.path), ['partial.clinic-data'])
   t.end()
 })
 

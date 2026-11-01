@@ -12,6 +12,10 @@
     "created_at": {"type": "string", "format": "date-time"},
     "started_at": {"type": "string", "format": "date-time"},
     "progress_pct": {"type": "number", "minimum": 0, "maximum": 100},
-    "message": {"type": "string"}
+    "phase": {"enum": ["queued", "preparing", "measuring", "profiling", "analyzing", "exporting", "completed", "failed", "timed_out", "cancelled", "partial"]},
+    "message": {"type": "string"},
+    "wait_timed_out": {"type": "boolean"},
+    "elapsed_ms": {"type": "number", "minimum": 0},
+    "next_poll_after_ms": {"type": "integer", "minimum": 1}
   }
 }

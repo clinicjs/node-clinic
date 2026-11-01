@@ -18,6 +18,7 @@ test('workload bindings are executable and unambiguous', t => {
   t.same(validateWorkloadBindings({ ...workload, parameters: { iterations: { type: 'integer', min: 10, max: 1, binding: { kind: 'argv', index: 2 } } } }).map(error => error.code), ['invalid_parameter_bounds'])
   t.same(validateWorkloadBindings({ ...workload, parameters: { iterations: { type: 'integer', min: 1, max: 10, binding: { kind: 'argv', index: 9 } } } }).map(error => error.code), ['binding_out_of_range'])
   t.same(validateWorkloadBindings({ ...workload, argv: [], env_allowlist: ['BAD-NAME'] }).map(error => error.code), ['invalid_environment_name', 'empty_argv', 'binding_out_of_range'])
+  t.same(validateWorkloadBindings({ ...workload, env_allowlist: ['NODE_OPTIONS'] }).map(error => error.code), ['forbidden_environment_name'])
   t.same(validateWorkloadBindings({ ...workload, parameters: { 'warm-up': { type: 'integer', min: 1, max: 2, binding: { kind: 'argv', index: 2 } } } }).map(error => error.code), ['invalid_parameter_name', 'binding_placeholder_mismatch', 'placeholder_count', 'unbound_placeholder'])
   t.same(validateWorkloadBindings({ ...workload, cwd: '/workspace/../etc' }).map(error => error.code), ['invalid_cwd'])
   t.same(validateWorkloadBindings({ ...workload, input_mounts: [{ source_root: 'workspace', source: '/etc/passwd', target: '/inputs/data', digest: 'sha256-' + 'a'.repeat(64) }] }).map(error => error.code), ['invalid_input_mount'])
@@ -57,11 +58,11 @@ test('accepts explicitly unsupported uncertainty without a confidence interval',
     profiler: { name: 'clinic-flame' },
     repository: { identity: 'repo', revision: 'c' },
     isolation: { provider: 'local', version: '1', limits: { wall_clock_ms: 1000, cpu_ms: 1000, memory_mb: 128, artifact_mb: 1, network: 'disabled' } },
-    runtime: { node_version: 'node-v1.0.0', toolchain_digest: 'sha256-' + 'b'.repeat(64) },
+    runtime: { node_version: 'node-v1.0.0', clinic_version: '13.0.0', os_version: 'linux-6.1', toolchain_digest: 'sha256-' + 'b'.repeat(64) },
     architecture: 'x'
   }
   const report = {
-    run: { status: 'completed', workload: 'w', profiler: 'clinic-flame', commit: 'c', node: 'node-v1.0.0', architecture: 'x', compatibility },
+    run: { status: 'completed', workload: 'w', profiler: 'clinic-flame', commit: 'c', clinic_version: '13.0.0', os_version: 'linux-6.1', node: 'node-v1.0.0', architecture: 'x', compatibility },
     findings: [],
     artifacts: [],
     comparison: {
@@ -73,6 +74,9 @@ test('accepts explicitly unsupported uncertainty without a confidence interval',
     }
   }
   t.same(validateReportSemantics(report), [])
+  report.run.clinic_version = '12.0.0'
+  t.equal(validateReportSemantics(report).some(error => error.path === 'run.compatibility.runtime.clinic_version'), true)
+  report.run.clinic_version = '13.0.0'
   report.comparison.candidate_uncertainty.low_pct = 9
   t.same(validateReportSemantics(report).map(error => error.code), ['invalid_uncertainty'])
   t.end()

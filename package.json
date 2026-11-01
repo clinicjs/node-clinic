@@ -20,11 +20,13 @@
     "lint": "standard --fix | snazzy"
   },
   "dependencies": {
+    "ajv": "^8.20.0",
     "@clinic/bubbleprof": "^10.0.0",
     "@clinic/doctor": "^11.0.0",
     "@clinic/flame": "^13.0.0",
     "@clinic/heap-profiler": "^5.0.0",
     "@modelcontextprotocol/sdk": "^1.32.2",
+    "ajv-formats": "^2.1.1",
     "any-shell-escape": "^0.1.1",
     "async": "^3.0.1",
     "autocannon": "^7.5.0",

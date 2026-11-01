@@ -1,5 +1,6 @@
 # clinic specific
-.clinic
+.clinic/
+.clinic_runs/
 deoptigate/
 *.tmp
 !test/fixtures/**/*.clinic-*

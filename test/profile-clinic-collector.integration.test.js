@@ -70,6 +70,8 @@ test('all Clinic collectors run through the worker and return profiler data', as
     if (profiler === 'clinic-flame') {
       t.ok(result.profile.sample_count > 0, 'Flame returns samples')
       t.ok(Array.isArray(result.profile.nodes), 'Flame returns call-tree nodes')
+      t.type(result.profile.call_tree, 'object', 'Flame preserves a hierarchical call tree for drill-down')
+      t.ok(Array.isArray(result.profile.call_tree.children), 'Flame call tree includes child frames')
     } else if (profiler === 'clinic-doctor') {
       t.type(result.profile.issues, 'object', 'Doctor returns issue analysis')
     } else if (profiler === 'clinic-bubbleprof') {

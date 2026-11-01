@@ -82,5 +82,15 @@ test('rejects invalid manifest semantics', t => {
   invalidMeasurement.profile_workloads.demo.measurement.max_wall_clock_ms = 1001
   fs.writeFileSync(file, JSON.stringify(invalidMeasurement))
   t.throws(() => loadManifest(file), error => error.code === 'INVALID_MANIFEST' && error.message.includes('measurement.max_wall_clock_ms'))
+  const descriptive = fixture()
+  delete descriptive.profile_workloads.demo.measurement
+  fs.writeFileSync(file, JSON.stringify(descriptive))
+  t.throws(() => loadManifest(file), error => error.code === 'INVALID_MANIFEST' && error.message.includes('throughput.value_field'))
+  descriptive.profile_workloads.demo.throughput.value_field = 'throughput'
+  fs.writeFileSync(file, JSON.stringify(descriptive))
+  t.doesNotThrow(() => loadManifest(file))
+  descriptive.profile_workloads.demo.throughput = null
+  fs.writeFileSync(file, JSON.stringify(descriptive))
+  t.doesNotThrow(() => loadManifest(file))
   t.end()
 })

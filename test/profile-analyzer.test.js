@@ -37,11 +37,25 @@ t.test('emits bounded profiler-neutral report', t => {
   })
   t.equal(report.schema_version, 1)
   t.equal(report.findings.length, 20)
+  t.equal(report.summary.findings_truncated, true)
   t.equal(report.findings[0].severity, 'high')
   t.equal(report.summary.throughput.unit, 'ops_per_second')
   t.equal(report.usage, null)
   t.notOk(Object.prototype.hasOwnProperty.call(report.findings[0].evidence, 'sample_count'))
   t.equal(report.run.compatibility.repository.revision, report.run.commit)
+  t.equal(report.run.exit_code, null)
+  t.equal(report.run.termination_reason, 'completed')
+  t.end()
+})
+
+t.test('records the exit code and termination reason supplied by the runner', t => {
+  const report = analyzeClinicFlame({ nodes: [] }, {
+    workload: 'demo',
+    exit_code: 7,
+    termination_reason: 'process_failed'
+  })
+  t.equal(report.run.exit_code, 7)
+  t.equal(report.run.termination_reason, 'process_failed')
   t.end()
 })
 
@@ -50,7 +64,17 @@ t.test('includes sample count only when collector provides a real count', t => {
   const withoutSamples = analyzeClinicFlame(profile, { workload: 'demo' })
   const withSamples = analyzeClinicFlame({ ...profile, sample_count: 17 }, { workload: 'demo', sample_count: 17 })
   t.notOk(Object.prototype.hasOwnProperty.call(withoutSamples.findings[0].evidence, 'sample_count'))
+  t.equal(withoutSamples.findings[0].confidence, 'low')
+  t.equal(withoutSamples.findings[0].evidence.confidence_basis, 'profiler_sample_count_unavailable')
   t.equal(withSamples.findings[0].evidence.sample_count, 17)
+  t.equal(withSamples.findings[0].confidence, 'medium')
+  t.equal(withSamples.findings[0].evidence.confidence_basis, 'profiler_sample_count')
+  const fromProfile = analyzeClinicFlame({ ...profile, sample_count: 17 }, { workload: 'demo' })
+  t.equal(fromProfile.findings[0].evidence.sample_count, 17)
+  t.equal(fromProfile.findings[0].confidence, 'medium')
+  const highConfidence = analyzeClinicFlame(profile, { workload: 'demo', sample_count: 100 })
+  t.equal(highConfidence.findings[0].confidence, 'high')
+  t.equal(highConfidence.summary.confidence, 'high')
   t.end()
 })
 
@@ -84,10 +108,12 @@ t.test('does not invent compatibility identity when metadata is missing', t => {
 })
 
 t.test('truncates profiler-derived labels and paths to bound report size', t => {
-  const report = analyzeClinicFlame({ nodes: [{ name: 'x'.repeat(10000), file: '/src/' + 'y'.repeat(10000), line: 1, self_time_pct: 1, total_time_pct: 10 }] }, { workload: 'demo' })
+  const report = analyzeClinicFlame({ nodes: [{ name: 'x'.repeat(10000), file: 'src/' + 'y'.repeat(10000), line: 1, self_time_pct: 1, total_time_pct: 10 }] }, { workload: 'demo' })
   t.ok(report.findings[0].title.length <= 240)
   t.ok(report.findings[0].location.file.length <= 240)
   t.ok(JSON.stringify(report).length < 2000)
+  const absolutePath = analyzeClinicFlame({ nodes: [{ name: 'outside', file: '/home/user/project.js', line: 1, total_time_pct: 1 }] }, { workload: 'demo' })
+  t.equal(absolutePath.findings[0].location, null)
   t.end()
 })
 
@@ -166,12 +192,35 @@ t.test('bootstraps repeated throughput measurements with a deterministic delta i
   t.end()
 })
 
+t.test('compares bounded finding deltas alongside throughput changes', t => {
+  const options = revision => ({
+    workload: 'fibonacci',
+    commit: revision,
+    repository: 'sha256-' + 'e'.repeat(64),
+    manifest_hash: 'sha256-' + 'a'.repeat(64),
+    runtime: { node_version: 'node-v24.21.0', toolchain_digest: 'sha256-' + 'b'.repeat(64) },
+    isolation: { provider: 'direct-host', version: '1', limits: { wall_clock_ms: 1000, cpu_ms: 1000, memory_mb: 128, artifact_mb: 1, network: 'disabled' } }
+  })
+  const report = (revision, names) => analyzeClinicFlame({
+    nodes: names.map(([name, total]) => ({ name, file: `src/${name}.js`, line: 1, self_time_pct: total / 2, total_time_pct: total })),
+    throughput: { value: revision === 'a'.repeat(40) ? 100 : 110, unit: 'ops_per_second', definition: 'completed operations / measured seconds' }
+  }, options(revision))
+  const baseline = report('a'.repeat(40), [['hot', 10], ['removed', 8]])
+  const candidate = report('b'.repeat(40), [['hot', 20], ['added', 12]])
+  const comparison = compareReports(candidate, baseline)
+  t.equal(comparison.compatibility, 'compatible')
+  t.equal(comparison.finding_changes.complete, true)
+  t.same(comparison.finding_changes.items.map(change => change.kind).sort(), ['baseline_only', 'candidate_only', 'changed'])
+  t.equal(comparison.finding_changes.total, 3)
+  t.end()
+})
+
 t.test('returns bounded source context only for paths inside the workspace', async t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'clinic-source-detail-'))
   const source = path.join(root, 'workload.js')
   fs.writeFileSync(source, 'one\ntwo\nthree\nfour\nfive\n')
   t.teardown(() => fs.rmSync(root, { recursive: true, force: true }))
-  const finding = { id: 'finding-001', location: { file: source, line: 3 } }
+  const finding = { id: 'finding-001', location: { file: 'workload.js', line: 3 } }
   const detail = findingDetail({}, finding, { source_root: root, source_context_lines: 3, top_k: 4, max_depth: 2 })
   t.equal(detail.call_tree, null)
   t.same(detail.source_context.lines, [{ line: 2, text: 'two' }, { line: 3, text: 'three' }, { line: 4, text: 'four' }])
@@ -179,5 +228,78 @@ t.test('returns bounded source context only for paths inside the workspace', asy
   const outside = findingDetail({}, { ...finding, location: { file: '/etc/passwd', line: 1 } }, { source_root: root, source_context_lines: 3 })
   t.equal(outside.source_context.available, false)
   t.equal(outside.source_context.reason, 'source_outside_workspace')
+
+  const normalized = analyzeClinicFlame({ nodes: [{ name: 'work', file: source, line: 2, total_time_pct: 50 }] }, { source_root: root })
+  t.same(normalized.findings[0].location, { file: 'workload.js', line: 2 })
+  const outsideProfile = analyzeClinicFlame({ nodes: [{ name: 'work', file: '/etc/passwd', line: 1, total_time_pct: 50 }] }, { source_root: root })
+  t.equal(outsideProfile.findings[0].location, null)
+
+  const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'clinic-source-outside-'))
+  fs.writeFileSync(path.join(outsideDir, 'secret.js'), 'secret')
+  fs.symlinkSync(outsideDir, path.join(root, 'linked'))
+  const symlinkFinding = { ...finding, location: { file: 'linked/secret.js', line: 1 } }
+  const symlinkDetail = findingDetail({}, symlinkFinding, { source_root: root, source_context_lines: 1 })
+  t.equal(symlinkDetail.source_context.available, false)
+  const symlinkProfile = analyzeClinicFlame({ nodes: [{ name: 'work', file: path.join(root, 'linked', 'secret.js'), line: 1, total_time_pct: 50 }] }, { source_root: root })
+  t.equal(symlinkProfile.findings[0].location, null)
+  fs.rmSync(outsideDir, { recursive: true, force: true })
+  t.end()
+})
+
+t.test('resolves source context only inside declared input mounts', async t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'clinic-declared-source-'))
+  const inputRoot = path.join(root, 'corpus')
+  fs.mkdirSync(inputRoot)
+  fs.writeFileSync(path.join(inputRoot, 'case.js'), 'first\nsecond\nthird\n')
+  t.teardown(() => fs.rmSync(root, { recursive: true, force: true }))
+  const sourceRoots = [
+    { root, virtualRoot: '/workspace', reportPrefix: '' },
+    { root: inputRoot, virtualRoot: '/inputs/corpus', reportPrefix: 'inputs/corpus' }
+  ]
+  const report = analyzeClinicFlame({ nodes: [{ name: 'inputWork', file: '/inputs/corpus/case.js', line: 2, total_time_pct: 40 }] }, {
+    workload: 'fibonacci',
+    source_roots: sourceRoots
+  })
+  t.same(report.findings[0].location, { file: 'inputs/corpus/case.js', line: 2 })
+  const detail = findingDetail(report, report.findings[0], { source_roots: sourceRoots, source_context_lines: 2 })
+  t.equal(detail.source_context.available, true)
+  t.same(detail.source_context.lines, [{ line: 1, text: 'first' }, { line: 2, text: 'second' }])
+  const undeclared = analyzeClinicFlame({ nodes: [{ name: 'secret', file: '/inputs/other/secret.js', line: 1, total_time_pct: 30 }] }, {
+    workload: 'fibonacci',
+    source_roots: sourceRoots
+  })
+  t.equal(undeclared.findings[0].location, null)
+  t.end()
+})
+
+t.test('returns a bounded call-tree slice for the selected Flame finding', t => {
+  const profile = {
+    nodes: [
+      { node_id: 'hot', name: 'hotFunction', total_time_pct: 60, self_time_pct: 20 },
+      { node_id: 'other', name: 'otherFunction', total_time_pct: 10, self_time_pct: 5 }
+    ],
+    call_tree: {
+      node_id: 'root',
+      name: '(root)',
+      total_time_pct: 100,
+      self_time_pct: 0,
+      children: [{
+        node_id: 'hot',
+        name: 'hotFunction',
+        total_time_pct: 60,
+        self_time_pct: 20,
+        children: [
+          { node_id: 'child-a', name: 'childA', total_time_pct: 30, self_time_pct: 10, children: [] },
+          { node_id: 'child-b', name: 'childB', total_time_pct: 20, self_time_pct: 5, children: [] }
+        ]
+      }]
+    }
+  }
+  const report = analyzeClinicFlame(profile)
+  const detail = findingDetail(report, report.findings[0], { top_k: 1, max_depth: 1 })
+  t.equal(detail.call_tree.root.name, 'hotFunction')
+  t.equal(detail.call_tree.root.children[0].name, 'childA')
+  t.equal(detail.call_tree.node_count, 2)
+  t.equal(detail.call_tree.truncated, true)
   t.end()
 })

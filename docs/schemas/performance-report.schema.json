@@ -6,6 +6,17 @@
   "required": ["schema_version", "run", "summary", "findings", "artifacts"],
   "additionalProperties": false,
   "$defs": {
+    "host_conditions": {
+      "type": "object",
+      "required": ["cpu_affinity", "cpu_governor", "cpu_frequency_khz", "thermal_millicelsius"],
+      "additionalProperties": false,
+      "properties": {
+        "cpu_affinity": {"anyOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+        "cpu_governor": {"anyOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+        "cpu_frequency_khz": {"anyOf": [{"type": "integer", "minimum": 0}, {"type": "null"}]},
+        "thermal_millicelsius": {"anyOf": [{"type": "integer"}, {"type": "null"}]}
+      }
+    },
     "error": {
       "type": "object",
       "required": ["code", "message", "retryable"],
@@ -56,8 +67,8 @@
       "required": ["samples", "sample_count", "warmup_count", "value_field", "max_wall_clock_ms", "elapsed_ms"],
       "additionalProperties": false,
       "properties": {
-        "samples": {"type": "array", "minItems": 2, "maxItems": 30, "items": {"type": "number", "minimum": 0}},
-        "sample_count": {"type": "integer", "minimum": 2, "maximum": 30},
+        "samples": {"type": "array", "minItems": 1, "maxItems": 30, "items": {"type": "number", "minimum": 0}},
+        "sample_count": {"type": "integer", "minimum": 1, "maximum": 30},
         "warmup_count": {"type": "integer", "minimum": 0, "maximum": 20},
         "value_field": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$"},
         "max_wall_clock_ms": {"type": "integer", "minimum": 1},
@@ -107,11 +118,13 @@
         }]},
         "runtime": {
           "type": "object",
-          "required": ["node_version", "toolchain_digest"],
+          "required": ["node_version", "clinic_version", "os_version", "toolchain_digest"],
           "additionalProperties": false,
           "properties": {
             "node_version": {"type": "string", "pattern": "^node-v[0-9]+\\.[0-9]+\\.[0-9]+$"},
-            "toolchain_digest": {"anyOf": [{"type": "string", "pattern": "^sha256-[a-f0-9]{64}$"}, {"type": "null"}]}
+            "toolchain_digest": {"anyOf": [{"type": "string", "pattern": "^sha256-[a-f0-9]{64}$"}, {"type": "null"}]},
+            "clinic_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$"},
+            "os_version": {"type": "string", "minLength": 1}
           }
         },
         "architecture": {"type": "string", "minLength": 1},
@@ -177,12 +190,13 @@
         "confidence": {"enum": ["low", "medium", "high", "unsupported"]},
         "evidence": {
           "type": "object",
-          "required": ["adapter", "adapter_schema_version"],
+          "required": ["adapter", "adapter_schema_version", "confidence_basis"],
           "additionalProperties": false,
           "properties": {
             "adapter": {"type": "string", "pattern": "^[a-z][a-z0-9-]*-v[0-9]+$"},
             "adapter_schema_version": {"type": "string", "pattern": "^[0-9]+$"},
-            "sample_count": {"type": "integer", "minimum": 1}
+            "sample_count": {"type": "integer", "minimum": 1},
+            "confidence_basis": {"enum": ["profiler_sample_count", "profiler_sample_count_unavailable", "doctor_issue_classification", "bubbleprof_event_sources", "heapprofiler_single_snapshot"]}
           }
         }
       }
@@ -192,16 +206,20 @@
     "schema_version": {"const": 1},
     "run": {
       "type": "object",
-      "required": ["id", "workload", "profiler", "commit", "node", "architecture", "status", "lifecycle", "compatibility"],
+      "required": ["id", "workload", "profiler", "commit", "clinic_version", "os_version", "node", "architecture", "status", "exit_code", "termination_reason", "lifecycle", "compatibility"],
       "additionalProperties": false,
       "properties": {
         "id": {"type": "string", "minLength": 1},
         "workload": {"type": "string", "minLength": 1},
         "profiler": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
         "commit": {"anyOf": [{"type": "string", "pattern": "^[a-f0-9]{40,64}$"}, {"type": "null"}]},
+        "clinic_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[A-Za-z0-9.-]+)?$"},
+        "os_version": {"type": "string", "minLength": 1},
         "node": {"type": "string", "pattern": "^node-v[0-9]+\\.[0-9]+\\.[0-9]+$"},
         "architecture": {"type": "string", "minLength": 1},
         "status": {"enum": ["completed", "failed", "timed_out", "cancelled", "partial"]},
+        "exit_code": {"anyOf": [{"type": "integer"}, {"type": "null"}]},
+        "termination_reason": {"type": "string", "minLength": 1, "maxLength": 128},
         "lifecycle": {
           "type": "object",
           "required": ["created_at"],
@@ -210,6 +228,22 @@
             "created_at": {"type": "string", "format": "date-time"},
             "finished_at": {"type": "string", "format": "date-time"}
           }
+        },
+        "command": {
+          "type": "object",
+          "required": ["executable", "working_directory", "argument_count"],
+          "additionalProperties": false,
+          "properties": {
+            "executable": {"type": "string", "minLength": 1, "maxLength": 256},
+            "working_directory": {"type": "string", "pattern": "^(?:\\.|[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*)$"},
+            "argument_count": {"type": "integer", "minimum": 0, "maximum": 1000}
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "maxProperties": 64,
+          "propertyNames": {"pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$"},
+          "additionalProperties": {"type": "integer"}
         },
         "error": {"anyOf": [{"$ref": "#/$defs/error"}, {"type": "null"}]},
         "compatibility": {"anyOf": [{"$ref": "#/$defs/compatibility"}, {"type": "null"}]}
@@ -239,12 +273,25 @@
       {"type": "null"},
       {
       "type": "object",
-      "required": ["duration_ms", "throughput", "confidence", "capabilities"],
+      "required": ["duration_ms", "throughput", "confidence", "capabilities", "findings_truncated"],
       "additionalProperties": false,
       "properties": {
         "duration_ms": {"type": "number", "minimum": 0},
         "throughput": {"anyOf": [{"$ref": "#/$defs/throughput"}, {"type": "null"}]},
         "measurement": {"anyOf": [{"$ref": "#/$defs/measurement"}, {"type": "null"}]},
+        "findings_truncated": {"type": "boolean"},
+        "measurement_environment": {
+          "type": "object",
+          "required": ["isolation_mode", "scheduler_mode", "start", "finish", "limitations"],
+          "additionalProperties": false,
+          "properties": {
+            "isolation_mode": {"type": "string", "minLength": 1},
+            "scheduler_mode": {"type": "string", "minLength": 1},
+            "start": {"$ref": "#/$defs/host_conditions"},
+            "finish": {"$ref": "#/$defs/host_conditions"},
+            "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}}
+          }
+        },
         "confidence": {"enum": ["low", "medium", "high", "unsupported"]},
         "capabilities": {
           "type": "object",
@@ -282,6 +329,18 @@
             "baseline_uncertainty": {"$ref": "#/$defs/uncertainty"},
             "delta_uncertainty": {"$ref": "#/$defs/uncertainty"},
             "delta_pct": {"type": "number"},
+            "finding_changes": {
+              "type": "object",
+              "required": ["scope", "complete", "items", "total", "truncated"],
+              "additionalProperties": false,
+              "properties": {
+                "scope": {"const": "reported_findings"},
+                "complete": {"type": "boolean"},
+                "items": {"type": "array", "maxItems": 20, "items": {"type": "object", "required": ["kind"], "properties": {"kind": {"enum": ["candidate_only", "baseline_only", "changed"]}}}},
+                "total": {"type": "integer", "minimum": 0},
+                "truncated": {"type": "boolean"}
+              }
+            },
             "compatibility": {"enum": ["compatible", "incompatible"]}
           },
           "allOf": [

@@ -47,3 +47,86 @@ replaceFile('lib/v8-log-to-ticks.js', [
 
 // 1.`]
 ])
+
+// on-net-listen relies on the owner property of async_hooks TCP resources.
+// Node 24 no longer assigns that property when TCPSERVERWRAP is initialized,
+// so Clinic's --on-port preload crashes before it can observe the listening
+// event. Observe Server instances directly instead.
+const onNetListenPath = path.join(__dirname, '..', 'node_modules', 'on-net-listen', 'index.js')
+const onNetListenPackagePath = path.join(__dirname, '..', 'node_modules', 'on-net-listen', 'package.json')
+if (fs.existsSync(onNetListenPath) && fs.existsSync(onNetListenPackagePath)) {
+  const source = fs.readFileSync(onNetListenPath, 'utf8')
+  const version = JSON.parse(fs.readFileSync(onNetListenPackagePath, 'utf8')).version
+  const isKnownAsyncHooksImplementation = source.includes("var hooks = require('async_hooks')") &&
+    source.includes('resource.owner.once') && source.includes('function oncluster (_, addr)')
+  if (version === '1.1.2' && isKnownAsyncHooksImplementation) {
+    fs.writeFileSync(onNetListenPath, `'use strict'
+
+const net = require('net')
+const events = require('events')
+const cluster = require('cluster')
+
+module.exports = onListening
+
+function onListening (onlistening) {
+  const e = new events.EventEmitter()
+  const originalListen = net.Server.prototype.listen
+
+  function listen (...args) {
+    this.once('listening', function () {
+      const addr = this.address()
+      if (addr) e.emit('listening', addr)
+    })
+    return originalListen.apply(this, args)
+  }
+
+  net.Server.prototype.listen = listen
+  cluster.on('listening', oncluster)
+  e.destroy = destroy
+
+  if (onlistening) e.on('listening', onlistening)
+
+  return e
+
+  function destroy () {
+    if (net.Server.prototype.listen === listen) {
+      net.Server.prototype.listen = originalListen
+    }
+    cluster.removeListener('listening', oncluster)
+  }
+
+  function oncluster (_, addr) {
+    e.emit('listening', addr)
+  }
+}
+`)
+  }
+}
+
+// Bubbleprof's --on-port control channel is a pipe, not a TCP socket. Read its
+// EOF as a stream so closing the parent's pipe reliably triggers the trace flush.
+const bubbleprofRoot = path.join(__dirname, '..', 'node_modules', '@clinic', 'bubbleprof')
+const bubbleprofPackagePath = path.join(bubbleprofRoot, 'package.json')
+const bubbleprofDetectPortPath = path.join(bubbleprofRoot, 'injects', 'detect-port.js')
+if (fs.existsSync(bubbleprofPackagePath) && fs.existsSync(bubbleprofDetectPortPath)) {
+  const version = JSON.parse(fs.readFileSync(bubbleprofPackagePath, 'utf8')).version
+  const source = fs.readFileSync(bubbleprofDetectPortPath, 'utf8')
+  const previousSignal = `function signal (fd, cb) {
+  const s = new net.Socket({ fd, readable: true, writable: false })
+  s.unref()
+  s.on('error', () => {})
+  s.on('close', cb)
+}`
+  if (version === '10.0.0' && (source.includes(previousSignal) || source.includes('autoClose: false'))) {
+    const patched = source
+      .replace("const net = require('net')\n", '')
+      .replace(previousSignal, `function signal (fd, cb) {
+  const stream = fs.createReadStream(null, { fd })
+  stream.on('error', () => {})
+  stream.on('end', cb)
+  stream.resume()
+}`)
+      .replace('fs.createReadStream(null, { fd, autoClose: false })', 'fs.createReadStream(null, { fd })')
+    fs.writeFileSync(bubbleprofDetectPortPath, patched)
+  }
+}

@@ -26,11 +26,11 @@ test('tracks estimated input/output tokens and enforces session and window budge
     now: () => now,
     budgets: {
       maxWindowInputTokens: 100,
-      maxWindowOutputTokens: 100,
+      maxWindowOutputTokens: 1000,
       maxSessionInputTokens: 100,
-      maxSessionOutputTokens: 100,
+      maxSessionOutputTokens: 1000,
       maxProcessInputTokens: 100,
-      maxProcessOutputTokens: 100,
+      maxProcessOutputTokens: 1000,
       windowMs: 1000
     }
   })
@@ -45,9 +45,52 @@ test('tracks estimated input/output tokens and enforces session and window budge
   t.equal(rejected.error.code, 'output_budget_exceeded')
 
   now += 1001
-  server.budgets.maxWindowOutputTokens = 100
+  server.budgets.maxWindowOutputTokens = 1000
   const afterWindow = await server.call('list_profile_workloads', {})
   t.equal(afterWindow.ok, true)
-  t.ok(afterWindow.usage.window_output_tokens_remaining < 100)
+  t.ok(afterWindow.usage.window_output_tokens_remaining < 1000)
+  t.end()
+})
+
+test('enforces a separate token budget for run-scoped requests', async t => {
+  let statusCalls = 0
+  const server = new ProfileMcpServer({
+    workloads: { fibonacci: { profilers: ['clinic-flame'] } },
+    runner: {
+      start: async () => ({ status: 'queued', runId: 'runner-run-budget' }),
+      status: async () => { statusCalls++; return { status: 'running' } }
+    }
+  })
+  const started = await server.call('start_profile_run', { workload: 'fibonacci' })
+  t.equal(started.ok, true)
+  t.ok(started.usage.run_input_tokens_remaining > 0)
+
+  const runId = started.data.run_id
+  server.budgets.maxRunInputTokens = server.runUsage.get(runId).inputTokens
+  const response = await server.call('get_profile_status', { run_id: runId, run_capability: started.data.run_capability })
+  t.equal(response.error.code, 'run_budget_exceeded')
+  t.equal(statusCalls, 0)
+  t.end()
+})
+
+test('does not poll a run after its output budget is exhausted', async t => {
+  let statusCalls = 0
+  const server = new ProfileMcpServer({
+    workloads: { fibonacci: { profilers: ['clinic-flame'] } },
+    runner: {
+      start: async () => ({ status: 'queued', runId: 'runner-output-budget' }),
+      status: async () => { statusCalls++; return { status: 'running' } }
+    }
+  })
+  const started = await server.call('start_profile_run', { workload: 'fibonacci' })
+  t.equal(started.ok, true)
+
+  server.budgets.maxRunOutputTokens = server.runUsage.get(started.data.run_id).outputTokens
+  const response = await server.call('get_profile_status', {
+    run_id: started.data.run_id,
+    run_capability: started.data.run_capability
+  })
+  t.equal(response.error.code, 'run_budget_exceeded')
+  t.equal(statusCalls, 0)
   t.end()
 })

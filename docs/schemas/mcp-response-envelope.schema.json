@@ -39,7 +39,15 @@
             "truncated": {"type": "boolean"},
             "low_information": {"type": "boolean"},
             "call_count": {"type": "integer", "minimum": 0},
-            "scope": {"enum": ["response", "run", "session", "window"]}
+            "scope": {"enum": ["response", "run", "session", "window"]},
+            "session_input_tokens_remaining": {"type": "integer", "minimum": 0},
+            "session_output_tokens_remaining": {"type": "integer", "minimum": 0},
+            "window_input_tokens_remaining": {"type": "integer", "minimum": 0},
+            "window_output_tokens_remaining": {"type": "integer", "minimum": 0},
+            "process_input_tokens_remaining": {"type": "integer", "minimum": 0},
+            "process_output_tokens_remaining": {"type": "integer", "minimum": 0},
+            "run_input_tokens_remaining": {"anyOf": [{"type": "integer", "minimum": 0}, {"type": "null"}]},
+            "run_output_tokens_remaining": {"anyOf": [{"type": "integer", "minimum": 0}, {"type": "null"}]}
           }
         }
       ]

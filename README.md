@@ -152,12 +152,21 @@ node /path/to/node-clinic/bin/profile-clinic.js --workload fibonacci --param ite
 
 This command runs the `fibonacci` workload with Clinic Flame. It writes a JSON
 report and saves the profile files in `.clinic-runs/` in your project directory.
+The checked-in workload uses three warmups and ten unprofiled throughput
+samples before Clinic collects the profile. The report stores those samples
+and their median; compatible comparisons use a deterministic bootstrap interval
+for the candidate's change against the selected baseline. Workloads without a
+measurement plan remain descriptive and report uncertainty as unsupported.
 
 ## Use the profiling MCP server
 
 The MCP server reads `profile-workloads.json` from its configured working
-directory. Set `cwd` to the project you want to profile so workload definitions
-and `.clinic-runs/` stay with that project. Each workload lists the profilers it
+directory once at startup, validates it, and keeps an immutable in-memory
+snapshot for that server process. Tool calls cannot add or change workload
+executables, and editing the JSON file while the server runs does not change its
+registered workloads; restart the server to load a reviewed manifest update.
+Set `cwd` to the project you want to profile so workload definitions and
+`.clinic-runs/` stay with that project. Each workload lists the profilers it
 allows. For example, when `fibonacci` allows `clinic-flame`, start it with:
 
 ```json
@@ -168,10 +177,15 @@ Available profilers are `clinic-doctor`, `clinic-bubbleprof`, `clinic-flame`,
 and `clinic-heapprofiler`. The profiler must be listed for that workload in the
 project manifest.
 
-The MCP server can show available workloads and start a profile. Use
-`get_profile_findings` to see the highest severity and impact findings first; long result
-lists are split into pages. Request individual finding details when needed.
-Profile files stay in the project and are not uploaded automatically.
+The MCP server can show available workloads and start a profile. `start_profile_run`
+returns a queued or running run; reuse its `run_id` and `run_capability` with
+`wait_profile_run` or `get_profile_status` until it completes. Use
+`get_profile_findings` to see the highest severity and impact findings first;
+long result lists are split into pages. Request individual finding details when needed.
+`get_profile_artifact` can list files for a completed run's `artifact_ref` and
+return bounded base64 pages when given one listed relative path. It requires
+the same `run_id` and `run_capability` as the run. Profile files stay in the
+project and are not uploaded automatically.
 
 Example MCP configuration:
 

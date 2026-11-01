@@ -10,7 +10,7 @@
     "argv": {"type": "array", "minItems": 1, "items": {"type": "string"}},
     "cwd": {"type": "string", "pattern": "^/workspace(?:/[A-Za-z0-9_-]+)*$"},
     "env_allowlist": {"type": "array", "items": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"}, "uniqueItems": true},
-    "profilers": {"type": "array", "const": ["clinic-flame"]},
+    "profilers": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["clinic-doctor", "clinic-bubbleprof", "clinic-flame", "clinic-heapprofiler"]}},
     "limits": {
       "type": "object",
       "required": ["wall_clock_ms", "cpu_ms", "memory_mb", "artifact_mb"],
@@ -67,6 +67,17 @@
       "properties": {
         "unit": {"type": "string", "minLength": 1},
         "definition": {"type": "string", "minLength": 1}
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "required": ["warmup_runs", "measured_runs", "max_wall_clock_ms", "value_field"],
+      "additionalProperties": false,
+      "properties": {
+        "warmup_runs": {"type": "integer", "minimum": 0, "maximum": 20},
+        "measured_runs": {"type": "integer", "minimum": 2, "maximum": 30},
+        "max_wall_clock_ms": {"type": "integer", "minimum": 1},
+        "value_field": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$"}
       }
     }
   }

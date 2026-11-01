@@ -75,10 +75,14 @@ t.test('worker input preserves the profiled workload cwd and removes temporary f
     })
   })
 
-  const result = await harness.collectClinicProfiler('clinic-flame', optionsFor(harness.dest))
+  const measurement = { warmup_runs: 2, measured_runs: 3, max_wall_clock_ms: 1000, value_field: 'throughput' }
+  const throughput = { unit: 'ops_per_second', definition: 'completed operations / measured seconds' }
+  const result = await harness.collectClinicProfiler('clinic-flame', optionsFor(harness.dest, { measurement, throughput }))
   const launch = await harness.spawned
 
   t.equal(workerInput.options.cwd, '/tmp/profiled-project')
+  t.same(workerInput.options.measurement, measurement)
+  t.same(workerInput.options.throughput, throughput)
   t.equal(launch.options.cwd, process.cwd())
   t.same(result, { profiler: 'clinic-flame', profile: { sample_count: 7 } })
   t.equal(await fs.stat(launch.paths.input).then(() => true, () => false), false)

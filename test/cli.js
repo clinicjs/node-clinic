@@ -40,8 +40,21 @@ function cli (settings, args, callback) {
         {},
         process.env,
         settings.env,
-        { NO_INSIGHT: '1', NO_UPDATE_NOTIFIER: '1' })
+        { NO_INSIGHT: '1', NO_UPDATE_NOTIFIER: '1' }),
+      detached: Boolean(settings.timeoutMs) && process.platform !== 'win32'
     })
+    let timedOut = false
+    const timeout = settings.timeoutMs && setTimeout(() => {
+      timedOut = true
+      if (process.platform !== 'win32') {
+        try {
+          process.kill(-program.pid, 'SIGKILL')
+        } catch {}
+      } else {
+        program.kill('SIGKILL')
+      }
+    }, settings.timeoutMs)
+
     if (settings.relayStderr) {
       program.stderr.pipe(process.stderr)
     }
@@ -73,9 +86,14 @@ function cli (settings, args, callback) {
         })
       }
     }, function (err, result) {
+      if (timeout) clearTimeout(timeout)
       process.once('exit', () => {
         rimraf.sync(tempdir)
       })
+
+      if (timedOut) {
+        err = new Error(`process timed out after ${settings.timeoutMs}ms\nstdout: ${JSON.stringify(result.stdout)}\nstderr: ${JSON.stringify(result.stderr)}`)
+      }
 
       callback(err,
         result ? result.stdout : null,

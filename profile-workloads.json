@@ -28,6 +28,12 @@
       "throughput": {
         "unit": "iterations_per_second",
         "definition": "completed iterations divided by measured wall-clock seconds"
+      },
+      "measurement": {
+        "warmup_runs": 3,
+        "measured_runs": 10,
+        "max_wall_clock_ms": 30000,
+        "value_field": "throughput"
       }
     }
   }

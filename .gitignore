@@ -1,5 +1,6 @@
 # clinic specific
 .clinic
+deoptigate/
 *.tmp
 !test/fixtures/**/*.clinic-*
 test/fixtures/**/ASK_MESSAGE

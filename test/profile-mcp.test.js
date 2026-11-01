@@ -3,6 +3,19 @@
 const test = require('tap').test
 const { ProfileMcpServer } = require('../lib/profile-mcp')
 
+test('registered workloads are an immutable in-memory snapshot', async t => {
+  const workloads = { fibonacci: { profilers: ['clinic-flame'], executable: 'bench.js' } }
+  const server = new ProfileMcpServer({ workloads })
+  workloads.fibonacci.executable = 'attacker.js'
+  workloads.attacker = { executable: 'attacker.js', profilers: ['clinic-flame'] }
+
+  t.equal(server.workloads.fibonacci.executable, 'bench.js')
+  t.notOk(server.workloads.attacker)
+  t.equal(Object.isFrozen(server.workloads), true)
+  t.equal(Object.isFrozen(server.workloads.fibonacci), true)
+  t.end()
+})
+
 test('MCP facade uses envelopes and session-bound capabilities', async t => {
   const runner = {
     start: async () => ({ status: 'completed', runId: 'runner-1' })
@@ -18,6 +31,31 @@ test('MCP facade uses envelopes and session-bound capabilities', async t => {
   const denied = await server.call('get_profile_status', { run_id: response.data.run_id, run_capability: 'wrong' }, 'req-2')
   t.equal(denied.ok, false)
   t.equal(denied.error.code, 'not_found')
+  t.end()
+})
+
+test('rejects invalid workload parameters before queueing a profile run', async t => {
+  let starts = 0
+  const server = new ProfileMcpServer({
+    workloads: {
+      fibonacci: {
+        profilers: ['clinic-flame'],
+        parameters: { iterations: { type: 'integer', min: 1, max: 10 } },
+        limits: { wall_clock_ms: 1000, memory_mb: 64 }
+      }
+    },
+    runner: { start: async () => { starts++; return { status: 'queued' } } }
+  })
+
+  const missing = await server.call('start_profile_run', { workload: 'fibonacci' })
+  const outOfRange = await server.call('start_profile_run', { workload: 'fibonacci', parameters: { iterations: 11 } })
+  const unknown = await server.call('start_profile_run', { workload: 'fibonacci', parameters: { iterations: 2, command: 'rm -rf .' } })
+
+  t.equal(missing.error.code, 'invalid_parameters')
+  t.equal(outOfRange.error.code, 'invalid_parameters')
+  t.equal(unknown.error.code, 'invalid_parameters')
+  t.equal(starts, 0)
+  t.equal(server.runs.size, 0)
   t.end()
 })
 

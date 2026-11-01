@@ -42,6 +42,25 @@ t.test('run manager abort waits for the run to stop', async t => {
   t.end()
 })
 
+t.test('run manager reports a stable error when cancellation wins before startup', async t => {
+  let executions = 0
+  const manager = createRunManager(async () => {
+    executions++
+    return { status: 'completed' }
+  })
+
+  await manager.start({ runId: 'run-cancel-before-start' })
+  const cancelled = await manager.cancel('run-cancel-before-start')
+  t.equal(executions, 0)
+  t.equal(cancelled.status, 'cancelled')
+  t.same(cancelled.error, {
+    code: 'PROFILE_CANCELLED',
+    message: 'Profile run was cancelled before it started',
+    retryable: false
+  })
+  t.end()
+})
+
 t.test('cancelling a workload terminates its detached process group', async t => {
   if (process.platform !== 'linux') {
     t.skip('process-group cancellation is verified on Linux')

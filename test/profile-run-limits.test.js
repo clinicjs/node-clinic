@@ -90,10 +90,10 @@ test('MCP prunes expired runs, reports, and approvals on the next run-scoped req
 
   const run = await server.call('start_profile_run', { workload: 'small' }, 'req-small')
   const approval = await server.call('start_profile_run', { workload: 'expensive' }, 'req-expensive')
-  const approvalToken = approval.error.approval_token
+  t.type(approval.error.approval_token, 'string')
   t.ok(server.runs.has(run.data.run_id))
   t.ok(server.reports.has(run.data.run_id))
-  t.ok(server.approvals.has(approvalToken))
+  t.equal(server.approvals.size, 1)
 
   now += 50
   const expired = await server.call('get_profile_status', {
@@ -105,5 +105,5 @@ test('MCP prunes expired runs, reports, and approvals on the next run-scoped req
   t.equal(expired.error.code, 'not_found')
   t.notOk(server.runs.has(run.data.run_id))
   t.notOk(server.reports.has(run.data.run_id))
-  t.notOk(server.approvals.has(approvalToken))
+  t.equal(server.approvals.size, 0)
 })

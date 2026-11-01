@@ -57,13 +57,27 @@ test('MCP SDK stdio initializes, lists tools, and starts a queued profile run', 
 
   const listed = await request('tools/list', {})
   t.ok(listed.result.tools.some(tool => tool.name === 'start_profile_run'))
+  t.ok(listed.result.tools.some(tool => tool.name === 'wait_profile_run'))
 
   const started = await request('tools/call', {
     name: 'start_profile_run',
     arguments: { workload: 'fibonacci', profiler: 'clinic-flame' }
   })
   t.equal(started.result.isError, false)
-  t.equal(started.result.structuredContent.status, 'queued')
-  t.equal(started.result.structuredContent.run_id.startsWith('run_'), true)
+  t.equal(started.result.structuredContent.ok, true)
+  t.equal(started.result.structuredContent.data.status, 'queued')
+  t.equal(started.result.structuredContent.data.run_id.startsWith('run_'), true)
+  const waited = await request('tools/call', {
+    name: 'wait_profile_run',
+    arguments: {
+      run_id: started.result.structuredContent.data.run_id,
+      run_capability: started.result.structuredContent.data.run_capability,
+      timeout_ms: 100,
+      poll_interval_ms: 50
+    }
+  })
+  t.equal(waited.result.isError, false)
+  t.equal(waited.result.structuredContent.ok, true)
+  t.equal(waited.result.structuredContent.data.wait_timed_out, true)
   t.end()
 })

@@ -40,6 +40,7 @@ async function main () {
     const result = await runner.runWorkload({
       ...options,
       manifest: loaded.manifest,
+      manifestSource: loaded,
       rootDir: workspaceRoot,
       runRoot,
       collector: collectorOptions => collectClinicProfiler(profiler, collectorOptions)
@@ -50,6 +51,7 @@ async function main () {
         : 0
       const duration = Number.isFinite(result.profile.duration_ms) ? result.profile.duration_ms : elapsed
       result.report = analyzeClinicDiagnostics(profiler, { ...result.profile, duration_ms: duration }, {
+        run_id: result.runId,
         workload: result.workload,
         profiler,
         manifest_hash: loaded.hash,
@@ -60,6 +62,7 @@ async function main () {
         artifact_ref: result.artifactRef,
         input: JSON.stringify(options.parameters || {}),
         sample_count: result.profile.sample_count,
+        measurement: result.measurement,
         started_at: result.startedAt,
         finished_at: result.finishedAt
       })
@@ -68,6 +71,8 @@ async function main () {
   })
   const server = new ProfileMcpServer({
     workloads: loaded.manifest.profile_workloads,
+    manifestHash: loaded.hash,
+    artifactRoot: runRoot,
     isolationProvider,
     strictIsolation,
     runner: {
@@ -77,7 +82,7 @@ async function main () {
     },
     analyzer: {
       compare: compareReports,
-      detail: findingDetail
+      detail: (report, finding, options) => findingDetail(report, finding, { ...options, source_root: workspaceRoot })
     }
   })
   await serveSdk(server)

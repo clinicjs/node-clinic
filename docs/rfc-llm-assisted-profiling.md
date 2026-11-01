@@ -13,46 +13,59 @@ implemented yet. The current MCP implementation provides:
 
 * project-local `profile-workloads.json` discovery from the MCP server's `cwd`;
 * per-workload profiler allowlists and selection with `workload` plus `profiler`;
-* local stdio tools for workload listing, profiling, approval, status, findings,
-  comparison, finding detail, and cancellation;
+* local stdio tools for workload listing, profiling, approval, status, bounded
+  waiting, findings, comparison, finding detail, and cancellation;
 * collector code paths for Doctor, Bubbleprof, Flame, and Heap Profiler; and
 * findings pages with a default of 10 items and 8,000 characters, capped at 20
   items and 20,000 characters. Cursors continue through the report's findings.
 
 The current runner returns a queued run promptly, executes it asynchronously,
 exposes status, and connects cancellation to the collector child process group.
+`start_profile_run` returns the run credentials for reuse; `wait_profile_run`
+polls that same run until a terminal response or its bounded timeout. The server
+limits active runs, so a queued response must not trigger a duplicate start.
 Status polling has no meaningful progress percentage yet. The runner enforces
-concurrent/stored-run limits and retention, but there are no per-call token
-estimates or per-session or time-window token quotas. Findings are sorted by
+concurrent/stored-run limits and retention. Tool calls include estimated token
+usage and enforce per-call character caps plus run, session, time-window, and
+process-lifetime token quotas; estimates use UTF-8 byte length divided by four
+and are explicitly approximate. Defaults are 20,000 input and output characters
+per call, 30,000 estimated input/output tokens per run, 100,000 per session,
+30,000 per rolling hour, and 200,000 per server-process lifetime. Findings are sorted by
 severity and measured impact; opaque server-side cursors bind paging to the
 session, run, findings snapshot, severity filter, sort, and expiry. The
-runner does not yet pin and revalidate the executable at launch as specified
-below. It reports the canonical hash of the manifest loaded at startup, hashes
-the Node executable contents, and records the Git revision plus a hashed remote
-identity when available; it sets compatibility to null when critical identity
-or isolation metadata is unavailable. End-to-end worker tests
+runner revalidates the startup manifest's canonical hash and file identity
+before launching a profile worker, rejecting content edits, ownership changes,
+and path replacement. It does not yet pin and revalidate the executable at
+each target spawn as specified below. It reports the canonical hash of the
+manifest loaded at startup, hashes
+the Node executable contents, and records a clean Git revision plus a hashed
+remote identity when available. Dirty or unavailable repository state makes
+compatibility null rather than claiming the checked-out commit describes the
+profiled source. End-to-end worker tests
 cover Doctor, Bubbleprof, Flame, and Heap Profiler. `get_profile_status`
 returns the full report when a run is complete, rather than a compact summary.
-The `detail_level` input is accepted but does not select the RFC's proposed
-response modes. `get_finding_detail` returns the selected finding with a
-placeholder one-node call tree; it does not read source files or return source
-context. Artifact references are included in reports, but there is no MCP tool
-to retrieve artifact files. The comparison code does not implement
-repeated-run sampling or a valid bootstrap interval, so comparisons must not
-be interpreted as the statistical regression analysis described later in
-this RFC.
+`get_profile_findings` supports summary and paginated findings modes.
+`get_finding_detail` returns a bounded source-line window only when explicitly
+requested and the file resolves inside the project workspace. `get_profile_artifact`
+lists files under a run-scoped artifact reference and returns bounded base64
+pages only after checking the run capability, artifact handle, and safe path.
+Call trees are currently reported as unavailable because the adapters do not preserve
+hierarchy. Workloads with a bounded `measurement` plan run unprofiled warmups
+and measured samples inside the Clinic worker; reports retain those samples
+and their median, and compatible comparisons include deterministic bootstrap
+intervals for each median and for the candidate delta. Workloads without a
+measurement plan still produce descriptive single-run comparisons with
+uncertainty marked unsupported.
 Strict isolation is enabled by default and fails closed without a configured
 provider; setting `CLINIC_PROFILE_ISOLATION=disabled` runs the declared workload
 directly on the host without that isolation boundary. The bundled Bubblewrap
 setup does not provide the required atomic executable-selection guarantee and
 therefore cannot currently run strict profiles; it fails closed.
 
-The MCP SDK adapter currently returns each tool's `data` or `error` payload
-directly as MCP content. The `{request_id, ok, data, error, usage}` envelope
-described below is the internal facade shape, not the current MCP wire payload.
-Treat the remaining normative sections, schemas, budgets, and example flows as
-target requirements until the corresponding behavior is implemented and
-verified.
+The MCP SDK adapter returns the `{request_id, ok, data, error, usage}` envelope
+as structured MCP content and validates its envelope shape. Some tool-specific
+payload schemas and several normative budgets and analysis flows remain target
+requirements until their corresponding behavior is implemented and verified.
 
 ## Abstract
 
@@ -196,6 +209,12 @@ directory, environment allowlist, resource limits, and network policy.
       "throughput": {
         "unit": "documents_per_second",
         "definition": "completed tokenizer documents divided by measured wall-clock seconds"
+      },
+      "measurement": {
+        "warmup_runs": 3,
+        "measured_runs": 10,
+        "max_wall_clock_ms": 30000,
+        "value_field": "throughput"
       }
     }
   }
@@ -220,6 +239,16 @@ unbound placeholders, duplicate bindings, and binding indices outside `argv`.
 JSON Schema validation alone is insufficient for these cross-field rules; the
 executable semantic validator is mandatory and is covered by executable
 positive and negative tests before a manifest is hashed.
+
+An optional `measurement` plan declares `warmup_runs` (0–20), `measured_runs`
+(2–30), `max_wall_clock_ms` (no greater than the workload limit), and a
+top-level `value_field` in the workload's JSON stdout record. The worker runs
+the fixed executable and argument vector without Clinic instrumentation for
+each warmup and measured sample, then runs Clinic once. It uses no shell, caps
+each stdout/stderr stream at 8 KiB, requires one JSON object with a finite
+non-negative numeric value, and stops the measurement process group on
+cancellation or timeout. The measured values and their median are retained in
+the report; throughput is never inferred from profiler sampling.
 
 The root `scripts` object is developer-only metadata for convenient local
 commands. It is excluded from the security-sensitive execution path and is
@@ -350,14 +379,20 @@ Proposed tools:
 * `approve_profile_run` — acknowledge a human/policy approval for an expensive
   run;
 * `get_profile_status` — return progress and completion status;
+* `wait_profile_run` — poll the same run until terminal status or a bounded
+  caller timeout, returning the current state when the timeout elapses;
 * `get_profile_findings` — return ranked findings with evidence;
-* `compare_profile_runs` — compare two completed reports; and
+* `compare_profile_runs` — compare two completed reports;
 * `get_finding_detail` — return a selected call-tree or source-location slice;
+* `get_profile_artifact` — list and page through files using a run-scoped
+  artifact reference; and
 * `cancel_profile_run` — cancel a queued or running run.
 
-Long-running operations return a `run_id` and are polled through
-`get_profile_status`. This prevents a single tool call from holding an LLM
-request open for the entire benchmark.
+Long-running operations return a `run_id` and `run_capability`. Callers can
+query that same run with `get_profile_status` or use `wait_profile_run` to
+poll internally for a bounded time. A queued or running response is not a
+reason to start the workload again. Concurrent starts are limited to one
+active run per server.
 
 ## Baseline comparison and reproducibility
 
@@ -390,22 +425,28 @@ not considered compatible because it can change scheduler and workload
 behavior.
 The comparison validator requires both candidate and baseline to be completed
 reports with non-null compatibility metadata and compares a canonical,
-order-independent serialization of those metadata objects.
+order-independent serialization of those metadata objects after excluding the
+repository revision. Repository identity must match across reports, but
+repository revision is expected to differ when measuring a candidate change
+against a baseline. Each report's repository revision must still match its own
+`run.commit` field.
 The report records the metric, units, direction
 (`higher_is_better` or `lower_is_better`), denominator, sample count, warmup
 count, and uncertainty method. A single sample may be displayed descriptively
 but cannot receive a high-confidence regression classification. The reference
-implementation uses repeated measured runs after warmup and reports a
-bootstrap 95% interval (or `unsupported` when the metric cannot be sampled
-reliably). Bootstrap uses a recorded fixed seed and algorithm version, making
-the interval calculation statistically reproducible for identical input
-samples. The measurement samples themselves remain subject to CPU scheduling,
-thermal frequency scaling, background load, benchmark nondeterminism, and
-other host effects. The runner records CPU affinity, scheduler/isolation mode,
-thermal/power information when available, and these limitations in the report.
-The `confidence` field is
-derived from these recorded facts and adapter quality, not generated by the
-LLM. Percentile bounds are percentages in the inclusive range 0–100; the
+implementation uses repeated measured runs after warmup and reports bootstrap
+95% intervals (or `unsupported` when the metric cannot be sampled reliably).
+Candidate and baseline intervals express each run's bootstrapped median as a
+percentage of its observed median (100% is the point estimate). The delta
+interval expresses the bootstrapped candidate change relative to the baseline
+median and may be negative. Bootstrap uses a recorded fixed seed and algorithm
+version, making the interval calculation statistically reproducible for
+identical input samples. The measurement samples themselves remain subject to
+CPU scheduling, thermal frequency scaling, background load, benchmark
+nondeterminism, and other host effects. The runner records CPU affinity,
+scheduler/isolation mode, thermal/power information when available, and these
+limitations in the report. The `confidence` field is derived from these
+recorded facts and adapter quality, not generated by the LLM. The
 manifest/report validator rejects `low_pct > high_pct` as a semantic rule
 because standard JSON Schema cannot compare sibling values.
 
@@ -451,6 +492,14 @@ without a meaningful throughput metric use `null` rather than a generic value.
       "unit": "documents_per_second",
       "definition": "completed tokenizer documents divided by measured wall-clock seconds"
     },
+    "measurement": {
+      "samples": [8000, 8150, 8120, 8200, 8090, 8140, 8080, 8160, 8110, 8126],
+      "sample_count": 10,
+      "warmup_count": 3,
+      "value_field": "throughput",
+      "max_wall_clock_ms": 30000,
+      "elapsed_ms": 1420
+    },
     "confidence": "medium",
     "capabilities": {
       "cpu_call_tree": "supported",
@@ -468,10 +517,11 @@ without a meaningful throughput metric use `null` rather than a generic value.
     "delta_pct": 12.8,
     "candidate_sample_count": 10,
     "candidate_warmup_count": 3,
-    "candidate_uncertainty": {"method": "bootstrap_95_ci", "algorithm_version": "1", "seed": 0, "low_pct": 8.1, "high_pct": 17.0},
+    "candidate_uncertainty": {"method": "bootstrap_95_ci", "algorithm_version": "1", "seed": 0, "low_pct": 98.1, "high_pct": 102.0},
     "baseline_sample_count": 10,
     "baseline_warmup_count": 3,
-    "baseline_uncertainty": {"method": "bootstrap_95_ci", "algorithm_version": "1", "seed": 0, "low_pct": 7.8, "high_pct": 16.2},
+    "baseline_uncertainty": {"method": "bootstrap_95_ci", "algorithm_version": "1", "seed": 0, "low_pct": 98.4, "high_pct": 101.7},
+    "delta_uncertainty": {"method": "bootstrap_95_ci", "algorithm_version": "1", "seed": 0, "low_pct": 8.1, "high_pct": 17.0},
     "compatibility": "compatible"
   },
   "findings": [
@@ -679,8 +729,8 @@ inside the `parameters` object, not at the top level of the tool input:
 
 For a successful, approved workload, the current MCP implementation returns
 `queued` with `run_id` and `run_capability`; poll `get_profile_status` to see
-when the run reaches a terminal state. The internal facade envelope is shown
-below; the MCP SDK returns its data or error payload directly.
+when the run reaches a terminal state. The response below is the MCP wire
+payload.
 The MCP SDK returns the tool's data or error payload directly. The envelope
 below is the internal facade response, not the MCP wire response:
 
@@ -742,6 +792,14 @@ terminated through the isolation provider and transitions to `cancelled` only
 after descendants are cleaned up. If artifacts were already produced, they are
 retained as classified partial diagnostics and referenced by the terminal
 report; otherwise analysis fields are unavailable.
+
+The current MCP refuses to claim cancellation when the configured runner has
+no cancellation operation, or when that operation returns before confirming a
+terminal state. It returns `cancellation_unavailable` or
+`cancellation_unconfirmed` and leaves the run available for status checks.
+Terminal failures, timeouts, and cancellations without a profile report are
+returned as schema-valid terminal reports with unavailable analysis fields and
+a stable error object.
 
 `iterations` and `warmup_iterations` have meaning only when declared by the
 workload manifest. A workload may instead define a fixed server lifetime or a

@@ -7,7 +7,9 @@
     "clinic": "bin.js"
   },
   "scripts": {
+    "pretest": "node scripts/patch-0x.js",
     "test": "standard | snazzy && tap --no-cov test/*.test.js",
+    "pretest-local": "node scripts/patch-0x.js",
     "test-local": "standard | snazzy && tap --no-cov test/*.test.js test-local/*.test.js",
     "ci-lint": "standard | snazzy",
     "ci-test-no-cov": "tap --no-cov test/*.test.js",

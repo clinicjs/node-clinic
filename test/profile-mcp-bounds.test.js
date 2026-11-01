@@ -81,10 +81,21 @@ test('finding cursors remain opaque and are bounded server-side', async t => {
   const args = { run_id: runId, run_capability: runCapability, page_size: 1 }
   const first = await server.call('get_profile_findings', args)
   t.ok(first.data.next_cursor)
-  t.ok(server.cursors.has(first.data.next_cursor))
+  t.notOk(server.cursors.has(first.data.next_cursor))
+  t.match([...server.cursors.keys()][0], /^[a-f0-9]{64}$/)
 
   await server.call('get_profile_findings', args)
   await server.call('get_profile_findings', args)
   t.equal(server.cursors.size, 2)
+  t.end()
+})
+
+test('summary detail mode avoids returning findings', async t => {
+  const { server, run_id: runId, run_capability: runCapability } = await setup(t)
+  const response = await server.call('get_profile_findings', { run_id: runId, run_capability: runCapability, detail_level: 'summary' })
+  t.equal(response.ok, true)
+  t.equal(response.data.total_findings, 4)
+  t.same(response.data.severity_counts, { high: 2, medium: 1, low: 1 })
+  t.notOk(Object.prototype.hasOwnProperty.call(response.data, 'items'))
   t.end()
 })

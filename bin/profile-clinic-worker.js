@@ -5,6 +5,7 @@ const fs = require('node:fs/promises')
 const path = require('node:path')
 const childProcess = require('node:child_process')
 const { collectClinicProfilerDirect } = require('../lib/profile-clinic-collector')
+const { runMeasurementPlan } = require('../lib/profile-measurement')
 
 async function main () {
   const [, , inputPath, resultPath] = process.argv
@@ -13,7 +14,18 @@ async function main () {
   const targetCwd = input.options.cwd
   const collectorCwd = path.resolve(input.options.dest)
   const shimPath = path.join(collectorCwd, `.clinic-cwd-${process.pid}.js`)
+  const cancellation = new AbortController()
+  const onTerminate = () => cancellation.abort()
+  process.once('SIGTERM', onTerminate)
+  process.once('SIGINT', onTerminate)
   try {
+    const measurement = await runMeasurementPlan({
+      nodePath: input.options.nodePath,
+      args: input.options.args,
+      cwd: targetCwd,
+      env: input.options.env,
+      signal: cancellation.signal
+    }, input.options.measurement, input.options.throughput)
     const targetExecutable = path.resolve(input.options.nodePath)
     const targetSpawnCwd = input.profiler === 'clinic-heapprofiler' ? targetCwd : collectorCwd
     const originalSpawn = childProcess.spawn
@@ -35,11 +47,13 @@ async function main () {
       ].filter(Boolean).join(' ')
     }
     const value = await collectClinicProfilerDirect(input.profiler, input.options)
-    await fs.writeFile(resultPath, JSON.stringify({ value }), { mode: 0o600, flag: 'wx' })
+    await fs.writeFile(resultPath, JSON.stringify({ value: { ...value, measurement } }), { mode: 0o600, flag: 'wx' })
   } catch (error) {
     await fs.writeFile(resultPath, JSON.stringify({ error: { code: error.code, message: error.message || String(error) } }), { mode: 0o600, flag: 'wx' })
     process.exitCode = 1
   } finally {
+    process.removeListener('SIGTERM', onTerminate)
+    process.removeListener('SIGINT', onTerminate)
     await fs.rm(shimPath, { force: true })
     for (const entry of await fs.readdir(collectorCwd).catch(() => [])) {
       if (/^node_trace\.\d+\.log$/.test(entry)) await fs.rm(path.join(collectorCwd, entry), { force: true })

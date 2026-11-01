@@ -26,8 +26,8 @@
             "method": {"const": "bootstrap_95_ci"},
             "algorithm_version": {"type": "string", "minLength": 1},
             "seed": {"type": "integer", "minimum": 0},
-            "low_pct": {"type": "number", "minimum": 0, "maximum": 100},
-            "high_pct": {"type": "number", "minimum": 0, "maximum": 100}
+            "low_pct": {"type": "number"},
+            "high_pct": {"type": "number"}
           }
         },
         {
@@ -49,6 +49,19 @@
         "value": {"type": "number", "minimum": 0},
         "unit": {"type": "string", "minLength": 1},
         "definition": {"type": "string", "minLength": 1}
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "required": ["samples", "sample_count", "warmup_count", "value_field", "max_wall_clock_ms", "elapsed_ms"],
+      "additionalProperties": false,
+      "properties": {
+        "samples": {"type": "array", "minItems": 2, "maxItems": 30, "items": {"type": "number", "minimum": 0}},
+        "sample_count": {"type": "integer", "minimum": 2, "maximum": 30},
+        "warmup_count": {"type": "integer", "minimum": 0, "maximum": 20},
+        "value_field": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$"},
+        "max_wall_clock_ms": {"type": "integer", "minimum": 1},
+        "elapsed_ms": {"type": "integer", "minimum": 0}
       }
     },
     "compatibility": {
@@ -231,6 +244,7 @@
       "properties": {
         "duration_ms": {"type": "number", "minimum": 0},
         "throughput": {"anyOf": [{"$ref": "#/$defs/throughput"}, {"type": "null"}]},
+        "measurement": {"anyOf": [{"$ref": "#/$defs/measurement"}, {"type": "null"}]},
         "confidence": {"enum": ["low", "medium", "high", "unsupported"]},
         "capabilities": {
           "type": "object",
@@ -266,6 +280,7 @@
             "baseline_sample_count": {"type": "integer", "minimum": 1},
             "baseline_warmup_count": {"type": "integer", "minimum": 0},
             "baseline_uncertainty": {"$ref": "#/$defs/uncertainty"},
+            "delta_uncertainty": {"$ref": "#/$defs/uncertainty"},
             "delta_pct": {"type": "number"},
             "compatibility": {"enum": ["compatible", "incompatible"]}
           },
@@ -273,7 +288,7 @@
             {
               "if": {"properties": {"compatibility": {"const": "compatible"}}},
               "then": {
-                "required": ["candidate_sample_count", "candidate_warmup_count", "candidate_uncertainty", "baseline_sample_count", "baseline_warmup_count", "baseline_uncertainty", "delta_pct"]
+                "required": ["candidate_sample_count", "candidate_warmup_count", "candidate_uncertainty", "baseline_sample_count", "baseline_warmup_count", "baseline_uncertainty", "delta_uncertainty", "delta_pct"]
               },
               "else": {
                 "not": {
@@ -284,6 +299,7 @@
                     {"required": ["baseline_sample_count"]},
                     {"required": ["baseline_warmup_count"]},
                     {"required": ["baseline_uncertainty"]},
+                    {"required": ["delta_uncertainty"]},
                     {"required": ["delta_pct"]}
                   ]
                 }
@@ -309,7 +325,7 @@
         }}
       ]
     },
-    "usage": {
+    "usage": {"anyOf": [{"type": "null"}, {
       "type": "object",
       "required": ["estimated_input_tokens", "estimated_output_tokens", "token_counts_are_estimates", "truncated"],
       "additionalProperties": false,
@@ -322,7 +338,7 @@
         "call_count": {"type": "integer", "minimum": 0},
         "scope": {"enum": ["response", "run", "session", "window"]}
       }
-    }
+    }]}
   },
   "allOf": [
     {
@@ -332,7 +348,7 @@
           "summary": {"not": {"type": "null"}},
           "findings": {"not": {"type": "null"}},
           "artifacts": {"not": {"type": "null"}},
-          "run": {"properties": {"compatibility": {"$ref": "#/$defs/compatibility"}}}
+          "run": {"properties": {"compatibility": {"anyOf": [{"$ref": "#/$defs/compatibility"}, {"type": "null"}]}}}
         }
       }
     },
